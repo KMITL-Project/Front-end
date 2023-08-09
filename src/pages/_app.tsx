@@ -9,6 +9,7 @@ import { store } from "@/store/store";
 import ThemeProvider from "@/theme/ThemeProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import "@/style/globals.css";
 
 const { publicRuntimeConfig } = getConfig();
 
