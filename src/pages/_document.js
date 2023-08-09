@@ -16,9 +16,10 @@ export default function Document() {
           integrity="sha384-8QOKbPtTFvh/lMY0qPVbXj9hDh+v8US0pD//FcoYFst2lCIf0BmT58+Heqj0IGyx"
           crossOrigin="anonymous"
         />
+        <link href="/dist/output.css" rel="stylesheet"/>
       </Head> 
 
-      <body>
+      <body className="m-0">
         <Main />
         <NextScript />
       </body>

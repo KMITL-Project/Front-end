@@ -6,6 +6,9 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import getConfig from "next/config";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
+import ThemeProvider from "@/theme/ThemeProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -32,18 +35,21 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        {getLayout(<Component {...pageProps} />)}
-
-        {publicRuntimeConfig.DebugMode && (
-          <>
-            <ReactQueryDevtools />
-            <React.Suspense fallback={null}>
-              <ReactQueryDevtoolsProduction />
-            </React.Suspense>
-          </>
-        )}
-      </QueryClientProvider>
+      <ThemeProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <QueryClientProvider client={queryClient}>
+            {getLayout(<Component {...pageProps} />)}
+            {publicRuntimeConfig.DebugMode && (
+              <>
+                <ReactQueryDevtools />
+                <React.Suspense fallback={null}>
+                  <ReactQueryDevtoolsProduction />
+                </React.Suspense>
+              </>
+            )}
+          </QueryClientProvider>
+        </LocalizationProvider>
+      </ThemeProvider>
     </Provider>
   );
 }

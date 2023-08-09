@@ -1,4 +1,4 @@
-import MainLayout from "@/layout/MainLayout";
+import SidebarLayout from "@/layout/SidebarLayout";
 import { ReactElement } from "react";
 
 const Index = () => {
@@ -6,11 +6,7 @@ const Index = () => {
 };
 
 Index.getLayout = (page: ReactElement) => {
-  return (
-    <MainLayout>
-      {page}
-    </MainLayout>
-  );
+  return <SidebarLayout>{page}</SidebarLayout>;
 };
 
 export default Index;
