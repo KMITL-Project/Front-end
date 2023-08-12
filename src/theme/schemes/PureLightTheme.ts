@@ -591,7 +591,6 @@ export const PureLightTheme = createTheme({
         },
         outlinedSecondary: {
           backgroundColor: colors.alpha.white[100],
-
           "&:hover, &.MuiSelected": {
             backgroundColor: colors.alpha.black[5],
             color: colors.alpha.black[100],

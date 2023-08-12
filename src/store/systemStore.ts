@@ -1,14 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export interface CounterState {
   sidebarOpen: boolean;
+  expandMenu: string[];
 }
 
 const initialState: CounterState = {
   sidebarOpen: false,
+  expandMenu: [],
 };
 
-export const systemStore = createSlice({
+export const systemStore: any = createSlice({
   name: "counter",
   initialState,
   reducers: {
@@ -18,17 +20,21 @@ export const systemStore = createSlice({
     sidebarIsClose: (state) => {
       state.sidebarOpen = false;
     },
-    sideBarIsToggle: (state) => {
+    sidebarIsToggle: (state) => {
       state.sidebarOpen = !state.sidebarOpen;
     },
-    // incrementByAmount: (state, action: PayloadAction<number>) => {
-    //   state.value += action.payload;
-    // },
+    expandMenuIsOpen: (state, action: PayloadAction<string>) => {
+      state.expandMenu = [action.payload];
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { sidebarIsClose, sidebarIsOpen, sideBarIsToggle } =
-  systemStore.actions;
+export const {
+  sidebarIsClose,
+  sidebarIsOpen,
+  sidebarIsToggle,
+  expandMenuIsOpen,
+} = systemStore.actions;
 
 export default systemStore.reducer;

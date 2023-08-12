@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
-import React, { ReactElement, ReactNode } from "react";
+import React, { ReactElement, ReactNode, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import getConfig from "next/config";
@@ -10,6 +10,7 @@ import ThemeProvider from "@/theme/ThemeProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import "@/style/globals.css";
+import { usePathname, useSearchParams } from "next/navigation";
 
 const { publicRuntimeConfig } = getConfig();
 

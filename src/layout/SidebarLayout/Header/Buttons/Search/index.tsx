@@ -40,7 +40,6 @@ const DialogWrapper = styled(Dialog)(
     .MuiDialog-container {
         height: auto;
     }
-    
     .MuiDialog-paperScrollPaper {
         max-height: calc(100vh - 64px)
     }

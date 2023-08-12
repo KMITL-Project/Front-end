@@ -6,6 +6,7 @@ import {
   styled,
   Button,
   ListItem,
+  Collapse,
 } from "@mui/material";
 
 import DesignServicesTwoToneIcon from "@mui/icons-material/DesignServicesTwoTone";
@@ -28,9 +29,12 @@ import WorkspacePremiumTwoToneIcon from "@mui/icons-material/WorkspacePremiumTwo
 import CameraFrontTwoToneIcon from "@mui/icons-material/CameraFrontTwoTone";
 import DisplaySettingsTwoToneIcon from "@mui/icons-material/DisplaySettingsTwoTone";
 
-import Link from "next/link";
-import { useDispatch } from "react-redux";
-import { sidebarIsClose } from "@/store/systemStore";
+import { useDispatch, useSelector } from "react-redux";
+import { expandMenuIsOpen, sidebarIsClose } from "@/store/systemStore";
+import { useState } from "react";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { IMenu, menuSidebar } from "@/config/menuSidebar";
+import { RootState } from "@/store/store";
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -42,14 +46,14 @@ const MenuWrapper = styled(Box)(
     }
   }
 
-    .MuiListSubheader-root {
-      text-transform: uppercase;
-      font-weight: bold;
-      font-size: ${theme.typography.pxToRem(12)};
-      color: ${theme.colors.alpha.trueWhite[50]};
-      padding: ${theme.spacing(0, 2.5)};
-      line-height: 1.4;
-    }
+  .MuiListSubheader-root {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: ${theme.typography.pxToRem(12)};
+    color: ${theme.colors.alpha.trueWhite[50]};
+    padding: ${theme.spacing(0, 2.5)};
+    line-height: 1.4;
+  }
 `
 );
 
@@ -175,30 +179,14 @@ const SubMenuWrapper = styled(Box)(
 );
 
 const SidebarMenu = () => {
+  const expandMenu = useSelector(
+    (state: RootState) => state.systemStore.expandMenu
+  );
   const dispatch = useDispatch();
 
   return (
     <>
       <MenuWrapper>
-        <List component="div">
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/overview"
-                  startIcon={<DesignServicesTwoToneIcon />}
-                >
-                  Overview
-                </Button>
-              </ListItem>
-            </List>
-          </SubMenuWrapper>
-        </List>
         <List
           component="div"
           subheader={
@@ -212,9 +200,8 @@ const SidebarMenu = () => {
               <ListItem component="div">
                 <Button
                   disableRipple
-                  component={Link}
                   onClick={() => {
-                    dispatch(sidebarIsClose);
+                    dispatch(sidebarIsClose());
                   }}
                   href="/dashboards/crypto"
                   startIcon={<BrightnessLowTwoToneIcon />}
@@ -225,9 +212,8 @@ const SidebarMenu = () => {
               <ListItem component="div">
                 <Button
                   disableRipple
-                  component={Link}
                   onClick={() => {
-                    dispatch(sidebarIsClose);
+                    dispatch(sidebarIsClose());
                   }}
                   href="/dashboards/messenger"
                   startIcon={<MmsTwoToneIcon />}
@@ -238,331 +224,81 @@ const SidebarMenu = () => {
             </List>
           </SubMenuWrapper>
         </List>
-        <List
-          component="div"
-          subheader={
-            <ListSubheader component="div" disableSticky>
-              Management
-            </ListSubheader>
-          }
-        >
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/transactions"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                  Transactions List
-                </Button>
-              </ListItem>
+        {menuSidebar.map((header, indexHeader) => {
+          return (
+            <List
+              key={"header-" + indexHeader}
+              component="div"
+              subheader={
+                <ListSubheader component="div" disableSticky>
+                  {header.name}
+                </ListSubheader>
+              }
+            >
+              <SubMenuWrapper>
+                <List component="div">
+                  {header.menus.map((menu: IMenu, indexMenu: number) => {
+                    const open =
+                      expandMenu.findIndex(
+                        (value) =>
+                          value ===
+                          "header-" + indexHeader + "menu-" + indexMenu
+                      ) !== -1;
+
+                    return (
+                      <div key={"menu-" + indexMenu}>
+                        <ListItem component="div">
+                          <Button
+                            disableRipple
+                            onClick={() => {
+                              dispatch(
+                                expandMenuIsOpen(
+                                  "header-" + indexHeader + "menu-" + indexMenu
+                                )
+                              );
+                              dispatch(sidebarIsClose());
+                            }}
+                            href={menu.href}
+                            startIcon={menu.icon}
+                          >
+                            {menu.name}
+                            {menu.subMenu.length !== 0 &&
+                              (open ? <ExpandLess /> : <ExpandMore />)}
+                          </Button>
+                        </ListItem>
+                        {menu.subMenu.length != 0 && (
+                          <Collapse in={open} timeout="auto" unmountOnExit>
+                            {menu.subMenu.map((subMenu, indexSubMenu) => {
+                              return (
+                                <ListItem
+                                  component="div"
+                                  key={"sub-menu-" + indexSubMenu}
+                                >
+                                  <Button
+                                    sx={{
+                                      paddingLeft: "55px !important",
+                                    }}
+                                    disableRipple
+                                    onClick={() => {
+                                      dispatch(sidebarIsClose());
+                                    }}
+                                    href={subMenu.href}
+                                  >
+                                    {subMenu.name}
+                                  </Button>
+                                </ListItem>
+                              );
+                            })}
+                          </Collapse>
+                        )}
+                      </div>
+                    );
+                  })}
+                </List>
+              </SubMenuWrapper>
             </List>
-          </SubMenuWrapper>
-        </List>
-        <List
-          component="div"
-          subheader={
-            <ListSubheader component="div" disableSticky>
-              Accounts
-            </ListSubheader>
-          }
-        >
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/profile/details"
-                  startIcon={<AccountCircleTwoToneIcon />}
-                >
-                  User Profile
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/profile/settings"
-                  startIcon={<DisplaySettingsTwoToneIcon />}
-                >
-                  Account Settings
-                </Button>
-              </ListItem>
-            </List>
-          </SubMenuWrapper>
-        </List>
-        <List
-          component="div"
-          subheader={
-            <ListSubheader component="div" disableSticky>
-              Components
-            </ListSubheader>
-          }
-        >
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/buttons"
-                  startIcon={<BallotTwoToneIcon />}
-                >
-                  Buttons
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/modals"
-                  startIcon={<BeachAccessTwoToneIcon />}
-                >
-                  Modals
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/accordions"
-                  startIcon={<EmojiEventsTwoToneIcon />}
-                >
-                  Accordions
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/tabs"
-                  startIcon={<FilterVintageTwoToneIcon />}
-                >
-                  Tabs
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/badges"
-                  startIcon={<HowToVoteTwoToneIcon />}
-                >
-                  Badges
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/tooltips"
-                  startIcon={<LocalPharmacyTwoToneIcon />}
-                >
-                  Tooltips
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/avatars"
-                  startIcon={<RedeemTwoToneIcon />}
-                >
-                  Avatars
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/cards"
-                  startIcon={<SettingsTwoToneIcon />}
-                >
-                  Cards
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/components/forms"
-                  startIcon={<TrafficTwoToneIcon />}
-                >
-                  Forms
-                </Button>
-              </ListItem>
-            </List>
-          </SubMenuWrapper>
-        </List>
-        <List
-          component="div"
-          subheader={
-            <ListSubheader component="div" disableSticky>
-              Extra Pages
-            </ListSubheader>
-          }
-        >
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/404"
-                  startIcon={<CheckBoxTwoToneIcon />}
-                >
-                  Error 404
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/500"
-                  startIcon={<CameraFrontTwoToneIcon />}
-                >
-                  Error 500
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/coming-soon"
-                  startIcon={<ChromeReaderModeTwoToneIcon />}
-                >
-                  Coming Soon
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/maintenance"
-                  startIcon={<WorkspacePremiumTwoToneIcon />}
-                >
-                  Maintenance
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/maintenance"
-                  startIcon={<WorkspacePremiumTwoToneIcon />}
-                >
-                  Maintenance
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/maintenance"
-                  startIcon={<WorkspacePremiumTwoToneIcon />}
-                >
-                  Maintenance
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/maintenance"
-                  startIcon={<WorkspacePremiumTwoToneIcon />}
-                >
-                  Maintenance
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/maintenance"
-                  startIcon={<WorkspacePremiumTwoToneIcon />}
-                >
-                  Maintenance
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/status/maintenance"
-                  startIcon={<WorkspacePremiumTwoToneIcon />}
-                >
-                  Maintenance
-                </Button>
-              </ListItem>
-            </List>
-          </SubMenuWrapper>
-        </List>
+          );
+        })}
       </MenuWrapper>
     </>
   );

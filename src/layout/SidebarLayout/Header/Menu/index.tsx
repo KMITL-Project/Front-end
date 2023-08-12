@@ -16,18 +16,15 @@ const ListWrapper = styled(Box)(
         .MuiTouchRipple-root {
             display: none;
         }
-        
         .MuiListItem-root {
             transition: ${theme.transitions.create(["color", "fill"])};
-            
             &.MuiListItem-indicators {
                 padding: ${theme.spacing(1, 2)};
-            
                 .MuiListItemText-root {
                     .MuiTypography-root {
                         &:before {
                             height: 4px;
-                            width: 22px;
+                            width: 30px;
                             opacity: 0;
                             visibility: hidden;
                             display: block;
@@ -40,13 +37,10 @@ const ListWrapper = styled(Box)(
                         }
                     }
                 }
-
                 &.active,
                 &:active,
                 &:hover {
-                
                     background: transparent;
-                
                     .MuiListItemText-root {
                         .MuiTypography-root {
                             &:before {
@@ -107,7 +101,6 @@ function HeaderMenu() {
           </ListItem>
           <ListItem
             classes={{ root: "MuiListItem-indicators" }}
-            button
             ref={ref}
             onClick={handleOpen}
           >

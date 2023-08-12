@@ -19,11 +19,7 @@ import HeaderUserbox from "./Userbox";
 import HeaderMenu from "./Menu";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import {
-  sideBarIsToggle,
-  sidebarIsClose,
-  sidebarIsOpen,
-} from "@/store/systemStore";
+import { sidebarIsOpen } from "@/store/systemStore";
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -45,12 +41,11 @@ const HeaderWrapper = styled(Box)(
 );
 
 function Header() {
+  const theme = useTheme();
   const sidebarStatus = useSelector(
     (state: RootState) => state.systemStore.sidebarOpen
   );
   const dispatch = useDispatch();
-
-  const theme = useTheme();
 
   return (
     <HeaderWrapper
@@ -94,7 +89,7 @@ function Header() {
             <IconButton
               color="primary"
               onClick={() => {
-                dispatch(sideBarIsToggle);
+                dispatch(sidebarIsOpen());
               }}
             >
               {!sidebarStatus ? (
