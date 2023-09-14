@@ -1,10 +1,12 @@
 import {
+  Box,
   Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
 } from "@mui/material";
+import PropTypes from 'prop-types';
 
 interface Props {
   children: React.ReactNode;
@@ -12,23 +14,19 @@ interface Props {
 
 const MainLayout = ({ children }: Props) => {
   return (
-    <div className="mt-10 ml-10">
+    <Box
+      sx={{
+        display: 'flex',
+        flex: 1,
+        height: '100%'
+      }}
+    >
       {children}
-      <Button variant="outlined">Outlined</Button>
-      <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Age</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          label="Age"
-        >
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
-        </Select>
-      </FormControl>
-    </div>
+    </Box>
   );
 };
-
+MainLayout.propTypes = {
+  children: PropTypes.node
+};
 export default MainLayout;
+
