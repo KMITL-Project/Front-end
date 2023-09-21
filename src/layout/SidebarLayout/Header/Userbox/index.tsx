@@ -21,6 +21,9 @@ import AccountBoxTwoToneIcon from "@mui/icons-material/AccountBoxTwoTone";
 import LockOpenTwoToneIcon from "@mui/icons-material/LockOpenTwoTone";
 import AccountTreeTwoToneIcon from "@mui/icons-material/AccountTreeTwoTone";
 import Link from "next/link";
+import NextLink from 'next/link';
+import { useRouter } from "next/router";
+
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -74,6 +77,10 @@ function HeaderUserbox() {
   const handleClose = (): void => {
     setOpen(false);
   };
+
+  const router = useRouter()
+
+  const currentRoute = router.pathname;
 
   return (
     <>
@@ -130,11 +137,18 @@ function HeaderUserbox() {
         </List>
         <Divider />
         <Box sx={{ m: 1 }}>
-          <Button href="/src/pages/signin.js"
-            target="" color="primary" fullWidth>
-            <LockOpenTwoToneIcon sx={{ mr: 1 }} />
-            Sign out
-          </Button>
+          <NextLink href="/login" passHref>
+            <Button
+              disableRipple
+              component="a"
+              target=""
+              color="primary"
+              fullWidth
+            >
+              <LockOpenTwoToneIcon sx={{ mr: 1 }} />
+              Sign out
+            </Button>
+          </NextLink>
         </Box>
       </Popover>
     </>

@@ -32,6 +32,12 @@ import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwo
 import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
 import { SidebarContext } from '@/contexts/SidebarContext copy';
+import DoorSlidingIcon from '@mui/icons-material/DoorSliding';
+import { Category, Inventory } from '@mui/icons-material';
+import CategoryIcon from '@mui/icons-material/Category';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import LayersIcon from '@mui/icons-material/Layers';
+
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -194,10 +200,10 @@ function SidebarMenu() {
           <SubMenuWrapper>
             <List component="div">
               <ListItem component="div">
-                <NextLink href="/dashboards/crypto" passHref>
+                <NextLink href="/dashboard/" passHref>
                   <Button
                     className={
-                      currentRoute === '/dashboards/crypto' ? 'active' : ''
+                      currentRoute === '/dashboard/' ? 'active' : ''
                     }
                     disableRipple
                     component="a"
@@ -255,10 +261,10 @@ function SidebarMenu() {
                 </NextLink>
               </ListItem>
               <ListItem component="div">
-                <NextLink href="/management/transactions" passHref>
+                <NextLink href="/management/" passHref>
                   <Button
                     className={
-                      currentRoute === '/management/transactions'
+                      currentRoute === '/management/'
                         ? 'active'
                         : ''
                     }
@@ -346,52 +352,52 @@ function SidebarMenu() {
           <SubMenuWrapper>
             <List component="div">
               <ListItem component="div">
-                <NextLink href="/management/transactions" passHref>
+                <NextLink href="/setup/shelf/" passHref>
                   <Button
                     className={
-                      currentRoute === '/management/transactions' ? 'active' : ''
+                      currentRoute === '/setup/shelf/' ? 'active' : ''
                     }
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
-                    startIcon={<BallotTwoToneIcon />}
+                    startIcon={<DoorSlidingIcon />}
                   >
                     Shelf
                   </Button>
                 </NextLink>
               </ListItem>
               <ListItem component="div">
-                <NextLink href="/components/modals" passHref>
+                <NextLink href="/setup/category/" passHref>
                   <Button
                     className={
-                      currentRoute === '/components/modals' ? 'active' : ''
+                      currentRoute === '/setup/category/' ? 'active' : ''
                     }
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
-                    startIcon={<BeachAccessTwoToneIcon />}
+                    startIcon={<CategoryIcon />}
                   >
                     Category
                   </Button>
                 </NextLink>
               </ListItem>
               <ListItem component="div">
-                <NextLink href="/components/accordions" passHref>
+                <NextLink href="/setup/unit/" passHref>
                   <Button
                     className={
-                      currentRoute === '/components/accordions' ? 'active' : ''
+                      currentRoute === '/setup/unit/' ? 'active' : ''
                     }
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
-                    startIcon={<EmojiEventsTwoToneIcon />}
+                    startIcon={<InventoryIcon />}
                   >
                     Unit of products
                   </Button>
                 </NextLink>
               </ListItem>
               <ListItem component="div">
-                <NextLink href="/components/tabs" passHref>
+                <NextLink href="/setup/tabs" passHref>
                   <Button
                     className={
                       currentRoute === '/components/tabs' ? 'active' : ''
@@ -399,7 +405,7 @@ function SidebarMenu() {
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
-                    startIcon={<FilterVintageTwoToneIcon />}
+                    startIcon={<LayersIcon />}
                   >
                     Materials type
                   </Button>

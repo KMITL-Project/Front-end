@@ -1,6 +1,6 @@
 // pages/login.tsx
 import React from 'react';
-import LoginForm from '../components/LogIn/LoginForm';
+import LoginForm from '../../components/Authen/LoginForm';
 
 const LoginPage: React.FC = () => {
   const handleLogin = (username: string, password: string) => {

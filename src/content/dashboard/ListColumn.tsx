@@ -245,10 +245,10 @@ import {
                 </AvatarWrapper>
                 <Box>
                   <Typography variant="h4" noWrap>
-                    Ethereum
+                    Profit
                   </Typography>
                   <Typography variant="subtitle1" noWrap>
-                    ETH
+                    Profit
                   </Typography>
                 </Box>
               </Box>
@@ -320,10 +320,10 @@ import {
                 </AvatarWrapper>
                 <Box>
                   <Typography variant="h4" noWrap>
-                    Cardano
+                    Loss
                   </Typography>
                   <Typography variant="subtitle1" noWrap>
-                    ADA
+                    Loss
                   </Typography>
                 </Box>
               </Box>

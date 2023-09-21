@@ -12,8 +12,8 @@ import RecentOrders from "@/content/Management/Transactions/RecentOrders";
 
 
 const Index = () => {
-  return <><>
-   <></></><RecentOrders></RecentOrders></>
+  return <>
+  <WatchList></WatchList></>
 
 
 
@@ -26,3 +26,6 @@ Index.getLayout = (page: ReactElement) => {
 
 
 export default Index;
+
+
+

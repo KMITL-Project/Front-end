@@ -26,7 +26,8 @@ import {
 } from '@mui/material';
 
 import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/models/crypto_order';
+import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
+import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
@@ -40,26 +41,26 @@ interface Filters {
   status?: CryptoOrderStatus;
 }
 
-const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
-  const map = {
-    failed: {
-      text: 'Failed',
-      color: 'error'
-    },
-    completed: {
-      text: 'Completed',
-      color: 'success'
-    },
-    pending: {
-      text: 'Pending',
-      color: 'warning'
-    }
-  };
+// const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
+//   const map = {
+//     failed: {
+//       text: 'Failed',
+//       color: 'error'
+//     },
+//     completed: {
+//       text: 'Completed',
+//       color: 'success'
+//     },
+//     pending: {
+//       text: 'Pending',
+//       color: 'warning'
+//     }
+//   };
 
-  const { text, color }: any = map[cryptoOrderStatus];
+//   const { text, color }: any = map[cryptoOrderStatus];
 
-  return <Label color={color}>{text}</Label>;
-};
+//   return <Label color={color}>{text}</Label>;
+// };
 
 const applyFilters = (
   cryptoOrders: CryptoOrder[],
@@ -183,26 +184,26 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
       )}
       {!selectedBulkActions && (
         <CardHeader
-          action={
-            <Box width={150}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={filters.status || 'all'}
-                  onChange={handleStatusChange}
-                  label="Status"
-                  autoWidth
-                >
-                  {statusOptions.map((statusOption) => (
-                    <MenuItem key={statusOption.id} value={statusOption.id}>
-                      {statusOption.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-          }
-          title="รายงาน"
+          // action={
+          //   // <Box width={150}>
+          //   //   <FormControl fullWidth variant="outlined">
+          //   //     <InputLabel>Status</InputLabel>
+          //   //     <Select
+          //   //       value={filters.status || 'all'}
+          //   //       onChange={handleStatusChange}
+          //   //       label="Status"
+          //   //       autoWidth
+          //   //     >
+          //   //       {statusOptions.map((statusOption) => (
+          //   //         <MenuItem key={statusOption.id} value={statusOption.id}>
+          //   //           {statusOption.name}
+          //   //         </MenuItem>
+          //   //       ))}
+          //   //     </Select>
+          //   //   </FormControl>
+          //   // </Box>
+          // }
+          title="Unit lists"
         />
       )}
       <Divider />
@@ -218,11 +219,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Order Details</TableCell>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Source</TableCell>
-              <TableCell align="right">Amount</TableCell>
-              <TableCell align="right">Status</TableCell>
+              <TableCell>Unit ID</TableCell>
+              <TableCell>Unit Name</TableCell>
+              <TableCell>Description</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -286,7 +285,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       {cryptoOrder.sourceDesc}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  {/* <TableCell align="right">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -302,11 +301,25 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                         `${cryptoOrder.currency}0,0.00`
                       )}
                     </Typography>
-                  </TableCell>
-                  <TableCell align="right">
+                  </TableCell> */}
+                  {/* <TableCell align="right">
                     {getStatusLabel(cryptoOrder.status)}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="right">
+                  <Tooltip title="View Order" arrow>
+                      <IconButton
+                        sx={{
+                          '&:hover': {
+                            background: theme.colors.info.lighter
+                          },
+                          color: theme.palette.info.main
+                        }}
+                        color="inherit"
+                        size="small"
+                      >
+                        <VisibilityTwoToneIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton
                         sx={{
