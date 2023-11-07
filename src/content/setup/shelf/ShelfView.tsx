@@ -1,6 +1,6 @@
 import { Card } from '@mui/material';
 import { Order } from '@/model/order';
-import RecentOrdersTable from './RecentOrdersTable';
+import RecentOrdersTable from './ShelfTable';
 import { subDays } from 'date-fns';
 
 function RecentOrders() {

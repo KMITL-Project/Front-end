@@ -37,7 +37,10 @@ import { Category, Inventory } from '@mui/icons-material';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import LayersIcon from '@mui/icons-material/Layers';
-
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import ListAltTwoToneIcon from '@mui/icons-material/ListAltTwoTone';
+import DescriptionTwoToneIcon from '@mui/icons-material/DescriptionTwoTone';
+import ShareLocationTwoToneIcon from '@mui/icons-material/ShareLocationTwoTone';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -290,49 +293,49 @@ function SidebarMenu() {
           <SubMenuWrapper>
             <List component="div">
               <ListItem component="div">
-                <NextLink href="/management/profile" passHref>
+                <NextLink href="/logistic/customerList" passHref>
                   <Button
                     className={
-                      currentRoute === '/management/profile' ? 'active' : ''
+                      currentRoute === '/logistic/customerList' ? 'active' : ''
                     }
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
-                    startIcon={<AccountCircleTwoToneIcon />}
+                    startIcon={<ListAltTwoToneIcon/>}
                   >
                     รายการลูกค้า
                   </Button>
                 </NextLink>
               </ListItem>
               <ListItem component="div">
-                <NextLink href="/management/profile/settings" passHref>
+                <NextLink href="/logistic/order" passHref>
                   <Button
                     className={
-                      currentRoute === '/management/profile/settings'
+                      currentRoute === '/logistic/order'
                         ? 'active'
                         : ''
                     }
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
-                    startIcon={<DisplaySettingsTwoToneIcon />}
+                    startIcon={<DescriptionTwoToneIcon />}
                   >
                     ใบสั่ง
                   </Button>
                 </NextLink>
               </ListItem>
               <ListItem component="div">
-                <NextLink href="/management/profile/settings" passHref>
+                <NextLink href="/logistic/tracking" passHref>
                   <Button
                     className={
-                      currentRoute === '/management/profile/settings'
+                      currentRoute === '/logistic/tracking'
                         ? 'active'
                         : ''
                     }
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
-                    startIcon={<DisplaySettingsTwoToneIcon />}
+                    startIcon={<ShareLocationTwoToneIcon />}
                   >
                     ติดตามการขนส่ง
                   </Button>
@@ -397,17 +400,32 @@ function SidebarMenu() {
                 </NextLink>
               </ListItem>
               <ListItem component="div">
-                <NextLink href="/setup/tabs" passHref>
+                <NextLink href="/setup/material" passHref>
                   <Button
                     className={
-                      currentRoute === '/components/tabs' ? 'active' : ''
+                      currentRoute === '/components/material' ? 'active' : ''
                     }
                     disableRipple
                     component="a"
                     onClick={closeSidebar}
                     startIcon={<LayersIcon />}
                   >
-                    Materials type
+                    Material type
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/setup/permission" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/components/permission' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<AdminPanelSettingsIcon />}
+                  >
+                    User Permission
                   </Button>
                 </NextLink>
               </ListItem>

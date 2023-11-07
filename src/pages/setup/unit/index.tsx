@@ -4,16 +4,20 @@ import PageHeader from '@/content/setup/unit/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 
-import RecentOrders from '@/content/setup/unit/RecentOrders';
+import RecentOrders from '@/content/setup/unit/UnitView';
 import { ReactElement } from 'react';
+import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
+  const pageData: string = 'Home/Unit'; // ระบุเส้นทางของหน้าปัจจุบัน
+
   return (
     <>
       <Head>
         <title></title>
       </Head>
       <PageTitleWrapper>
+      <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
       <Container maxWidth="lg">

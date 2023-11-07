@@ -1,18 +1,14 @@
+import { useTheme } from "@emotion/react";
 import {
   Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
 } from "@mui/material";
-import PropTypes from 'prop-types';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const MainLayout = ({ children }: Props) => {
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -25,8 +21,6 @@ const MainLayout = ({ children }: Props) => {
     </Box>
   );
 };
-MainLayout.propTypes = {
-  children: PropTypes.node
-};
+
 export default MainLayout;
 

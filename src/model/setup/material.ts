@@ -7,9 +7,10 @@ export interface CryptoOrder {
   orderDate: number;
   orderID: string;
   sourceName: string;
+  unit: string;
   sourceDesc: string;
-  amountCrypto: number;
+  amountOrder: number;
   amount: number;
-  cryptoCurrency: string;
+  orderCurrency: string;
   currency: string;
 }

@@ -26,11 +26,12 @@ import {
 } from '@mui/material';
 
 import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
+import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/material';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
+import NextLink from "next/link";
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -203,7 +204,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           //   //   </FormControl>
           //   // </Box>
           // }
-          title="Category lists"
+          title="Material lists"
         />
       )}
       <Divider />
@@ -219,9 +220,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Cat ID</TableCell>
-              <TableCell>Category Name</TableCell>
-              <TableCell>Description</TableCell>
+              <TableCell>User ID</TableCell>
+              <TableCell>User Name</TableCell>
+              <TableCell>Phone Number</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -281,8 +283,17 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     >
                       {cryptoOrder.sourceName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {cryptoOrder.sourceDesc}
+
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.unit}
                     </Typography>
                   </TableCell>
                   {/* <TableCell align="right">
@@ -306,19 +317,21 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     {getStatusLabel(cryptoOrder.status)}
                   </TableCell> */}
                   <TableCell align="right">
-                  <Tooltip title="View Order" arrow>
-                      <IconButton
-                        sx={{
-                          '&:hover': {
-                            background: theme.colors.info.lighter
-                          },
-                          color: theme.palette.info.main
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <VisibilityTwoToneIcon fontSize="small" />
-                      </IconButton>
+                  <Tooltip title="View User" arrow>
+                      <NextLink href="/setup/permission/AddPermission" passHref>
+                        <IconButton
+                          sx={{
+                            "&:hover": {
+                              background: theme.colors.info.lighter,
+                            },
+                            color: theme.palette.info.main,
+                          }}
+                          color="inherit"
+                          size="small"
+                        >
+                          <VisibilityTwoToneIcon fontSize="small" />
+                        </IconButton>
+                      </NextLink>
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton

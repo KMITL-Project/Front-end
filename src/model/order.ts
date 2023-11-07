@@ -7,6 +7,7 @@ export interface Order {
   orderDate: number;
   orderID: string;
   sourceName: string;
+  unit: string;
   sourceDesc: string;
   amountOrder: number;
   amount: number;

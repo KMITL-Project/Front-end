@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
 import PageTitle from '@/components/PageTitle';
-import { useState } from 'react';
+import { ReactElement, useState } from 'react';
 
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import {
@@ -480,6 +480,6 @@ function Forms() {
   );
 }
 
-Forms.getLayout = (page) => <SidebarLayout>{page}</SidebarLayout>;
+Forms.getLayout = (page: ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
 
 export default Forms;

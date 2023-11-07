@@ -15,7 +15,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Shelf
+          Category
         </Typography>
         {/* <Typography variant="subtitle2">
           {user.name}, these are your recent transactions
@@ -24,16 +24,16 @@ function PageHeader() {
 
 
       <Grid item>
-        <NextLink href="/setup/shelf/AddShelf" passHref>
+        <NextLink href="/setup/category/AddCategory/" passHref>
         <Button
             variant="contained" sx={{ margin:1}}
-            className={currentRoute === "/setup/shelf/AddShelf/" ? "active" : ""}
+            className={currentRoute === "/setup/category/AddCategory/" ? "active" : ""}
             disableRipple
             component="a"
             // onClick={closeSidebar}
             // startIcon={<TableChartTwoToneIcon />}
           >
-            + Create Shelf{" "}
+            + Create Category{" "}
           </Button>
         </NextLink>
       </Grid>

@@ -31,6 +31,8 @@ import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
+import NextLink from "next/link";
+
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -203,7 +205,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           //   //   </FormControl>
           //   // </Box>
           // }
-          title="Shelf lists"
+          title="Category lists"
         />
       )}
       <Divider />
@@ -219,10 +221,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Shelf ID</TableCell>
-              <TableCell>Shelf Name</TableCell>
+              <TableCell>Cat ID</TableCell>
+              <TableCell>Category Name</TableCell>
               <TableCell>Description</TableCell>
-              <TableCell align="right">Amount</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -286,7 +287,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       {cryptoOrder.sourceDesc}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  {/* <TableCell align="right">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -302,24 +303,27 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                         `${cryptoOrder.currency}0,0.00`
                       )}
                     </Typography>
-                  </TableCell>
+                  </TableCell> */}
                   {/* <TableCell align="right">
                     {getStatusLabel(cryptoOrder.status)}
                   </TableCell> */}
+                  
                   <TableCell align="right">
-                  <Tooltip title="View Order" arrow>
-                      <IconButton
-                        sx={{
-                          '&:hover': {
-                            background: theme.colors.info.lighter
-                          },
-                          color: theme.palette.info.main
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <VisibilityTwoToneIcon fontSize="small" />
-                      </IconButton>
+                  <Tooltip title="View Category" arrow>
+                      <NextLink href="/setup/category/AddCategory" passHref>
+                        <IconButton
+                          sx={{
+                            "&:hover": {
+                              background: theme.colors.info.lighter,
+                            },
+                            color: theme.palette.info.main,
+                          }}
+                          color="inherit"
+                          size="small"
+                        >
+                          <VisibilityTwoToneIcon fontSize="small" />
+                        </IconButton>
+                      </NextLink>
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton

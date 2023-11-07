@@ -31,6 +31,8 @@ import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
+import NextLink from "next/link";
+
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -203,7 +205,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           //   //   </FormControl>
           //   // </Box>
           // }
-          title="Unit lists"
+          title="Category lists"
         />
       )}
       <Divider />
@@ -219,8 +221,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Unit ID</TableCell>
-              <TableCell>Unit Name</TableCell>
+              <TableCell>Cat ID</TableCell>
+              <TableCell>Category Name</TableCell>
               <TableCell>Description</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
@@ -305,20 +307,23 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   {/* <TableCell align="right">
                     {getStatusLabel(cryptoOrder.status)}
                   </TableCell> */}
+                  
                   <TableCell align="right">
-                  <Tooltip title="View Order" arrow>
-                      <IconButton
-                        sx={{
-                          '&:hover': {
-                            background: theme.colors.info.lighter
-                          },
-                          color: theme.palette.info.main
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <VisibilityTwoToneIcon fontSize="small" />
-                      </IconButton>
+                  <Tooltip title="View Category" arrow>
+                      <NextLink href="/setup/category/AddCategory" passHref>
+                        <IconButton
+                          sx={{
+                            "&:hover": {
+                              background: theme.colors.info.lighter,
+                            },
+                            color: theme.palette.info.main,
+                          }}
+                          color="inherit"
+                          size="small"
+                        >
+                          <VisibilityTwoToneIcon fontSize="small" />
+                        </IconButton>
+                      </NextLink>
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton
