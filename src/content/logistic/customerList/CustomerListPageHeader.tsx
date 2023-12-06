@@ -24,10 +24,10 @@ function PageHeader() {
 
 
       <Grid item>
-        <NextLink href="/setup/shelf/AddShelf" passHref>
+        <NextLink href="/logistic/customerList/AddCustomerList/" passHref>
         <Button
             variant="contained" sx={{ margin:1}}
-            className={currentRoute === "/setup/shelf/AddShelf/" ? "active" : ""}
+            className={currentRoute === "/logistic/customerList/AddCustomerList/" ? "active" : ""}
             disableRipple
             component="a"
             // onClick={closeSidebar}

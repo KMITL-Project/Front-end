@@ -26,23 +26,23 @@ import {
 } from "@mui/material";
 
 import Label from "@/components/Label";
-import { CryptoOrder, CryptoOrderStatus } from "@/model/setup/shelf";
+import { Shelf, ShelfStatus  } from "@/model/setup/shelf";
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import BulkActions from "./BulkActions";
 import NextLink from "next/link";
 
-interface RecentOrdersTableProps {
+interface SetupShelfTableProps {
   className?: string;
-  cryptoOrders: CryptoOrder[];
+  mockShelves: Shelf[];
 }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: ShelfStatus;
 }
 
-// const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
+// const getStatusLabel = (ShelfStatus: ShelfStatus): JSX.Element => {
 //   const map = {
 //     failed: {
 //       text: 'Failed',
@@ -58,19 +58,19 @@ interface Filters {
 //     }
 //   };
 
-//   const { text, color }: any = map[cryptoOrderStatus];
+//   const { text, color }: any = map[ShelfStatus];
 
 //   return <Label color={color}>{text}</Label>;
 // };
 
 const applyFilters = (
-  cryptoOrders: CryptoOrder[],
+  mockShelves: Shelf[],
   filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+): Shelf[] => {
+  return mockShelves.filter((mockShelve) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && mockShelve.status !== filters.status) {
       matches = false;
     }
 
@@ -79,18 +79,18 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  cryptoOrders: CryptoOrder[],
+  mockShelves: Shelf[],
   page: number,
   limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+): Shelf[] => {
+  return mockShelves.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
-  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
+const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
+  const [selectedMockShelves, setSelectedMockShelves] = useState<string[]>(
     []
   );
-  const selectedBulkActions = selectedCryptoOrders.length > 0;
+  const selectedBulkActions = selectedMockShelves.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
@@ -129,28 +129,28 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     }));
   };
 
-  const handleSelectAllCryptoOrders = (
+  const handleSelectAllSetupShelf = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedCryptoOrders(
+    setSelectedMockShelves(
       event.target.checked
-        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
+        ? mockShelves.map((mockShelve) => mockShelve.id)
         : []
     );
   };
 
-  const handleSelectOneCryptoOrder = (
+  const handleSelectOneSetupShelf = (
     _event: ChangeEvent<HTMLInputElement>,
-    cryptoOrderId: string
+    setupShelfId: string
   ): void => {
-    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
-      setSelectedCryptoOrders((prevSelected) => [
+    if (!selectedMockShelves.includes(setupShelfId)) {
+      setSelectedMockShelves((prevSelected) => [
         ...prevSelected,
-        cryptoOrderId,
+        setupShelfId,
       ]);
     } else {
-      setSelectedCryptoOrders((prevSelected) =>
-        prevSelected.filter((id) => id !== cryptoOrderId)
+      setSelectedMockShelves((prevSelected) =>
+        prevSelected.filter((id) => id !== setupShelfId)
       );
     }
   };
@@ -163,17 +163,17 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
-  const paginatedCryptoOrders = applyPagination(
-    filteredCryptoOrders,
+  const filteredMockShelves = applyFilters(mockShelves, filters);
+  const paginatedMockShelves = applyPagination(
+    filteredMockShelves,
     page,
     limit
   );
-  const selectedSomeCryptoOrders =
-    selectedCryptoOrders.length > 0 &&
-    selectedCryptoOrders.length < cryptoOrders.length;
-  const selectedAllCryptoOrders =
-    selectedCryptoOrders.length === cryptoOrders.length;
+  const selectedSomeMockShelves =
+    selectedMockShelves.length > 0 &&
+    selectedMockShelves.length < mockShelves.length;
+  const selectedAllMockShelves =
+    selectedMockShelves.length === mockShelves.length;
   const theme = useTheme();
 
   return (
@@ -215,9 +215,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
               <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
-                  checked={selectedAllCryptoOrders}
-                  indeterminate={selectedSomeCryptoOrders}
-                  onChange={handleSelectAllCryptoOrders}
+                  checked={selectedAllMockShelves}
+                  indeterminate={selectedSomeMockShelves}
+                  onChange={handleSelectAllSetupShelf}
                 />
               </TableCell>
               <TableCell>Shelf ID</TableCell>
@@ -227,24 +227,24 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedCryptoOrders.map((cryptoOrder) => {
-              const isCryptoOrderSelected = selectedCryptoOrders.includes(
-                cryptoOrder.id
+            {paginatedMockShelves.map((mockShelve) => {
+              const isMockShelvesSelected = selectedMockShelves.includes(
+                mockShelve.id
               );
               return (
                 <TableRow
                   hover
-                  key={cryptoOrder.id}
-                  selected={isCryptoOrderSelected}
+                  key={mockShelve.id}
+                  selected={isMockShelvesSelected}
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
                       color="primary"
-                      checked={isCryptoOrderSelected}
+                      checked={isMockShelvesSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneCryptoOrder(event, cryptoOrder.id)
+                        handleSelectOneSetupShelf(event, mockShelve.id)
                       }
-                      value={isCryptoOrderSelected}
+                      value={isMockShelvesSelected}
                     />
                   </TableCell>
                   <TableCell>
@@ -255,10 +255,21 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderDetails}
+                      {mockShelve.shelfID}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(cryptoOrder.orderDate, "MMMM dd yyyy")}
+                    {/* <Typography variant="body2" color="text.secondary" noWrap>
+                      {format(mockShelve.orderDate, "MMMM dd yyyy")}
+                    </Typography> */}
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {mockShelve.shelfName}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -269,26 +280,15 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderID}
+                      {mockShelve.shelfDescription}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.sourceName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {cryptoOrder.sourceDesc}
-                    </Typography>
+                    {/* <Typography variant="body2" color="text.secondary" noWrap>
+                      {mockShelve.sourceDesc}
+                    </Typography> */}
                   </TableCell>
 
                   {/* <TableCell align="right">
-                    {getStatusLabel(cryptoOrder.status)}
+                    {getStatusLabel(mockShelve.status)}
                   </TableCell> */}
                   <TableCell align="center">
                     <Tooltip title="View Shelf" arrow>
@@ -308,6 +308,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       </NextLink>
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
+                    <NextLink href="/setup/shelf/AddShelf" passHref>
+
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -320,6 +322,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       >
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
+                    </NextLink>
                     </Tooltip>
                     <Tooltip title="Delete Order" arrow>
                       <IconButton
@@ -343,7 +346,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredCryptoOrders.length}
+          count={filteredMockShelves.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -355,12 +358,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   );
 };
 
-RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired,
+SetupShelfTable.propTypes = {
+  mockShelves: PropTypes.array.isRequired,
 };
 
-RecentOrdersTable.defaultProps = {
-  cryptoOrders: [],
+SetupShelfTable.defaultProps = {
+  mockShelves: [],
 };
 
-export default RecentOrdersTable;
+export default SetupShelfTable;

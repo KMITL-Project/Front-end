@@ -1,147 +1,147 @@
 import { Card } from '@mui/material';
-import { Order } from '@/model/order';
-import RecentOrdersTable from './ShelfTable';
+import { Shelf } from '@/model/setup/shelf';
+import RecentShelvesTable from './ShelfTable';
 import { subDays } from 'date-fns';
 
-function RecentOrders() {
-  const cryptoOrders: Order[] = [
+function RecentShelves() {
+  const mockShelves: Shelf[] = [
     {
       id: '1',
-      orderDetails: 'Fiat Deposit',
-      orderDate: new Date().getTime(),
+      shelfID: 'VUVX709ET7BY',
+      shelfDate: new Date().getTime(),
       status: 'completed',
-      orderID: 'VUVX709ET7BY',
-      sourceName: 'Bank Account',
+      shelfName: 'Shelf 1',
+      shelfDescription: 'อุปกรณ์ช่าง',
       sourceDesc: '*** 1111',
-      amountOrder: 34.4565,
+      amountShelf: 34.4565,
       amount: 56787,
-      orderCurrency: 'ETH',
+      shelfCurrency: 'ETHx',
       currency: '$'
     },
     {
       id: '2',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 1).getTime(),
+      shelfID: '23M3UOG65G8K',
+      shelfDate: subDays(new Date(), 1).getTime(),
       status: 'completed',
-      orderID: '23M3UOG65G8K',
-      sourceName: 'Bank Account',
+      shelfName: 'Shelf 2',
+      shelfDescription: 'อุปกรณ์ช่าง',
       sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
+      amountShelf: 6.58454334,
       amount: 8734587,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '3',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 5).getTime(),
+      shelfID: 'F6JHK65MS818',
+      shelfDate: subDays(new Date(), 5).getTime(),
       status: 'failed',
-      orderID: 'F6JHK65MS818',
-      sourceName: 'Bank Account',
+      shelfName: 'Shelf 3',
+      shelfDescription: 'แผ่นอลูมิเนียม',
       sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
+      amountShelf: 6.58454334,
       amount: 8734587,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '4',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 55).getTime(),
+      shelfID: 'QJFAI7N84LGM',
+      shelfDate: subDays(new Date(), 55).getTime(),
       status: 'completed',
-      orderID: 'QJFAI7N84LGM',
-      sourceName: 'Bank Account',
+      shelfName: 'Shelf 4',
+      shelfDescription: 'แผ่นเหล็ก',
       sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
+      amountShelf: 6.58454334,
       amount: 8734587,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '5',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 56).getTime(),
+      shelfID: 'BO5KFSYGC0YW',
+      shelfDate: subDays(new Date(), 56).getTime(),
       status: 'pending',
-      orderID: 'BO5KFSYGC0YW',
-      sourceName: 'Bank Account',
+      shelfName: 'Shelf 5',
+      shelfDescription: 'วัสดุสิ้นเปลือง',
       sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
+      amountShelf: 6.58454334,
       amount: 8734587,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '6',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 33).getTime(),
+      shelfID: 'Fiat Deposit',
+      shelfDate: subDays(new Date(), 33).getTime(),
       status: 'completed',
-      orderID: '6RS606CBMKVQ',
-      sourceName: 'Bank Account',
+      shelfName: '6RS606CBMKVQ',
+      shelfDescription: 'Bank Account',
       sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
+      amountShelf: 6.58454334,
       amount: 8734587,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '7',
-      orderDetails: 'Fiat Deposit',
-      orderDate: new Date().getTime(),
+      shelfID: 'Fiat Deposit',
+      shelfDate: new Date().getTime(),
       status: 'pending',
-      orderID: '479KUYHOBMJS',
-      sourceName: 'Bank Account',
+      shelfName: '479KUYHOBMJS',
+      shelfDescription: 'Bank Account',
       sourceDesc: '*** 1212',
-      amountOrder: 2.346546,
+      amountShelf: 2.346546,
       amount: 234234,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '8',
-      orderDetails: 'Paypal Withdraw',
-      orderDate: subDays(new Date(), 22).getTime(),
+      shelfID: 'Paypal Withdraw',
+      shelfDate: subDays(new Date(), 22).getTime(),
       status: 'completed',
-      orderID: 'W67CFZNT71KR',
-      sourceName: 'Paypal Account',
+      shelfName: 'W67CFZNT71KR',
+      shelfDescription: 'Paypal Account',
       sourceDesc: '*** 1111',
-      amountOrder: 3.345456,
+      amountShelf: 3.345456,
       amount: 34544,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '9',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 11).getTime(),
+      shelfID: 'Fiat Deposit',
+      shelfDate: subDays(new Date(), 11).getTime(),
       status: 'completed',
-      orderID: '63GJ5DJFKS4H',
-      sourceName: 'Bank Account',
+      shelfName: '63GJ5DJFKS4H',
+      shelfDescription: 'Bank Account',
       sourceDesc: '*** 2222',
-      amountOrder: 1.4389567945,
+      amountShelf: 1.4389567945,
       amount: 123843,
-      orderCurrency: 'BTC',
+      shelfCurrency: 'BTC',
       currency: '$'
     },
     {
       id: '10',
-      orderDetails: 'Wallet Transfer',
-      orderDate: subDays(new Date(), 123).getTime(),
+      shelfID: 'Wallet Transfer',
+      shelfDate: subDays(new Date(), 123).getTime(),
       status: 'failed',
-      orderID: '17KRZHY8T05M',
-      sourceName: 'Wallet Transfer',
+      shelfName: '17KRZHY8T05M',
+      shelfDescription: 'Wallet Transfer',
       sourceDesc: "John's Cardano Wallet",
-      amountOrder: 765.5695,
+      amountShelf: 765.5695,
       amount: 7567,
-      orderCurrency: 'ADA',
+      shelfCurrency: 'ADA',
       currency: '$'
     }
   ];
 
   return (
     <Card>
-      <RecentOrdersTable cryptoOrders={cryptoOrders} />
+      <RecentShelvesTable mockShelves={mockShelves} />
     </Card>
   );
 }
 
-export default RecentOrders;
+export default RecentShelves;

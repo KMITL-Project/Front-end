@@ -146,7 +146,7 @@ const SetupShelfInfoTable: FC<SetupShelfInfoTableProps> = ({cryptoOrders}) => {
         <Card sx={{ maxWidth: 345 }}>
           <CardMedia
             sx={{ height: 140 }}
-            image="/static/images/2.jpg"
+            image="/static/images/shelf.jpeg"
             title="Shelf"
           />
           <CardContent>

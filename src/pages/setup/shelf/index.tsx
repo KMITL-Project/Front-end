@@ -10,7 +10,7 @@ import Breadcrumb from '@/components/Breadcrumbs';
 
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Shelf'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home > Shelf'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>

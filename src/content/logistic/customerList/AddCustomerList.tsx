@@ -140,7 +140,7 @@ function Forms() {
         <Grid container spacing={0}>
           <Grid item xs={12} direction="column" justifyContent="center">
             <Card>
-              <CardHeader title="Shelf Details" />
+              <CardHeader title="Order Details" />
               <Divider />
               <CardContent>
                 <Box
@@ -157,45 +157,38 @@ function Forms() {
                       <TextField
                         required
                         id="outlined-required"
-                        label="Shelf Name"
-                        defaultValue="ชั้นเครื่องมือ"
+                        label="Customer Name"
+                        defaultValue="Jack Dawson"
                       />
             
                       <TextField
                         required
                         id="outlined-required"
-                        label="Shlef Description"
+                        label="Details"
                         defaultValue="ประแจ"
                       />
-                      <AvatarWrapper>
-                        <Avatar
-                          variant="rounded"
-                          // alt={user.name}
-                          // src={user.avatar}
-                        />
-                        <ButtonUploadWrapper>
-                          <Input
-                            accept="image/*"
-                            id="icon-button-file"
-                            name="icon-button-file"
-                            type="file"
-                          />
-                          <label htmlFor="icon-button-file">
-                            <IconButton component="span" color="primary">
-                              <CameraAltIcon />
-                            </IconButton>
-                          </label>
-                        </ButtonUploadWrapper>
-                      </AvatarWrapper>
+
+<TextField
+                        required
+                        id="outlined-required"
+                        label="Address"
+                        defaultValue="KMITL"
+                      />
+                      <TextField
+                        required
+                        id="outlined-required"
+                        label="Date"
+                        defaultValue="ประแจ"
+                      />
                     </Grid>
  
                     <Grid container justifyContent={"center"} paddingTop={2}>
-                      <NextLink href="/setup/shelf/" passHref>
+                      <NextLink href="/logistic/customerList/" passHref>
                         <Button
                           variant="contained"
                           sx={{ margin: 1 }}
                           className={
-                            currentRoute === "/setup/shelf/" ? "active" : ""
+                            currentRoute === "/logistic/customerList/" ? "active" : ""
                           }
                           disableRipple
                           component="a"
@@ -203,13 +196,13 @@ function Forms() {
                           Save{" "}
                         </Button>
                       </NextLink>
-                      <NextLink href="/setup/shelf/" passHref>
+                      <NextLink href="/logistic/customerList//" passHref>
                         <Button
                           variant="contained"
                           sx={{ margin: 1 }}
                           color="error"
                           className={
-                            currentRoute === "/setup/shelf/" ? "active" : ""
+                            currentRoute === "/logistic/customerList/" ? "active" : ""
                           }
                           disableRipple
                           component="a"

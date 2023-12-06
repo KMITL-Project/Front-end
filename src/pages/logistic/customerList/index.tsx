@@ -1,25 +1,19 @@
-import React from 'react';
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
 import PageHeader from '@/content/logistic/customerList/CustomerListPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
-import RecentOrders from '@/content/logistic/customerList/CustomerListView';
-import { ReactElement } from 'react';
-import Breadcrumb from '@/components/Breadcrumbs';
+import Footer from '@/components/Footer';
 
+import RecentOrders from '@/content/logistic/customerList/CustomerListView';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Customer Lists'; // ระบุเส้นทางของหน้าปัจจุบัน
-
   return (
     <>
-      <Head>
-        <title></title>
-      </Head>
+      {/* <Head>
+        <title>Transactions - Applications</title>
+      </Head> */}
       <PageTitleWrapper>
-        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
-        <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
       <Container maxWidth="lg">
@@ -35,11 +29,12 @@ function ApplicationsTransactions() {
           </Grid>
         </Grid>
       </Container>
+      <Footer />
     </>
   );
 }
 
-ApplicationsTransactions.getLayout = (page: ReactElement) => (
+ApplicationsTransactions.getLayout = (page) => (
   <SidebarLayout>{page}</SidebarLayout>
 );
 

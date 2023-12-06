@@ -202,7 +202,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
               </FormControl>
             </Box>
           }
-          title="รายงาน"
+          title="Customer List"
         />
       )}
       <Divider />
