@@ -1,3 +1,6 @@
+import { useContext } from 'react';
+import { useRouter } from 'next/router';
+
 import {
   ListSubheader,
   alpha,
@@ -5,36 +8,39 @@ import {
   List,
   styled,
   Button,
-  ListItem,
-  Collapse,
-} from "@mui/material";
+  ListItem
+} from '@mui/material';
+import NextLink from 'next/link';
 
-import DesignServicesTwoToneIcon from "@mui/icons-material/DesignServicesTwoTone";
-import BrightnessLowTwoToneIcon from "@mui/icons-material/BrightnessLowTwoTone";
-import MmsTwoToneIcon from "@mui/icons-material/MmsTwoTone";
-import TableChartTwoToneIcon from "@mui/icons-material/TableChartTwoTone";
-import AccountCircleTwoToneIcon from "@mui/icons-material/AccountCircleTwoTone";
-import BallotTwoToneIcon from "@mui/icons-material/BallotTwoTone";
-import BeachAccessTwoToneIcon from "@mui/icons-material/BeachAccessTwoTone";
-import EmojiEventsTwoToneIcon from "@mui/icons-material/EmojiEventsTwoTone";
-import FilterVintageTwoToneIcon from "@mui/icons-material/FilterVintageTwoTone";
-import HowToVoteTwoToneIcon from "@mui/icons-material/HowToVoteTwoTone";
-import LocalPharmacyTwoToneIcon from "@mui/icons-material/LocalPharmacyTwoTone";
-import RedeemTwoToneIcon from "@mui/icons-material/RedeemTwoTone";
-import SettingsTwoToneIcon from "@mui/icons-material/SettingsTwoTone";
-import TrafficTwoToneIcon from "@mui/icons-material/TrafficTwoTone";
-import CheckBoxTwoToneIcon from "@mui/icons-material/CheckBoxTwoTone";
-import ChromeReaderModeTwoToneIcon from "@mui/icons-material/ChromeReaderModeTwoTone";
-import WorkspacePremiumTwoToneIcon from "@mui/icons-material/WorkspacePremiumTwoTone";
-import CameraFrontTwoToneIcon from "@mui/icons-material/CameraFrontTwoTone";
-import DisplaySettingsTwoToneIcon from "@mui/icons-material/DisplaySettingsTwoTone";
-
-import { useDispatch, useSelector } from "react-redux";
-import { expandMenuIsOpen, sidebarIsClose } from "@/store/systemStore";
-import { useState } from "react";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { IMenu, menuSidebar } from "@/config/menuSidebar";
-import { RootState } from "@/store/store";
+import DesignServicesTwoToneIcon from '@mui/icons-material/DesignServicesTwoTone';
+import BrightnessLowTwoToneIcon from '@mui/icons-material/BrightnessLowTwoTone';
+import MmsTwoToneIcon from '@mui/icons-material/MmsTwoTone';
+import TableChartTwoToneIcon from '@mui/icons-material/TableChartTwoTone';
+import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
+import BallotTwoToneIcon from '@mui/icons-material/BallotTwoTone';
+import BeachAccessTwoToneIcon from '@mui/icons-material/BeachAccessTwoTone';
+import EmojiEventsTwoToneIcon from '@mui/icons-material/EmojiEventsTwoTone';
+import FilterVintageTwoToneIcon from '@mui/icons-material/FilterVintageTwoTone';
+import HowToVoteTwoToneIcon from '@mui/icons-material/HowToVoteTwoTone';
+import LocalPharmacyTwoToneIcon from '@mui/icons-material/LocalPharmacyTwoTone';
+import RedeemTwoToneIcon from '@mui/icons-material/RedeemTwoTone';
+import SettingsTwoToneIcon from '@mui/icons-material/SettingsTwoTone';
+import TrafficTwoToneIcon from '@mui/icons-material/TrafficTwoTone';
+import CheckBoxTwoToneIcon from '@mui/icons-material/CheckBoxTwoTone';
+import ChromeReaderModeTwoToneIcon from '@mui/icons-material/ChromeReaderModeTwoTone';
+import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwoTone';
+import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
+import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
+import { SidebarContext } from '@/contexts/SidebarContext copy';
+import DoorSlidingIcon from '@mui/icons-material/DoorSliding';
+import { Category, Inventory } from '@mui/icons-material';
+import CategoryIcon from '@mui/icons-material/Category';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import LayersIcon from '@mui/icons-material/Layers';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import ListAltTwoToneIcon from '@mui/icons-material/ListAltTwoTone';
+import DescriptionTwoToneIcon from '@mui/icons-material/DescriptionTwoTone';
+import ShareLocationTwoToneIcon from '@mui/icons-material/ShareLocationTwoTone';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -46,14 +52,14 @@ const MenuWrapper = styled(Box)(
     }
   }
 
-  .MuiListSubheader-root {
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: ${theme.typography.pxToRem(12)};
-    color: ${theme.colors.alpha.trueWhite[50]};
-    padding: ${theme.spacing(0, 2.5)};
-    line-height: 1.4;
-  }
+    .MuiListSubheader-root {
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: ${theme.typography.pxToRem(12)};
+      color: ${theme.colors.alpha.trueWhite[50]};
+      padding: ${theme.spacing(0, 2.5)};
+      line-height: 1.4;
+    }
 `
 );
 
@@ -87,7 +93,7 @@ const SubMenuWrapper = styled(Box)(
 
           .MuiButton-startIcon,
           .MuiButton-endIcon {
-            transition: ${theme.transitions.create(["color"])};
+            transition: ${theme.transitions.create(['color'])};
 
             .MuiSvgIcon-root {
               font-size: inherit;
@@ -151,8 +157,8 @@ const SubMenuWrapper = styled(Box)(
                 background: ${theme.colors.alpha.trueWhite[100]};
                 opacity: 0;
                 transition: ${theme.transitions.create([
-                  "transform",
-                  "opacity",
+                  'transform',
+                  'opacity'
                 ])};
                 width: 6px;
                 height: 6px;
@@ -178,11 +184,10 @@ const SubMenuWrapper = styled(Box)(
 `
 );
 
-const SidebarMenu = () => {
-  const expandMenu = useSelector(
-    (state: RootState) => state.systemStore.expandMenu
-  );
-  const dispatch = useDispatch();
+function SidebarMenu() {
+  const { closeSidebar } = useContext(SidebarContext);
+  const router = useRouter();
+  const currentRoute = router.pathname;
 
   return (
     <>
@@ -191,117 +196,264 @@ const SidebarMenu = () => {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Dashboards
+              Overview
             </ListSubheader>
           }
         >
           <SubMenuWrapper>
             <List component="div">
               <ListItem component="div">
-                <Button
-                  disableRipple
-                  onClick={() => {
-                    dispatch(sidebarIsClose());
-                  }}
-                  href="/dashboards/crypto"
-                  startIcon={<BrightnessLowTwoToneIcon />}
-                >
-                  Cryptocurrency
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  onClick={() => {
-                    dispatch(sidebarIsClose());
-                  }}
-                  href="/dashboards/messenger"
-                  startIcon={<MmsTwoToneIcon />}
-                >
-                  Messenger
-                </Button>
+                <NextLink href="/dashboard/" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/dashboard/' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<BrightnessLowTwoToneIcon />}
+                  >
+                    Dashboard
+                  </Button>
+                </NextLink>
               </ListItem>
             </List>
           </SubMenuWrapper>
         </List>
-        {menuSidebar.map((header, indexHeader) => {
-          return (
-            <List
-              key={"header-" + indexHeader}
-              component="div"
-              subheader={
-                <ListSubheader component="div" disableSticky>
-                  {header.name}
-                </ListSubheader>
-              }
-            >
-              <SubMenuWrapper>
-                <List component="div">
-                  {header.menus.map((menu: IMenu, indexMenu: number) => {
-                    const open =
-                      expandMenu.findIndex(
-                        (value) =>
-                          value ===
-                          "header-" + indexHeader + "menu-" + indexMenu
-                      ) !== -1;
-
-                    return (
-                      <div key={"menu-" + indexMenu}>
-                        <ListItem component="div">
-                          <Button
-                            disableRipple
-                            onClick={() => {
-                              dispatch(
-                                expandMenuIsOpen(
-                                  "header-" + indexHeader + "menu-" + indexMenu
-                                )
-                              );
-                              dispatch(sidebarIsClose());
-                            }}
-                            href={menu.href}
-                            startIcon={menu.icon}
-                          >
-                            {menu.name}
-                            {menu.subMenu.length !== 0 &&
-                              (open ? <ExpandLess /> : <ExpandMore />)}
-                          </Button>
-                        </ListItem>
-                        {menu.subMenu.length != 0 && (
-                          <Collapse in={open} timeout="auto" unmountOnExit>
-                            {menu.subMenu.map((subMenu, indexSubMenu) => {
-                              return (
-                                <ListItem
-                                  component="div"
-                                  key={"sub-menu-" + indexSubMenu}
-                                >
-                                  <Button
-                                    sx={{
-                                      paddingLeft: "55px !important",
-                                    }}
-                                    disableRipple
-                                    onClick={() => {
-                                      dispatch(sidebarIsClose());
-                                    }}
-                                    href={subMenu.href}
-                                  >
-                                    {subMenu.name}
-                                  </Button>
-                                </ListItem>
-                              );
-                            })}
-                          </Collapse>
-                        )}
-                      </div>
-                    );
-                  })}
-                </List>
-              </SubMenuWrapper>
+        <List
+          component="div"
+          subheader={
+            <ListSubheader component="div" disableSticky>
+              Management
+            </ListSubheader>
+          }
+        >
+          <SubMenuWrapper>
+            <List component="div">
+              <ListItem component="div">
+                <NextLink href="/management/material" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/management/transactions'
+                        ? 'active'
+                        : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<TableChartTwoToneIcon />}
+                  >
+                    วัสดุทั้งหมด
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/management/materialAdd" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/management/transactions'
+                        ? 'active'
+                        : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<TableChartTwoToneIcon />}
+                  >
+                    เพิ่มวัสดุ
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/management/pickup" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/management/transactions'
+                        ? 'active'
+                        : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<TableChartTwoToneIcon />}
+                  >
+                    เบิกวัสดุ                  
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/management/report" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/management/transactions'
+                        ? 'active'
+                        : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<TableChartTwoToneIcon />}
+                  >
+                    รายงาน                  
+                  </Button>
+                </NextLink>
+              </ListItem>
             </List>
-          );
-        })}
+          </SubMenuWrapper>
+        </List>
+        <List
+          component="div"
+          subheader={
+            <ListSubheader component="div" disableSticky>
+              Logistic
+            </ListSubheader>
+          }
+        >
+          <SubMenuWrapper>
+            <List component="div">
+              <ListItem component="div">
+                <NextLink href="/logistic/customerList" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/logistic/customerList' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<ListAltTwoToneIcon/>}
+                  >
+                    รายการลูกค้า
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/logistic/order" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/logistic/order'
+                        ? 'active'
+                        : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<DescriptionTwoToneIcon />}
+                  >
+                    ใบสั่ง
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/logistic/tracking" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/logistic/tracking'
+                        ? 'active'
+                        : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<ShareLocationTwoToneIcon />}
+                  >
+                    ติดตามการขนส่ง
+                  </Button>
+                </NextLink>
+              </ListItem>
+            </List>
+          </SubMenuWrapper>
+        </List>
+        <List
+          component="div"
+          subheader={
+            <ListSubheader component="div" disableSticky>
+              Set Up
+            </ListSubheader>
+          }
+        >
+          <SubMenuWrapper>
+            <List component="div">
+              <ListItem component="div">
+                <NextLink href="/setup/shelf/" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/setup/shelf/' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<DoorSlidingIcon />}
+                  >
+                    Shelf
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/setup/category/" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/setup/category/' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<CategoryIcon />}
+                  >
+                    Category
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/setup/unit/" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/setup/unit/' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<InventoryIcon />}
+                  >
+                    Unit of products
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/setup/material" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/components/material' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<LayersIcon />}
+                  >
+                    Material type
+                  </Button>
+                </NextLink>
+              </ListItem>
+              <ListItem component="div">
+                <NextLink href="/setup/permission" passHref>
+                  <Button
+                    className={
+                      currentRoute === '/components/permission' ? 'active' : ''
+                    }
+                    disableRipple
+                    component="a"
+                    onClick={closeSidebar}
+                    startIcon={<AdminPanelSettingsIcon />}
+                  >
+                    User Permission
+                  </Button>
+                </NextLink>
+              </ListItem>
+            </List>
+          </SubMenuWrapper>
+        </List>
       </MenuWrapper>
     </>
   );
-};
+}
 
 export default SidebarMenu;
