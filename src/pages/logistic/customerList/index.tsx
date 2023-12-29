@@ -34,7 +34,7 @@ function ApplicationsTransactions() {
   );
 }
 
-ApplicationsTransactions.getLayout = (page) => (
+ApplicationsTransactions.getLayout = (page: any) => (
   <SidebarLayout>{page}</SidebarLayout>
 );
 
