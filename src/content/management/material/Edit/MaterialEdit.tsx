@@ -214,6 +214,7 @@ const MaterialEdit = () => {
                               sx={{ margin:1}}
                               disableRipple
                               component="a"
+                              color="error"
                               onClick={() => router.push('/management/material')}
                             >
                                 Cancel
@@ -224,7 +225,6 @@ const MaterialEdit = () => {
                               variant="contained" 
                               sx={{ margin:1}}
                               disableRipple
-                              color="error"
                               component="a"
                               onClick={() => router.push('/management/material')}
                             >
