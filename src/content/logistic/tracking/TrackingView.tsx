@@ -1,16 +1,16 @@
 import { Card } from '@mui/material';
-import { Order } from '@/model/order';
-import RecentOrdersTable from './CategoryTable';
+import { Tracking } from '@/model/logistic/tracking';
+import RecentOrdersTable from './TrackingTable';
 import { subDays } from 'date-fns';
 
 function RecentOrders() {
-  const cryptoOrders: Order[] = [
+  const Trackings: Tracking[] = [
     {
       id: '1',
       orderDetails: 'Fiat Deposit',
       orderDate: new Date().getTime(),
       status: 'completed',
-      orderID: 'VUVX709ET7BY',
+      trackingID: 'VUVX709ET7BY',
       sourceName: 'Bank Account',
       sourceDesc: '*** 1111',
       amountOrder: 34.4565,
@@ -139,7 +139,7 @@ function RecentOrders() {
 
   return (
     <Card>
-      <RecentOrdersTable cryptoOrders={cryptoOrders} />
+      <RecentOrdersTable Trackings={Trackings} />
     </Card>
   );
 }

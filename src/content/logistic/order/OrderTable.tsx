@@ -26,13 +26,12 @@ import {
 } from '@mui/material';
 
 import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
+import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/material';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
 import NextLink from "next/link";
-
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -205,7 +204,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           //   //   </FormControl>
           //   // </Box>
           // }
-          title="Category lists"
+          title="Order lists"
         />
       )}
       <Divider />
@@ -213,7 +212,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              <TableCell padding="checkbox" align="center">
                 <Checkbox
                   color="primary"
                   checked={selectedAllCryptoOrders}
@@ -221,10 +220,13 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Cat ID</TableCell>
-              <TableCell>Category Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Customer</TableCell>
+              <TableCell align="center">Address</TableCell>
+              <TableCell align="center">Date</TableCell>
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -238,7 +240,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   key={cryptoOrder.id}
                   selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
                       checked={isCryptoOrderSelected}
@@ -247,20 +249,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       }
                       value={isCryptoOrderSelected}
                     />
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.orderDetails}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(cryptoOrder.orderDate, 'MMMM dd yyyy')}
-                    </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography
@@ -281,10 +269,34 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.sourceName}
+                      {cryptoOrder.orderDetails}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" noWrap>
-                      {cryptoOrder.sourceDesc}
+                      {format(cryptoOrder.orderDate, 'MMMM dd yyyy')}
+                    </Typography>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.sourceName}
+                    </Typography>
+
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.unit}
                     </Typography>
                   </TableCell>
                   {/* <TableCell align="right">
@@ -307,10 +319,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   {/* <TableCell align="right">
                     {getStatusLabel(cryptoOrder.status)}
                   </TableCell> */}
-                  
                   <TableCell align="right">
-                  <Tooltip title="View Category" arrow>
-                      <NextLink href="/setup/category/AddCategory" passHref>
+                  <Tooltip title="View Material" arrow>
+                      <NextLink href="/setup/material/AddMaterial" passHref>
                         <IconButton
                           sx={{
                             "&:hover": {

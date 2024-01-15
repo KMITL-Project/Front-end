@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 import {
   Avatar,
@@ -21,6 +21,9 @@ import AccountBoxTwoToneIcon from "@mui/icons-material/AccountBoxTwoTone";
 import LockOpenTwoToneIcon from "@mui/icons-material/LockOpenTwoTone";
 import AccountTreeTwoToneIcon from "@mui/icons-material/AccountTreeTwoTone";
 import Link from "next/link";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -58,14 +61,49 @@ const UserBoxDescription = styled(Typography)(
 );
 
 function HeaderUserbox() {
-  const user = {
-    name: "Catherine Pike",
-    avatar: "/static/images/avatars/1.jpg",
-    jobtitle: "Project Manager",
-  };
+  const [user, setUser] = useState({
+    name: "",
+    avatar: "",
+  });
 
   const ref = useRef<any>(null);
-  const [isOpen, setOpen] = useState<boolean>(false);
+  // const [isOpen, setOpen] = useState<boolean>(false);
+  const [isOpen, setOpen] = useState(false);
+
+  useEffect(() => {
+    
+    const fetchUserInfo = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          const response = await fetch(`${publicRuntimeConfig.BackEnd}users/user-info`, {
+            method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            
+            const userData = await response.json();
+            console.log('ok', userData);
+            setUser({
+              name: userData.data.full_name,
+              avatar: userData.data.image_url,
+            });
+            
+          } else {
+            // Handle error when fetching user info
+            console.error('Error fetching user info:', response.statusText);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
+    // console.log('user state:', user);
+    fetchUserInfo();
+  },[]);
 
   const handleOpen = (): void => {
     setOpen(true);
@@ -77,14 +115,11 @@ function HeaderUserbox() {
 
   return (
     <>
-      <UserBoxButton color="secondary" ref={ref} onClick={handleOpen}>
+      <UserBoxButton color="secondary" onClick={handleOpen}>
         <Avatar variant="rounded" alt={user.name} src={user.avatar} />
         <Hidden mdDown>
           <UserBoxText>
             <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
-            <UserBoxDescription variant="body2">
-              {user.jobtitle}
-            </UserBoxDescription>
           </UserBoxText>
         </Hidden>
         <Hidden smDown>
@@ -92,7 +127,7 @@ function HeaderUserbox() {
         </Hidden>
       </UserBoxButton>
       <Popover
-        anchorEl={ref.current}
+        // anchorEl={ref.current}
         onClose={handleClose}
         open={isOpen}
         anchorOrigin={{
@@ -108,9 +143,6 @@ function HeaderUserbox() {
           <Avatar variant="rounded" alt={user.name} src={user.avatar} />
           <UserBoxText>
             <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
-            <UserBoxDescription variant="body2">
-              {user.jobtitle}
-            </UserBoxDescription>
           </UserBoxText>
         </MenuUserBox>
         <Divider sx={{ mb: 0 }} />
@@ -132,7 +164,7 @@ function HeaderUserbox() {
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth>
             <LockOpenTwoToneIcon sx={{ mr: 1 }} />
-            Sign out
+            LogOut 
           </Button>
         </Box>
       </Popover>

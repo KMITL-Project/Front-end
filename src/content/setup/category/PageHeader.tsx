@@ -17,16 +17,15 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Category
+          Tracking
         </Typography>
         {/* <Typography variant="subtitle2">
           {user.name}, these are your recent transactions
         </Typography> */}
       </Grid>
 
-
       <Grid item>
-        <Button
+        {/* <Button
             variant="contained" sx={{ margin:1}}
             // className={currentRoute === "/setup/category/AddCategory/" ? "active" : ""}
             disableRipple
@@ -38,7 +37,7 @@ function PageHeader() {
             // startIcon={<TableChartTwoToneIcon />}
           >
             + Create Category{" "}
-          </Button>
+          </Button> */}
       </Grid>
     </Grid>
   );

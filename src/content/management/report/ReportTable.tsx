@@ -151,65 +151,62 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
     // ถ้าเลือก Export เป็น Excel
     if (fileType === 'excel') {
       // สร้างชุดข้อมูลสำหรับ Excel
-      const dataForExcel = paginatedReports.map((report) => {
-        return {
-          'Material ID': report.orderDetails,
-          'Material Name': report.orderID,
-          'Category': report.sourceName,
-          'Unit': report.unit,
-          'Shelf': report.shelf,
-          'Floor': report.floor,
-        };
-      });
-
-      // สร้าง Workbook ของ Excel
-      const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
-      // Merge เซลล์ A1 ถึง F1 เพื่อใส่หัวข้อ
-      worksheet['!merges'] = [
-        // สร้างการ Merge ให้กับเซลล์ A1 ถึง F1
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // A1:F1
-      ];
-
-      // กำหนดข้อความลงในเซลล์ A1 ให้เป็น "Material List"
-      const headerStyle = {
-        font: { bold: true },
-        alignment: { horizontal: 'center' },
-      };
+      const dataForExcel: any[][] = paginatedReports.map((report, index) => [
+        index + 1, // เลขลำดับอัตโนมัติ
+        report.orderDetails,
+        report.orderID,
+        report.sourceName,
+        report.unit,
+        report.shelf,
+        report.floor,
+      ]);
+    
+      // เพิ่มข้อความที่ A1
+      const worksheet = XLSX.utils.aoa_to_sheet([
+        ['ชื่อบริษัทภาษาไทย', '', '', '', '', '', '', '', '', '', 'เลขที่', ''], // เพิ่มข้อความที่ A1
+        ['ชื่อบริษัทภาษาอังกฤษ'], // เพิ่มข้อความที่ A2
+        ['', '', '', '', 'รายการสินค้า', ''],
+        ['', '', '', '', '', '', '', '', '', '', 'วันที่', ''],
+        ['', '', '', '', '', ''],
+        ['', '', '', '', '', ''],
+        ['ลำดับ', 'วันที่', 'รหัสสินค้า', 'รายการ', 'หมวดหมู่', 'หน่วย', 'ชั้นวาง', 'ชั้น', 'ล็อต', 'จำนวน', 'ราคา', 'หมายเหตุ'],
+        ...dataForExcel,
+      ]);
+    
+      if (worksheet['!ref']) {
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
       
-      worksheet['A1'].s = headerStyle;
-      worksheet['A1'].v = 'Material List';
-
-      // ใส่ข้อมูลลงในเซลล์ใน Worksheet และกำหนดรูปแบบให้กับหัวเรื่อง
-      worksheet['A2'].s = headerStyle;
-      worksheet['A2'].v = 'Material ID';
-
-      worksheet['B2'].s = headerStyle;
-      worksheet['B2'].v = 'Material Name';
-
-      worksheet['C2'].s = headerStyle;
-      worksheet['C2'].v = 'Category';
-
-      worksheet['D2'].s = headerStyle;
-      worksheet['D2'].v = 'Unit';
-
-      worksheet['E2'].s = headerStyle;
-      worksheet['E2'].v = 'Shelf';
-
-      worksheet['F2'].s = headerStyle;
-      worksheet['F2'].v = 'Floor';
-
+        // เพิ่ม border ในแต่ละเซลล์
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+          for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cellAddress = { r: R, c: C };
+            const cellStyle = worksheet[XLSX.utils.encode_cell(cellAddress)] || {};
+            cellStyle.s = {
+              border: {
+                top: { style: 'thin', color: { auto: 1 } },
+                bottom: { style: 'thin', color: { auto: 1 } },
+                left: { style: 'thin', color: { auto: 1 } },
+                right: { style: 'thin', color: { auto: 1 } },
+              },
+              ...cellStyle.s,
+            };
+            worksheet[XLSX.utils.encode_cell(cellAddress)] = cellStyle;
+          }
+        }
+      }
+    
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'MaterialList');
-
+    
       // แปลง Workbook ให้เป็นไฟล์ Excel
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const excelBlob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-
+    
       // ดาวน์โหลดไฟล์ Excel
       saveAs(excelBlob, `${fileName}.xlsx`);
       setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
-
-    } else if (fileType === 'pdf') {
+    }
+    else if (fileType === 'pdf') {
       const generatePDF = () => {
         // ลงทะเบียนฟอนต์
         // Font.register({

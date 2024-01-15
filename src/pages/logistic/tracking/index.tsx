@@ -1,15 +1,15 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/category/PageHeader';
+import PageHeader from '@/content/logistic/tracking/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 
-import RecentOrders from '@/content/setup/category/CategoryView';
+import RecentOrders from '@/content/logistic/tracking/TrackingView';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Category'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Tracking'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
