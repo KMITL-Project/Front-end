@@ -1,6 +1,5 @@
-import { FC, ChangeEvent, useState } from "react";
-import { format } from "date-fns";
-import PropTypes from "prop-types";
+import { FC, ChangeEvent, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import {
   Tooltip,
   Divider,
@@ -21,56 +20,36 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader,
-} from "@mui/material";
+  CardHeader
+} from '@mui/material';
 
-import Label from "@/components/Label";
-import { Shelf, ShelfStatus  } from "@/model/setup/shelf";
-import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
-import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
-import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
-import BulkActions from "./BulkActions";
-import NextLink from "next/link";
+// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
+import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import BulkActions from './BulkActions';
 import { useRouter } from 'next/router';
+import getConfig from "next/config";
 
-interface SetupShelfTableProps {
+const { publicRuntimeConfig } = getConfig();
+
+interface RecentOrdersTableProps {
   className?: string;
-  mockShelves: Shelf[];
+  cryptoOrders: CryptoOrder[];
 }
 
 interface Filters {
-  status?: ShelfStatus;
+  status?: CryptoOrderStatus;
 }
 
-// const getStatusLabel = (ShelfStatus: ShelfStatus): JSX.Element => {
-//   const map = {
-//     failed: {
-//       text: 'Failed',
-//       color: 'error'
-//     },
-//     completed: {
-//       text: 'Completed',
-//       color: 'success'
-//     },
-//     pending: {
-//       text: 'Pending',
-//       color: 'warning'
-//     }
-//   };
-
-//   const { text, color }: any = map[ShelfStatus];
-
-//   return <Label color={color}>{text}</Label>;
-// };
-
 const applyFilters = (
-  mockShelves: Shelf[],
+  cryptoOrders: CryptoOrder[],
   filters: Filters
-): Shelf[] => {
-  return mockShelves.filter((mockShelve) => {
+): CryptoOrder[] => {
+  return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
-    if (filters.status && mockShelve.status !== filters.status) {
+    if (filters.status && cryptoOrder.status !== filters.status) {
       matches = false;
     }
 
@@ -79,79 +58,95 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  mockShelves: Shelf[],
+  cryptoOrders: CryptoOrder[],
   page: number,
   limit: number
-): Shelf[] => {
-  return mockShelves.slice(page * limit, page * limit + limit);
+): CryptoOrder[] => {
+  return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
   const router = useRouter();
-  const [selectedMockShelves, setSelectedMockShelves] = useState<string[]>(
-    []
-  );
-  const selectedBulkActions = selectedMockShelves.length > 0;
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
+  const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null,
+    status: null
   });
+  const [cryptoOrders, setCryptoOrders] = useState([]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}shelf`, {
+          method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const responseData = await response.json();
+          if (responseData && responseData.data && Array.isArray(responseData.data)) {
+            setCryptoOrders(responseData.data);
+          } else {
+            console.error('Invalid data format from API');
+          }
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          console.error('Failed to fetch crypto orders');
+        }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
 
-  const statusOptions = [
-    {
-      id: "all",
-      name: "All",
-    },
-    {
-      id: "completed",
-      name: "Completed",
-    },
-    {
-      id: "pending",
-      name: "Pending",
-    },
-    {
-      id: "failed",
-      name: "Failed",
-    },
-  ];
-
+    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
+  }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
+  
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
+    let value = null;
 
-    if (e.target.value !== "all") {
+    if (e.target.value !== 'all') {
       value = e.target.value;
     }
 
     setFilters((prevFilters) => ({
       ...prevFilters,
-      status: value,
+      status: value
     }));
   };
 
-  const handleSelectAllSetupShelf = (
+  const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedMockShelves(
+    setSelectedCryptoOrders(
       event.target.checked
-        ? mockShelves.map((mockShelve) => mockShelve.id)
+        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
         : []
     );
   };
 
-  const handleSelectOneSetupShelf = (
+  const handleSelectOneCryptoOrder = (
     _event: ChangeEvent<HTMLInputElement>,
-    setupShelfId: string
+    cryptoOrderId: string
   ): void => {
-    if (!selectedMockShelves.includes(setupShelfId)) {
-      setSelectedMockShelves((prevSelected) => [
+    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
+      setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        setupShelfId,
+        cryptoOrderId
       ]);
     } else {
-      setSelectedMockShelves((prevSelected) =>
-        prevSelected.filter((id) => id !== setupShelfId)
+      setSelectedCryptoOrders((prevSelected) =>
+        prevSelected.filter((id) => id !== cryptoOrderId)
       );
     }
   };
@@ -164,17 +159,17 @@ const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredMockShelves = applyFilters(mockShelves, filters);
-  const paginatedMockShelves = applyPagination(
-    filteredMockShelves,
+  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
+  const paginatedCryptoOrders = applyPagination(
+    filteredCryptoOrders,
     page,
     limit
   );
-  const selectedSomeMockShelves =
-    selectedMockShelves.length > 0 &&
-    selectedMockShelves.length < mockShelves.length;
-  const selectedAllMockShelves =
-    selectedMockShelves.length === mockShelves.length;
+  const selectedSomeCryptoOrders =
+    selectedCryptoOrders.length > 0 &&
+    selectedCryptoOrders.length < cryptoOrders.length;
+  const selectedAllCryptoOrders =
+    selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
   return (
@@ -186,26 +181,7 @@ const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
       )}
       {!selectedBulkActions && (
         <CardHeader
-          // action={
-          //   // <Box width={150}>
-          //   //   <FormControl fullWidth variant="outlined">
-          //   //     <InputLabel>Status</InputLabel>
-          //   //     <Select
-          //   //       value={filters.status || 'all'}
-          //   //       onChange={handleStatusChange}
-          //   //       label="Status"
-          //   //       autoWidth
-          //   //     >
-          //   //       {statusOptions.map((statusOption) => (
-          //   //         <MenuItem key={statusOption.id} value={statusOption.id}>
-          //   //           {statusOption.name}
-          //   //         </MenuItem>
-          //   //       ))}
-          //   //     </Select>
-          //   //   </FormControl>
-          //   // </Box>
-          // }
-          title="Shelf lists"
+          title="Unit lists"
         />
       )}
       <Divider />
@@ -213,86 +189,76 @@ const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              <TableCell padding="checkbox" align="center">
                 <Checkbox
                   color="primary"
-                  checked={selectedAllMockShelves}
-                  indeterminate={selectedSomeMockShelves}
-                  onChange={handleSelectAllSetupShelf}
+                  checked={selectedAllCryptoOrders}
+                  indeterminate={selectedSomeCryptoOrders}
+                  onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Shelf ID</TableCell>
-              <TableCell>Shelf Name</TableCell>
-              <TableCell>Description</TableCell>
+              <TableCell align="center">Unit ID</TableCell>
+              <TableCell align="center">Unit Name</TableCell>
+              <TableCell align="center">Description</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedMockShelves.map((mockShelve) => {
-              const isMockShelvesSelected = selectedMockShelves.includes(
-                mockShelve.id
+            {paginatedCryptoOrders.map((cryptoOrder) => {
+              const isCryptoOrderSelected = selectedCryptoOrders.includes(
+                cryptoOrder.id
               );
               return (
                 <TableRow
                   hover
-                  key={mockShelve.id}
-                  selected={isMockShelvesSelected}
+                  key={cryptoOrder.id}
+                  selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
-                      checked={isMockShelvesSelected}
+                      checked={isCryptoOrderSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneSetupShelf(event, mockShelve.id)
+                        handleSelectOneCryptoOrder(event, cryptoOrder.id)
                       }
-                      value={isMockShelvesSelected}
+                      value={isCryptoOrderSelected}
                     />
                   </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {mockShelve.shelfID}
-                    </Typography>
-                    {/* <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(mockShelve.orderDate, "MMMM dd yyyy")}
-                    </Typography> */}
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {mockShelve.shelfName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {mockShelve.shelfDescription}
-                    </Typography>
-                    {/* <Typography variant="body2" color="text.secondary" noWrap>
-                      {mockShelve.sourceDesc}
-                    </Typography> */}
-                  </TableCell>
-
-                  {/* <TableCell align="right">
-                    {getStatusLabel(mockShelve.status)}
-                  </TableCell> */}
                   <TableCell align="center">
-                    <Tooltip title="View Shelf" arrow>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.id}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.name}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.detail}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                  <Tooltip title="View Unit" arrow>
                         <IconButton
                           sx={{
                             "&:hover": {
@@ -300,25 +266,24 @@ const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
                             },
                             color: theme.palette.info.main,
                           }}
+                          onClick={() => router.push('/setup/shelf/info')}
                           color="inherit"
                           size="small"
-                          onClick={() => router.push('/setup/shelf/info')}
                         >
                           <VisibilityTwoToneIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
-
                       <IconButton
                         sx={{
-                          "&:hover": {
-                            background: theme.colors.primary.lighter,
+                          '&:hover': {
+                            background: theme.colors.primary.lighter
                           },
-                          color: theme.palette.primary.main,
+                          color: theme.palette.primary.main
                         }}
+                        onClick={() => router.push('/setup/shelf/AddShelf')}
                         color="inherit"
                         size="small"
-                        onClick={() => router.push('/setup/shelf/AddShelf')}
                       >
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
@@ -326,8 +291,8 @@ const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
                     <Tooltip title="Delete Order" arrow>
                       <IconButton
                         sx={{
-                          "&:hover": { background: theme.colors.error.lighter },
-                          color: theme.palette.error.main,
+                          '&:hover': { background: theme.colors.error.lighter },
+                          color: theme.palette.error.main
                         }}
                         color="inherit"
                         size="small"
@@ -345,7 +310,7 @@ const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredMockShelves.length}
+          count={filteredCryptoOrders.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -357,12 +322,12 @@ const SetupShelfTable: FC<SetupShelfTableProps> = ({ mockShelves }) => {
   );
 };
 
-SetupShelfTable.propTypes = {
-  mockShelves: PropTypes.array.isRequired,
+RecentOrdersTable.propTypes = {
+  cryptoOrders: PropTypes.array.isRequired,
 };
 
-SetupShelfTable.defaultProps = {
-  mockShelves: [],
+RecentOrdersTable.defaultProps = {
+  cryptoOrders: []
 };
 
-export default SetupShelfTable;
+export default RecentOrdersTable;

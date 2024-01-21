@@ -22,6 +22,7 @@ import LockOpenTwoToneIcon from "@mui/icons-material/LockOpenTwoTone";
 import AccountTreeTwoToneIcon from "@mui/icons-material/AccountTreeTwoTone";
 import Link from "next/link";
 import getConfig from "next/config";
+import { useRouter } from 'next/router';
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -61,6 +62,7 @@ const UserBoxDescription = styled(Typography)(
 );
 
 function HeaderUserbox() {
+  const router = useRouter();
   const [user, setUser] = useState({
     name: "",
     avatar: "",
@@ -70,8 +72,7 @@ function HeaderUserbox() {
   // const [isOpen, setOpen] = useState<boolean>(false);
   const [isOpen, setOpen] = useState(false);
 
-  useEffect(() => {
-    
+  useEffect(() => { 
     const fetchUserInfo = async () => {
       try {
         const token = localStorage.getItem('accessToken');
@@ -84,14 +85,18 @@ function HeaderUserbox() {
           });
 
           if (response.ok) {
-            
             const userData = await response.json();
             console.log('ok', userData);
             setUser({
               name: userData.data.full_name,
               avatar: userData.data.image_url,
             });
-            
+          
+          } else if (response.status === 401) {
+            // Token หมดอายุหรือไม่ถูกต้อง
+            console.log('Token expired or invalid');
+            // ทำการลบ token ที่หมดอายุจาก localStorage
+            localStorage.removeItem('accessToken');
           } else {
             // Handle error when fetching user info
             console.error('Error fetching user info:', response.statusText);

@@ -1,10 +1,14 @@
+import Head from "next/head";
 import * as React from 'react';
+import { ReactElement, useState } from "react";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
   Button,
   Checkbox,
   Grid,
+  Card,
   TextField,
+  CardContent,
   Typography,
   Avatar,
   CssBaseline,
@@ -12,54 +16,77 @@ import {
   Box,
   Container,
 } from '@mui/material';
-import { useRouter } from 'next/router';
 import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
+import { useRouter } from 'next/router';
 import getConfig from "next/config";
-import Image from 'next/image';
+
 const { publicRuntimeConfig } = getConfig();
+
 const queryClient = new QueryClient();
 
 function SignUp() {
   const router = useRouter();
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [file, setFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
+  const [formData, setFormData] = useState({
+    full_name: "",
+    username: "",
+    password: "",
+    // upload_image: imageUrl,
+  });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const userData = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        Full_name: data.get('Full_name'),
-        username: data.get('username'),
-        password: data.get('password'),
-      }),
-    };
-
+    const formRegister = new FormData();
+    formRegister.append('full_name', formData.full_name);
+    formRegister.append('username', formData.username);
+    formRegister.append('password', formData.password);
+    formRegister.append('upload_image', file);  // แนบรูปภาพ
     try {
-      const response = await fetch(`${publicRuntimeConfig.BackEnd}auth/register`, userData);
+      const response = await fetch(`${publicRuntimeConfig.BackEnd}auth/register`, {
+        method: 'POST',
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
+        body: formRegister,
+      });
+      console.log('formData:', formRegister);
+      console.log('full_name:', formRegister.get('full_name'));
+      console.log('username:', formRegister.get('username'));
+      console.log('password:', formRegister.get('password'));
       if (response.ok) {
         // ดำเนินการหลังจากการเรียก API ที่สำเร็จ
-        router.push('/'); // ไปยังหน้าที่ต้องการหลังจาก Sign Up สำเร็จ
-        console.log('Signed up successfully!');
+        const responseData = await response.json();
+        const uploadedImageUrl = responseData.upload_image;
+        setImageUrl(uploadedImageUrl);
+        console.log('Response Data:', responseData);
+        console.log('Registed successfully!');
+        router.push('/auth/login'); // ไปยังหน้าที่ต้องการหลังจาก Sign Up สำเร็จ
       } else {
         // ถ้าการเรียก API ไม่สำเร็จ
-        console.error('Sign up failed');
+        console.error('Register failed');
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    setSelectedFile(file || null);
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+  
+    if (selectedFile) {
+      // ทำการอ่านไฟล์รูปภาพ
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result);
+      };
+      reader.readAsDataURL(selectedFile);
+  
+      setFile(selectedFile);  // เซ็ตค่า file ใน state
+    }
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
       <div className="flex items-center justify-center min-h-screen">
         <Container component="main" maxWidth="xs">
           <CssBaseline />
@@ -71,7 +98,7 @@ function SignUp() {
               <Typography component="h1" variant="h5">
                 Register
               </Typography>
-              <form className="mt-1 w-full" onSubmit={handleSubmit} noValidate>
+              <form className="mt-1 w-full" noValidate onSubmit={handleRegister}>
                 <TextField
                   margin="normal"
                   required
@@ -81,6 +108,8 @@ function SignUp() {
                   name="Full_name"
                   autoComplete="Full_name"
                   autoFocus
+                  value={formData.full_name}
+                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                 />
                 <TextField
                   margin="normal"
@@ -91,6 +120,8 @@ function SignUp() {
                   name="username"
                   autoComplete="username"
                   autoFocus
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 />
                 <TextField
                   margin="normal"
@@ -101,44 +132,30 @@ function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="current-password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
-                <Grid container  className="mt-1">
-                  {selectedFile && (
-                    <div className="mt-3">
-                      <Typography variant="body1">Uploaded Image:</Typography>
-                      <Image
-                        src={`/images/${selectedFile.name}`} // Assuming the file is uploaded to the 'images' folder inside the 'public' directory
-                        alt="Uploaded"
-                        layout="responsive"
-                        width={800}
-                        height={400}
-                      />
-                    </div>
-                  )}
-                  <input
-                    id="upload-image"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  <label htmlFor="upload-image">
-                    <Button
-                      variant="outlined"
-                      component="span"
-                      className="mt-3 mb-2"
-                    >
-                      Upload Image
-                    </Button>
-                  </label>
-                </Grid>
+                <input
+                  id="dropzone-file"
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                {imageUrl && (
+                  <img src={imageUrl} alt="Uploaded Image" className="w-300 h-300 justify-center" />
+                )}
+                <Button variant="outlined" component="label" htmlFor="dropzone-file" className="mt-2">
+                  Upload Image
+                </Button>
+    
                 <Button
-                  type="submit"
                   fullWidth
                   variant="outlined"
                   className="mt-3 mb-2"
-                  onClick={() => router.push('/')}
-                >
+                  component="a"
+                  type="submit"
+                  onClick={handleRegister}
+                  >
                   Register
                 </Button>
                 <Grid
@@ -163,7 +180,6 @@ function SignUp() {
           </Box>
         </Container>
       </div>
-    </QueryClientProvider>
   );
 }
 export default SignUp;

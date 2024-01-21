@@ -1,4 +1,4 @@
-import { FC, ChangeEvent, useState } from "react";
+import { FC, ChangeEvent, useState, } from "react";
 import { format } from "date-fns";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import PropTypes from "prop-types";
@@ -40,7 +40,10 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { CardActionArea } from "@mui/material";
 import NextLink from "next/link";
+import { useRouter } from 'next/router';
+import getConfig from "next/config";
 
+const { publicRuntimeConfig } = getConfig();
 
 interface SetupShelfInfoTableProps {
   className?: string;
@@ -50,27 +53,6 @@ interface SetupShelfInfoTableProps {
 interface Filters {
   status?: ShelfInfoStatus;
 }
-
-// const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
-//   const map = {
-//     failed: {
-//       text: 'Failed',
-//       color: 'error'
-//     },
-//     completed: {
-//       text: 'Completed',
-//       color: 'success'
-//     },
-//     pending: {
-//       text: 'Pending',
-//       color: 'warning'
-//     }
-//   };
-
-//   const { text, color }: any = map[cryptoOrderStatus];
-
-//   return <Label color={color}>{text}</Label>;
-// };
 
 const applyFilters = (
   cryptoOrders: ShelfInfo[],
@@ -98,16 +80,6 @@ const applyPagination = (
 const SetupShelfInfoTable: FC<SetupShelfInfoTableProps> = ({cryptoOrders}) => {
 
   const columns: GridColDef[] = [
-    // { 
-    //   field: 'id', 
-    //   headerName: 'Floor ID',
-    //   width: 70 
-    // },
-    // { 
-    //   field: 'floorId', 
-    //   headerName: 'Floor ID', 
-    //   width: 130 
-    // },
     { 
       field: 'floorName', 
       headerName: 'Floor', 

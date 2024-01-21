@@ -3,7 +3,7 @@ import SidebarLayout from '@/layout/SidebarLayout';
 import PageHeader from '@/content/setup/unit/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
-
+import RecentOrdersTable from '@/content/setup/unit/UnitTable';
 import RecentOrders from '@/content/setup/unit/UnitView';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
@@ -29,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <RecentOrders />
+            <RecentOrdersTable />
           </Grid>
         </Grid>
       </Container>

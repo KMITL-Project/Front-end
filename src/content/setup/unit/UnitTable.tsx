@@ -1,6 +1,4 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
-import numeral from 'numeral';
+import { FC, ChangeEvent, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   Tooltip,
@@ -25,14 +23,15 @@ import {
   CardHeader
 } from '@mui/material';
 
-import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
+// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
-import NextLink from "next/link";
 import { useRouter } from 'next/router';
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -42,27 +41,6 @@ interface RecentOrdersTableProps {
 interface Filters {
   status?: CryptoOrderStatus;
 }
-
-// const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
-//   const map = {
-//     failed: {
-//       text: 'Failed',
-//       color: 'error'
-//     },
-//     completed: {
-//       text: 'Completed',
-//       color: 'success'
-//     },
-//     pending: {
-//       text: 'Pending',
-//       color: 'warning'
-//     }
-//   };
-
-//   const { text, color }: any = map[cryptoOrderStatus];
-
-//   return <Label color={color}>{text}</Label>;
-// };
 
 const applyFilters = (
   cryptoOrders: CryptoOrder[],
@@ -87,37 +65,53 @@ const applyPagination = (
   return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
   const router = useRouter();
-  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
-    []
-  );
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
   const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
+  const [cryptoOrders, setCryptoOrders] = useState([]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
+          method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const responseData = await response.json();
+          if (responseData && responseData.data && Array.isArray(responseData.data)) {
+            setCryptoOrders(responseData.data);
+          } else {
+            console.error('Invalid data format from API');
+          }
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          console.error('Failed to fetch crypto orders');
+        }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
 
-  const statusOptions = [
-    {
-      id: 'all',
-      name: 'All'
-    },
-    {
-      id: 'completed',
-      name: 'Completed'
-    },
-    {
-      id: 'pending',
-      name: 'Pending'
-    },
-    {
-      id: 'failed',
-      name: 'Failed'
-    }
-  ];
-
+    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
+  }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
+  
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
     let value = null;
 
@@ -144,7 +138,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const handleSelectOneCryptoOrder = (
     _event: ChangeEvent<HTMLInputElement>,
     cryptoOrderId: string
-  ): void => {
+): void => {
     if (!selectedCryptoOrders.includes(cryptoOrderId)) {
       setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
@@ -155,6 +149,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
         prevSelected.filter((id) => id !== cryptoOrderId)
       );
     }
+
   };
 
   const handlePageChange = (_event: any, newPage: number): void => {
@@ -178,6 +173,40 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
+  const handleDeleteCryptoOrder = async (cryptoOrderId: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit/${cryptoOrderId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          // ดำเนินการหลังจากการลบ Unit สำเร็จ
+          console.log(`Unit with ID ${cryptoOrderId} deleted successfully!`);
+
+          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
+          // router.replace(router.asPath);
+          router.reload();
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          // ถ้าการลบ Unit ไม่สำเร็จ
+          console.error(`Failed to delete Unit with ID ${cryptoOrderId}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <Card>
       {selectedBulkActions && (
@@ -187,25 +216,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
       )}
       {!selectedBulkActions && (
         <CardHeader
-          // action={
-          //   // <Box width={150}>
-          //   //   <FormControl fullWidth variant="outlined">
-          //   //     <InputLabel>Status</InputLabel>
-          //   //     <Select
-          //   //       value={filters.status || 'all'}
-          //   //       onChange={handleStatusChange}
-          //   //       label="Status"
-          //   //       autoWidth
-          //   //     >
-          //   //       {statusOptions.map((statusOption) => (
-          //   //         <MenuItem key={statusOption.id} value={statusOption.id}>
-          //   //           {statusOption.name}
-          //   //         </MenuItem>
-          //   //       ))}
-          //   //     </Select>
-          //   //   </FormControl>
-          //   // </Box>
-          // }
           title="Unit lists"
         />
       )}
@@ -214,7 +224,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              <TableCell padding="checkbox" align="center">
                 <Checkbox
                   color="primary"
                   checked={selectedAllCryptoOrders}
@@ -222,10 +232,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Unit ID</TableCell>
-              <TableCell>Unit Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="center">Unit ID</TableCell>
+              <TableCell align="center">Unit Name</TableCell>
+              <TableCell align="center">Description</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -239,7 +249,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   key={cryptoOrder.id}
                   selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
                       checked={isCryptoOrderSelected}
@@ -249,7 +259,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       value={isCryptoOrderSelected}
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -257,13 +267,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderDetails}
+                      {cryptoOrder.id}
                     </Typography>
-                    {/* <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(cryptoOrder.orderDate, 'MMMM dd yyyy')}
-                    </Typography> */}
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -271,10 +278,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderID}
+                      {cryptoOrder.name}
                     </Typography>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -284,33 +291,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     >
                       {cryptoOrder.sourceName}
                     </Typography>
-                    {/* <Typography variant="body2" color="text.secondary" noWrap>
-                      {cryptoOrder.sourceDesc}
-                    </Typography> */}
                   </TableCell>
-                  {/* <TableCell align="right">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.amountCrypto}
-                      {cryptoOrder.cryptoCurrency}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {numeral(cryptoOrder.amount).format(
-                        `${cryptoOrder.currency}0,0.00`
-                      )}
-                    </Typography>
-                  </TableCell> */}
-                  {/* <TableCell align="right">
-                    {getStatusLabel(cryptoOrder.status)}
-                  </TableCell> */}
-                  <TableCell align="right">
+                  <TableCell align="center">
                   <Tooltip title="View Unit" arrow>
-                      {/* <NextLink href="/setup/unit/AddUnit" passHref> */}
                         <IconButton
                           sx={{
                             "&:hover": {
@@ -318,13 +301,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                             },
                             color: theme.palette.info.main,
                           }}
-                          onClick={() => router.push('/setup/unit/AddUnit')}
+                          onClick={() => router.push(`/setup/unit/info/${cryptoOrder.id}`)}
                           color="inherit"
                           size="small"
                         >
                           <VisibilityTwoToneIcon fontSize="small" />
                         </IconButton>
-                      {/* </NextLink> */}
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton
@@ -334,6 +316,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                           },
                           color: theme.palette.primary.main
                         }}
+                        onClick={() => router.push(`/setup/unit/edit/${cryptoOrder.id}`)}
                         color="inherit"
                         size="small"
                       >
@@ -348,6 +331,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                         }}
                         color="inherit"
                         size="small"
+                        onClick={() => handleDeleteCryptoOrder(cryptoOrder.id)}
                       >
                         <DeleteTwoToneIcon fontSize="small" />
                       </IconButton>
@@ -375,7 +359,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
 };
 
 RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired
+  cryptoOrders: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {

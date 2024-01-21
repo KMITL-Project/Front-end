@@ -1,17 +1,14 @@
-import React from 'react';
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/shelf/ShelfPageHeader';
+import PageHeader from '@/content/setup/unit/Info/UnitInfoPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
-import RecentOrdersTable from '@/content/setup/shelf/ShelfTable';
-import RecentOrders from '@/content/setup/shelf/ShelfView';
 import { ReactElement } from 'react';
+import InfoUnit from '@/content/setup/unit/Info/UnitInfo';
 import Breadcrumb from '@/components/Breadcrumbs';
 
-
 function ApplicationsTransactions() {
-  const pageData: string = 'Home > Shelf'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Unit/Unit Info'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -32,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <RecentOrdersTable />
+            <InfoUnit/>
           </Grid>
         </Grid>
       </Container>
@@ -45,3 +42,6 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
+
+
+

@@ -1,9 +1,6 @@
 import Head from "next/head";
 import SidebarLayout from "@/layout/SidebarLayout";
-import PageTitle from "@/components/PageTitle";
 import { ReactElement, useState } from "react";
-
-import PageTitleWrapper from "@/components/PageTitleWrapper";
 import {
   Container,
   Grid,
@@ -13,61 +10,62 @@ import {
   Divider,
   Button,
 } from "@mui/material";
-import Footer from "@/components/Footer";
-
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import { pink } from "@mui/material/colors";
-import Checkbox from "@mui/material/Checkbox";
-
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
-
-import Stack from "@mui/material/Stack";
-import Slider from "@mui/material/Slider";
-import VolumeDown from "@mui/icons-material/VolumeDown";
-import VolumeUp from "@mui/icons-material/VolumeUp";
-
-import Switch from "@mui/material/Switch";
-import NextLink from 'next/link';
-import router from "next/router";
 import { useRouter } from 'next/router';
+import getConfig from "next/config";
 
-
-const label = { inputProps: { "aria-label": "Switch demo" } };
-
-const currencies = [
-  {
-    value: "USD",
-    label: "$",
-  },
-  {
-    value: "EUR",
-    label: "€",
-  },
-  {
-    value: "BTC",
-    label: "฿",
-  },
-  {
-    value: "JPY",
-    label: "¥",
-  },
-];
+const { publicRuntimeConfig } = getConfig();
 
 function Forms() {
   const router = useRouter();
-  // const currentRoute = router.pathname;
-
-  const [currency, setCurrency] = useState("EUR");
-
-  const handleChange = (event) => {
-    setCurrency(event.target.value);
+  const [formData, setFormData] = useState({
+    name: "เครื่องมืองานเหล็ก",
+    description: "ใช้สำหรับงานเหล็ก",
+  });
+  const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // const data = new FormData(event.currentTarget); // ใช้ event.currentTarget เพื่อให้ได้ form element ที่ถูกต้อง
+    const token = localStorage.getItem('accessToken');
+    const requestData = {
+      method: 'POST', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+      headers: {
+        'Content-Type': 'application/json', // กำหนด Content-Type ตาม API ของคุณ
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: formData.name, // ใช้ 'username' เนื่องจากชื่อฟิลด์ในฟอร์มคือ 'username'
+        detail: formData.description,
+      }),
+    };
+    try {
+      if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit`, requestData);
+        if (response.ok) {
+          // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
+          console.log('Unit created successfully!');
+          router.push('/setup/unit/');
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          // ถ้าการสร้าง Unit ไม่สำเร็จ
+          console.error('Unit creation failed');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
+  const handleChange = (event) => {
+    setFormData({
+      ...formData,
+      [event.target.id]: event.target.value,
+    });
+  };
+  const [currency, setCurrency] = useState("EUR");
 
   const [value, setValue] = useState(30);
 
@@ -80,7 +78,6 @@ function Forms() {
       <Head>
         <title></title>
       </Head>
-   
       <Container maxWidth="lg">
         <Grid
           container
@@ -89,69 +86,67 @@ function Forms() {
           alignItems="stretch"
           spacing={1}
         >
-          <Grid 
+        <Grid 
           item xs={10}
           direction="column"
           justifyContent="center"
-          >
+        >    
+        <Card>
+          <CardHeader title="Create Unit" />
+          <Divider />
+          <CardContent>
+            <Box
+              component="form"
+              sx={{
+                "& .MuiTextField-root": { m: 1, width: "60ch" },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+            <div>
+              <TextField
+                required
+                id="name"
+                label="Unit Name"
+                defaultValue={formData.name}
+                onChange={handleChange}
+              />
+
+              <TextField
+                required
+                id="description"
+                label="Unit Description"
+                defaultValue={formData.description}
+                onChange={handleChange}
+              />
             
-            <Card>
-              <CardHeader title="Unit Details" />
-              <Divider />
-              <CardContent>
-                <Box
-                  component="form"
-                  sx={{
-                    "& .MuiTextField-root": { m: 1, width: "60ch" },
-                  }}
-                  noValidate
-                  autoComplete="off"
+              <Grid container justifyContent="flex-end">
+                <Button
+                  // type="submit"
+                  variant="contained" 
+                  sx={{ margin:1}}
+                  onClick={handleCreateUnit}
+                  disableRipple
+                  component="a"
+
+                >Create
+                  {" "}
+                </Button>
+                <Button
+                  variant="contained" 
+                  sx={{ margin:1}}
+                  color="error"
+                  onClick={() => router.push('/setup/unit/')}
+                  disableRipple
+                  component="a"
                 >
-                  <div>
-                    <TextField
-                      required
-                      id="outlined-required"
-                      label="Unit Name"
-                      defaultValue="เครื่องมืองานเหล็ก"
-                    />
-
-                    <TextField
-                      required
-                      id="outlined-required"
-                      label="Unit Description"
-                      defaultValue="ใช้สำหรับงานเหล็ก"
-                    />
-                 
-                    <Grid item>
-        {/* <NextLink href="/setup/unit/" passHref> */}
-        <Button
-            variant="contained" sx={{ margin:1}}
-            // className={currentRoute === "/setup/unit/" ? "active" : ""}
-            onClick={() => router.push('/setup/unit/')}
-            disableRipple
-            component="a"
-
-          >Save
-            {" "}
-          </Button>
-        {/* </NextLink> */}
-        {/* <NextLink href="/setup/unit/" passHref> */}
-        <Button
-            variant="contained" sx={{ margin:1}}
-            color="error"
-            onClick={() => router.push('/setup/unit/')}
-            // className={currentRoute === "/setup/unit/" ? "active" : ""}
-            disableRipple
-            component="a"
-          >
-            Cancel{" "}
-          </Button>
-        {/* </NextLink> */}
-      </Grid>
-                  </div>
-                </Box>
-              </CardContent>
-            </Card>
+                  Cancel{" "}
+                </Button>
+              </Grid>
+            </div>
+            </Box>
+          </CardContent>
+          </Card>
           </Grid>
         </Grid>
       </Container>
