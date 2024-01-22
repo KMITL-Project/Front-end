@@ -97,18 +97,13 @@ const InfoUnit: FC<EditUnitProps> = () => {
                             <CardHeader title="Unit Info" />
                             <Divider />
                             <CardContent>
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        "& .MuiTextField-root": { m: 1, width: "60ch" },
-                                    }}
-                                    noValidate
-                                    autoComplete="off"
-                                    >
+                              <Grid container spacing={3} justifyContent="center">
+                                <Grid item xs={12} sm={6} className="mt-5">
                                     <TextField
                                         required
                                         fullWidth
                                         label="Unit Name"
+                                        className="mb-4" 
                                         variant="outlined"
                                         value={unitData.name}
                                         InputProps={{ readOnly: true }}
@@ -118,11 +113,13 @@ const InfoUnit: FC<EditUnitProps> = () => {
                                         required
                                         fullWidth
                                         label="Unit Detail"
+                                        className="mb-4" 
                                         variant="outlined"
                                         value={unitData.detail}
                                         InputProps={{ readOnly: true }}
                                         // onChange={(e) => setUnitData({ ...unitData, detail: e.target.value })}
                                     />
+                                    </Grid>
                                     <Grid container justifyContent="flex-end">
                                         <Button
                                             // type="submit"
@@ -136,7 +133,7 @@ const InfoUnit: FC<EditUnitProps> = () => {
                                             {" "}
                                         </Button>
                                     </Grid>
-                                </Box>
+                                </Grid>
                             </CardContent>
                         </Card>
                     </Grid>

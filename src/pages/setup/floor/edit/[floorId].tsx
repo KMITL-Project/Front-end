@@ -1,20 +1,20 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/unit/AddUnitPageHeader';
+import PageHeader from '@/content/setup/shelf/Floor/Edit/FloorEditPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container, Typography } from '@mui/material';
-
-import RecentOrders from '@/content/setup/category/CategoryView';
+import { Grid, Container } from '@mui/material';
 import { ReactElement } from 'react';
-import Forms from '@/content/setup/unit/AddUnit';
+import FloorEdit from '@/content/setup/shelf/Floor/Edit/FloorEdit'
+import MaterialInfoPage from '@/content/management/material/info/MaterialInfo';
 import Breadcrumb from '@/components/Breadcrumbs';
 
+
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Unit/Add Unit'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Floor/Floor Edit'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
-     <Head>
+      <Head>
         <title></title>
       </Head>
       <PageTitleWrapper>
@@ -31,7 +31,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <Forms />
+            <FloorEdit/>
           </Grid>
         </Grid>
       </Container>

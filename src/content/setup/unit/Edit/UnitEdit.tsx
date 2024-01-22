@@ -132,54 +132,51 @@ const EditUnit: FC<EditUnitProps> = () => {
                             <CardHeader title="Edit Unit" />
                             <Divider />
                             <CardContent>
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        "& .MuiTextField-root": { m: 1, width: "60ch" },
-                                    }}
-                                    noValidate
-                                    autoComplete="off"
-                                    >
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Unit Name"
-                                        variant="outlined"
-                                        value={unitData.name}
-                                        onChange={(e) => setUnitData({ ...unitData, name: e.target.value })}
+                              <Grid container spacing={3} justifyContent="center">
+                                <Grid item xs={12} sm={6} className="mt-5">
+                                  <TextField
+                                      required
+                                      fullWidth
+                                      label="Unit Name"
+                                      className="mb-4"
+                                      variant="outlined"
+                                      value={unitData.name}
+                                      onChange={(e) => setUnitData({ ...unitData, name: e.target.value })}
                                     />
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Unit Detail"
-                                        variant="outlined"
-                                        value={unitData.detail}
-                                        onChange={(e) => setUnitData({ ...unitData, detail: e.target.value })}
+                                  <TextField
+                                      required
+                                      fullWidth
+                                      label="Unit Detail"
+                                      className="mb-4"
+                                      variant="outlined"
+                                      value={unitData.detail}
+                                      onChange={(e) => setUnitData({ ...unitData, detail: e.target.value })}
                                     />
-                                    <Grid container justifyContent="flex-end">
-                                        <Button
-                                            // type="submit"
-                                            variant="contained" 
-                                            sx={{ margin:1}}
-                                            onClick={handleUpdateUnit}
-                                            disableRipple
-                                            component="a"
+                                </Grid>
+                                  <Grid container justifyContent="flex-end">
+                                      <Button
+                                          // type="submit"
+                                          variant="contained" 
+                                          sx={{ margin:1}}
+                                          onClick={handleUpdateUnit}
+                                          disableRipple
+                                          component="a"
 
-                                            >Update
-                                            {" "}
-                                        </Button>
-                                        <Button
-                                            variant="contained" 
-                                            sx={{ margin:1}}
-                                            color="error"
-                                            onClick={() => router.push('/setup/unit/')}
-                                            disableRipple
-                                            component="a"
-                                            >
-                                            Cancel{" "}
-                                        </Button>
-                                    </Grid>
-                                </Box>
+                                          >Update
+                                          {" "}
+                                      </Button>
+                                      <Button
+                                          variant="contained" 
+                                          sx={{ margin:1}}
+                                          color="error"
+                                          onClick={() => router.push('/setup/unit/')}
+                                          disableRipple
+                                          component="a"
+                                          >
+                                          Cancel{" "}
+                                      </Button>
+                                  </Grid>
+                                </Grid>
                             </CardContent>
                         </Card>
                     </Grid>

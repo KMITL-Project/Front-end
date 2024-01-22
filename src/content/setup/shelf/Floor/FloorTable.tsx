@@ -1,4 +1,5 @@
 import { FC, ChangeEvent, useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import {
   Tooltip,
@@ -27,7 +28,7 @@ import {
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
+import BulkActions from '@/content/setup/shelf/Floor/BulkActions';
 import { useRouter } from 'next/router';
 import getConfig from "next/config";
 
@@ -81,7 +82,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
       try {
         const token = localStorage.getItem('accessToken');
         if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}shelf`, {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
           method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
           headers: {
             'Content-Type': 'application/json',
@@ -215,7 +216,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
       )}
       {!selectedBulkActions && (
         <CardHeader
-          title="Shelf lists"
+          title="Floor lists"
         />
       )}
       <Divider />
@@ -231,9 +232,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">Shelf ID</TableCell>
-              <TableCell align="center">Shelf Name</TableCell>
+              <TableCell align="center">Floor ID</TableCell>
+              <TableCell align="center">Floor Name</TableCell>
               <TableCell align="center">Description</TableCell>
+              <TableCell align="center">Date</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -292,7 +294,18 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                  <Tooltip title="View Unit" arrow>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.created_at ? format(new Date(cryptoOrder.created_at), 'yyyy-MM-dd') : ''}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                  <Tooltip title="View Floor" arrow>
                         <IconButton
                           sx={{
                             "&:hover": {
@@ -300,14 +313,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                             },
                             color: theme.palette.info.main,
                           }}
-                          onClick={() => router.push(`/setup/shelf/info/${cryptoOrder.id}`)}
+                          onClick={() => router.push(`/setup/floor/info/${cryptoOrder.id}`)}
                           color="inherit"
                           size="small"
                         >
                           <VisibilityTwoToneIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
+                    <Tooltip title="Edit Floor" arrow>
                       <IconButton
                         sx={{
                           '&:hover': {
@@ -315,14 +328,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                           },
                           color: theme.palette.primary.main
                         }}
-                        onClick={() => router.push(`/setup/shelf/edit/${cryptoOrder.id}`)}
+                        onClick={() => router.push(`/setup/floor/edit/${cryptoOrder.id}`)}
                         color="inherit"
                         size="small"
                       >
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
+                    <Tooltip title="Delete Floor" arrow>
                       <IconButton
                         sx={{
                           '&:hover': { background: theme.colors.error.lighter },

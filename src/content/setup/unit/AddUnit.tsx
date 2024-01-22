@@ -65,47 +65,22 @@ function Forms() {
       [event.target.id]: event.target.value,
     });
   };
-  const [currency, setCurrency] = useState("EUR");
-
-  const [value, setValue] = useState(30);
-
-  const handleChange2 = (_event, newValue) => {
-    setValue(newValue);
-  };
 
   return (
     <>
       <Head>
         <title></title>
       </Head>
-      <Container maxWidth="lg">
-        <Grid
-          container
-          direction="column"
-          justifyContent="center"
-          alignItems="stretch"
-          spacing={1}
-        >
-        <Grid 
-          item xs={10}
-          direction="column"
-          justifyContent="center"
-        >    
-        <Card>
-          <CardHeader title="Create Unit" />
-          <Divider />
-          <CardContent>
-            <Box
-              component="form"
-              sx={{
-                "& .MuiTextField-root": { m: 1, width: "60ch" },
-              }}
-              noValidate
-              autoComplete="off"
-            >
-            <div>
+      <Card>
+        <CardHeader title="Create Unit" />
+        <Divider />
+        <CardContent>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item xs={12} sm={6} className="mt-5">
               <TextField
                 required
+                fullWidth
+                className="mb-4" 
                 id="name"
                 label="Unit Name"
                 defaultValue={formData.name}
@@ -114,42 +89,40 @@ function Forms() {
 
               <TextField
                 required
+                fullWidth
+                className="mb-4" 
                 id="description"
                 label="Unit Description"
                 defaultValue={formData.description}
                 onChange={handleChange}
               />
-            
-              <Grid container justifyContent="flex-end">
-                <Button
-                  // type="submit"
-                  variant="contained" 
-                  sx={{ margin:1}}
-                  onClick={handleCreateUnit}
-                  disableRipple
-                  component="a"
+            </Grid>
+            <Grid container justifyContent="flex-end" className="mt-5">
+              <Button
+                // type="submit"
+                variant="contained" 
+                sx={{ margin:1}}
+                onClick={handleCreateUnit}
+                disableRipple
+                component="a"
 
-                >Create
-                  {" "}
-                </Button>
-                <Button
-                  variant="contained" 
-                  sx={{ margin:1}}
-                  color="error"
-                  onClick={() => router.push('/setup/unit/')}
-                  disableRipple
-                  component="a"
-                >
-                  Cancel{" "}
-                </Button>
-              </Grid>
-            </div>
-            </Box>
-          </CardContent>
-          </Card>
+              >Create
+                {" "}
+              </Button>
+              <Button
+                variant="contained" 
+                sx={{ margin:1}}
+                color="error"
+                onClick={() => router.push('/setup/unit/')}
+                disableRipple
+                component="a"
+              >
+                Cancel{" "}
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+        </CardContent>
+      </Card>
     </>
   );
 }

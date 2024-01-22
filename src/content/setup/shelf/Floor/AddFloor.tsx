@@ -17,6 +17,8 @@ const { publicRuntimeConfig } = getConfig();
 
 function Forms() {
   const router = useRouter();
+  const { shelfId } = router.query;
+  console.log('Id:', shelfId);
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
   const [formData, setFormData] = useState({
@@ -29,12 +31,14 @@ function Forms() {
     event.preventDefault();
     const token = localStorage.getItem('accessToken');
     const formDataToSend = new FormData();
-    formDataToSend.append('image_url', file);  // แนบรูปภาพ
+    formDataToSend.append('shelve_id', shelfId);
     formDataToSend.append('name', formData.name);
+    formDataToSend.append('image_url', file);  // แนบรูปภาพ
     formDataToSend.append('detail', formData.detail);
+    
     try {
       if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}shelf`, {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`
@@ -94,7 +98,7 @@ function Forms() {
         <title></title>
       </Head>
         <Card>
-        <CardHeader title="Create Shelf" />
+        <CardHeader title="Create Floor" />
         <Divider />
           <CardContent>
               <Grid container spacing={3} justifyContent="center">
@@ -109,7 +113,7 @@ function Forms() {
                       fullWidth
                       className="mb-4" 
                       id="name"
-                      label="Shelf Name"
+                      label="Floor Name"
                       defaultValue={formData.name}
                       onChange={handleChange}
                       />
@@ -118,7 +122,7 @@ function Forms() {
                       fullWidth
                       className="mb-4" 
                       id="detail"
-                      label="Shlef detail"
+                      label="Floor detail"
                       defaultValue={formData.detail}
                       onChange={handleChange}
                   />

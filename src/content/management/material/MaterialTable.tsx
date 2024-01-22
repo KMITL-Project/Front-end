@@ -1,35 +1,55 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
+import { FC, ChangeEvent, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {Tooltip, Divider, Box, Card, Checkbox, IconButton, Table,
-  TableBody, TableCell, TableHead, TablePagination, TableRow, TableContainer,
-  Typography, useTheme, CardHeader
+import {
+  Tooltip,
+  Divider,
+  Box,
+  FormControl,
+  InputLabel,
+  Card,
+  Checkbox,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TableContainer,
+  Select,
+  MenuItem,
+  Typography,
+  useTheme,
+  CardHeader
 } from '@mui/material';
-import { materialOrder, materialStatus } from '@/model/management/material';
+
+// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 interface RecentOrdersTableProps {
   className?: string;
-  materialOrders: materialOrder[];
+  cryptoOrders: CryptoOrder[];
 }
 
 interface Filters {
-  status?: materialStatus;
+  status?: CryptoOrderStatus;
 }
 
 const applyFilters = (
-  materialOrders: materialOrder[],
+  cryptoOrders: CryptoOrder[],
   filters: Filters
-): materialOrder[] => {
-  return materialOrders.filter((materialOrder) => {
+): CryptoOrder[] => {
+  return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
-    if (filters.status && materialOrder.status !== filters.status) {
+    if (filters.status && cryptoOrder.status !== filters.status) {
       matches = false;
     }
 
@@ -38,26 +58,62 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  materialOrders: materialOrder[],
+  cryptoOrders: CryptoOrder[],
   page: number,
   limit: number
-): materialOrder[] => {
-  return materialOrders.slice(page * limit, page * limit + limit);
+): CryptoOrder[] => {
+  return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
-  
+const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
   const router = useRouter();
-  const [selectedmaterialOrders, setSelectedmaterialOrders] = useState<string[]>(
-    []
-  );
-  const selectedBulkActions = selectedmaterialOrders.length > 0;
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
+  const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
-  const [filters, setFilters] = useState<Filters>({status: 'completed'});
+  const [filters, setFilters] = useState<Filters>({
+    status: null
+  });
+  const [cryptoOrders, setCryptoOrders] = useState([]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
+          method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const responseData = await response.json();
+          if (responseData && responseData.data && Array.isArray(responseData.data)) {
+            setCryptoOrders(responseData.data);
+          } else {
+            console.error('Invalid data format from API');
+          }
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          console.error('Failed to fetch crypto orders');
+        }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
 
+    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
+  }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
+  
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
+    let value = null;
 
     if (e.target.value !== 'all') {
       value = e.target.value;
@@ -69,28 +125,28 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
     }));
   };
 
-  const handleSelectAllmaterialOrders = (
+  const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedmaterialOrders(
+    setSelectedCryptoOrders(
       event.target.checked
-        ? materialOrders.map((materialOrder) => materialOrder.id)
+        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
         : []
     );
   };
 
-  const handleSelectOnematerialOrder = (
+  const handleSelectOneCryptoOrder = (
     _event: ChangeEvent<HTMLInputElement>,
-    materialOrderId: string
+    cryptoOrderId: string
   ): void => {
-    if (!selectedmaterialOrders.includes(materialOrderId)) {
-      setSelectedmaterialOrders((prevSelected) => [
+    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
+      setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        materialOrderId
+        cryptoOrderId
       ]);
     } else {
-      setSelectedmaterialOrders((prevSelected) =>
-        prevSelected.filter((id) => id !== materialOrderId)
+      setSelectedCryptoOrders((prevSelected) =>
+        prevSelected.filter((id) => id !== cryptoOrderId)
       );
     }
   };
@@ -103,18 +159,52 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredmaterialOrders = applyFilters(materialOrders, filters);
-  const paginatedmaterialOrders = applyPagination(
-    filteredmaterialOrders,
+  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
+  const paginatedCryptoOrders = applyPagination(
+    filteredCryptoOrders,
     page,
     limit
   );
-  const selectedSomematerialOrders =
-    selectedmaterialOrders.length > 0 &&
-    selectedmaterialOrders.length < materialOrders.length;
-  const selectedAllmaterialOrders =
-    selectedmaterialOrders.length === materialOrders.length;
+  const selectedSomeCryptoOrders =
+    selectedCryptoOrders.length > 0 &&
+    selectedCryptoOrders.length < cryptoOrders.length;
+  const selectedAllCryptoOrders =
+    selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
+
+  const handleDeleteCryptoOrder = async (cryptoOrderId: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}material/${cryptoOrderId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          // ดำเนินการหลังจากการลบ Unit สำเร็จ
+          console.log(`Unit with ID ${cryptoOrderId} deleted successfully!`);
+
+          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
+          // router.replace(router.asPath);
+          router.reload();
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          // ถ้าการลบ Unit ไม่สำเร็จ
+          console.error(`Failed to delete Unit with ID ${cryptoOrderId}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
     <Card>
@@ -136,96 +226,90 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
               <TableCell padding="checkbox" align="center">
                 <Checkbox
                   color="primary"
-                  checked={selectedAllmaterialOrders}
-                  indeterminate={selectedSomematerialOrders}
-                  onChange={handleSelectAllmaterialOrders}
+                  checked={selectedAllCryptoOrders}
+                  indeterminate={selectedSomeCryptoOrders}
+                  onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Category</TableCell>
-              <TableCell align="center">Amount</TableCell>
-              <TableCell align="center">unit</TableCell>
-              <TableCell align="center">shelf</TableCell>
+              <TableCell align="center">Material ID</TableCell>
+              <TableCell align="center">Material Name</TableCell>
+              <TableCell align="center">Description</TableCell>
+              <TableCell align="center">Unit</TableCell>
+              <TableCell align="center">Total</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedmaterialOrders.map((materialOrder) => {
-              const ismaterialOrderSelected = selectedmaterialOrders.includes(
-                materialOrder.id
+            {paginatedCryptoOrders.map((cryptoOrder) => {
+              const isCryptoOrderSelected = selectedCryptoOrders.includes(
+                cryptoOrder.id
               );
-              
               return (
                 <TableRow
                   hover
-                  key={materialOrder.id}
-                  selected={ismaterialOrderSelected}
+                  key={cryptoOrder.id}
+                  selected={isCryptoOrderSelected}
                 >
                   <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
-                      checked={ismaterialOrderSelected}
+                      checked={isCryptoOrderSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOnematerialOrder(event, materialOrder.id)
+                        handleSelectOneCryptoOrder(event, cryptoOrder.id)
                       }
-                      value={ismaterialOrderSelected}
+                      value={isCryptoOrderSelected}
                     />
                   </TableCell>
-
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {materialOrder.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(materialOrder.orderDate, 'MMMM dd yyyy')}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {materialOrder.category}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.id}
                     </Typography>
                   </TableCell>
-
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {materialOrder.amount}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.name}
                     </Typography>
                   </TableCell>
-
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {materialOrder.unit}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.detail}
                     </Typography>
                   </TableCell>
-
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {materialOrder.shelf}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <Tooltip title="View material" arrow>
-                    {/* <Link href={`/management/material/info/${materialOrder.id}`} passHref> */}
+                  <Tooltip title="View Unit" arrow>
                         <IconButton
                           sx={{
-                            '&:hover': {
-                              background: theme.colors.info.lighter
+                            "&:hover": {
+                              background: theme.colors.info.lighter,
                             },
-                            color: theme.palette.info.main
+                            color: theme.palette.info.main,
                           }}
+                          onClick={() => router.push(`/setup/shelf/info/${cryptoOrder.id}`)}
                           color="inherit"
                           size="small"
-                          onClick={() => router.push(`/management/material/info/${materialOrder.id}`)}
                         >
                           <VisibilityTwoToneIcon fontSize="small" />
                         </IconButton>
-                      {/* </Link> */}
                     </Tooltip>
-
-                    <Tooltip title="Edit material" arrow>
-                      {/* <Link href={`/management/material/edit/${materialOrder.id}`} passHref> */}
+                    <Tooltip title="Edit Order" arrow>
                       <IconButton
                         sx={{
                           '&:hover': {
@@ -233,15 +317,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
                           },
                           color: theme.palette.primary.main
                         }}
+                        onClick={() => router.push(`/setup/shelf/edit/${cryptoOrder.id}`)}
                         color="inherit"
                         size="small"
-                        onClick={() => router.push(`/management/material/edit/${materialOrder.id}`)}
                       >
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
-                      {/* </Link> */}
                     </Tooltip>
-                    <Tooltip title="Delete material" arrow>
+                    <Tooltip title="Delete Order" arrow>
                       <IconButton
                         sx={{
                           '&:hover': { background: theme.colors.error.lighter },
@@ -249,6 +332,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
                         }}
                         color="inherit"
                         size="small"
+                        onClick={() => handleDeleteCryptoOrder(cryptoOrder.id)}
                       >
                         <DeleteTwoToneIcon fontSize="small" />
                       </IconButton>
@@ -263,7 +347,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredmaterialOrders.length}
+          count={filteredCryptoOrders.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -276,11 +360,11 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialOrders }) => {
 };
 
 RecentOrdersTable.propTypes = {
-  materialOrders: PropTypes.array.isRequired
+  cryptoOrders: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  materialOrders: []
+  cryptoOrders: []
 };
 
 export default RecentOrdersTable;

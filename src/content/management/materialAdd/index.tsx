@@ -1,163 +1,201 @@
-import React from 'react';
-import { useRouter } from 'next/router';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import { ReactElement, useState } from "react";
 import {
-    Button,
-    Card,
-    CardContent,
-    MenuItem,
-    TextField,
-    Grid,
-  } from '@mui/material';
+  Grid,
+  Card,
+  CardContent,
+  Button,
+  CardHeader,
+  Divider,
+} from "@mui/material";
+import TextField from "@mui/material/TextField";
+import { useRouter } from 'next/router';
+import getConfig from "next/config";
 
-  const user = [
-    {
-        value: "User 1",
-        label: "User 1",
-    },
-    {
-        value: "User 2",
-        label: "User 2",
-    },
-    {
-        value: "User 3",
-        label: "User 3",
-    },
-  ];
+const { publicRuntimeConfig } = getConfig();
+
+function Forms() {
+  const router = useRouter();
+  const [file, setFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
+  const [formData, setFormData] = useState({
+    image: imageUrl,
+    name: "ชั้นเครื่องมือ",
+    detail: "ประแจ",
+    total: " ",
+    floor: " ",
+    unit: " ",
+
+  });
+
+  const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const token = localStorage.getItem('accessToken');
+    const formDataToSend = new FormData();
+    formDataToSend.append('image_url', file);  // แนบรูปภาพ
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('detail', formData.detail);
+    try {
+      if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          body: formDataToSend,
+        });
+        console.log('formData:', formDataToSend);
+        if (response.ok) {
+          console.log('name:', formDataToSend.get('name'));
+          console.log('detail:', formDataToSend.get('detail'));
+          const responseData = await response.json();
+          const uploadedImageUrl = responseData.imageUrl;
+          setImageUrl(uploadedImageUrl);
+          // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
+          console.log('Unit created successfully!');
+          router.push('/setup/shelf/');
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          // ถ้าการสร้าง Unit ไม่สำเร็จ
+          console.error('Unit creation failed');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleChange = (event) => {
+    setFormData({
+      ...formData,
+      [event.target.id]: event.target.value,
+    });
+  };
   
-  const material = [
-    {
-      value: "Material 1",
-      label: "Material 1",
-    },
-    {
-      value: "Material 2",
-      label: "Material 2",
-    },
-    {
-      value: "Material 3",
-      label: "Material 3",
-    },
-  ];
-
-function MaterialAdd() {
-
-    const router = useRouter();
-
-    const handleCancel = () => {
-        router.push('/management/material');
-    };
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
   
-    const handleSave = () => {
-        router.push('/management/material');
-    };
+    if (selectedFile) {
+      // ทำการอ่านไฟล์รูปภาพ
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result);
+      };
+      reader.readAsDataURL(selectedFile);
+  
+      setFile(selectedFile);  // เซ็ตค่า file ใน state
+    }
+  };
 
-    return (
-        <>
-            <Card>
-                <CardContent>
-                    <Grid container spacing={3} justifyContent="center">
-
-                        {/* Column 1 - Form */}
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                required
-                                fullWidth className="mb-4"
-                                id="outlined-select-currency"
-                                select
-                                label="Material"
-                                defaultValue=" "
-                                >
-                                {material.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                            <TextField
-                                required
-                                fullWidth
-                                className="mb-4" 
-                                id="outlined-required"
-                                label="Amount"
-                                defaultValue=" "
-                                />
-                            {/* </TextField> */}
-                            <TextField
-                                required
-                                fullWidth 
-                                className="mb-4" 
-                                id="outlined-required"
-                                label="Price"
-                                defaultValue=" "
-                                />
-                            <TextField
-                                required
-                                fullWidth className="mb-4" 
-                                id="outlined-required"
-                                label="Description"
-                                defaultValue=" "
-                                />
-                            <TextField
-                                required
-                                fullWidth className="mb-4"
-                                id="outlined-select-currency"
-                                select
-                                label="User"
-                                defaultValue=" "
-                                >
-                                {user.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-
-                        {/* Column 2 - Upload */}
-                        <Grid item xs={12} sm={4} container justifyContent="center" alignItems="center" className="ml-5">
-                            <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                    </svg>
-                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold text-violet-600">Click to upload</span> or drag and drop</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                                </div>
-                                <input id="dropzone-file" type="file" className="hidden" />
-                            </label>
-                        </Grid>
-                    </Grid>
-
-                    {/* Button Row */}
-                    <Grid container justifyContent="flex-end">
-                        <Grid item>
-                            <Button
-                                variant="contained"
-                                sx={{ margin: 1 }}
-                                disableRipple
-                                component="a"
-                                onClick={handleCancel}
-                            >
-                                Cancel
-                            </Button>
-                        </Grid>
-                        <Grid item>
-                            <Button 
-                                variant="contained" 
-                                sx={{ margin:1}}
-                                disableRipple
-                                color="error"
-                                component="a"
-                                onClick={handleSave}
-                            >
-                                Save
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
-        </>
-    );
+  return (
+    <>
+      <Head>
+        <title></title>
+      </Head>
+        <Card>
+        <CardHeader title="Create Material" />
+        <Divider />
+          <CardContent>
+              <Grid container spacing={3} justifyContent="center">
+                {/* Column 1 - Label */}
+                {/* <Grid item xs={12} sm={1.5}>
+            
+                </Grid> */}
+                {/* Column 2 - Form */}
+                <Grid item xs={12} sm={6} className="mt-5">
+                  <TextField
+                      required
+                      fullWidth
+                      className="mb-4" 
+                      id="name"
+                      label="Material Name"
+                      defaultValue={formData.name}
+                      onChange={handleChange}
+                      />
+                  <TextField
+                      required
+                      fullWidth
+                      className="mb-4" 
+                      id="detail"
+                      label="Material Detail"
+                      defaultValue={formData.detail}
+                      onChange={handleChange}
+                  />
+                  <TextField
+                      required
+                      fullWidth
+                      className="mb-4" 
+                      id="detail"
+                      label="Material Total"
+                      defaultValue={formData.total}
+                      onChange={handleChange}
+                  />
+                  <TextField
+                      required
+                      fullWidth
+                      className="mb-4" 
+                      id="detail"
+                      label="Floor"
+                      defaultValue={formData.floor}
+                      onChange={handleChange}
+                  />
+                  <TextField
+                      required
+                      fullWidth
+                      className="mb-4" 
+                      id="detail"
+                      label="Unit"
+                      defaultValue={formData.unit}
+                      onChange={handleChange}
+                  />
+                  <input
+                    id="dropzone-file"
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  {imageUrl && (
+                    <img src={imageUrl} alt="Uploaded Image" className="w-300 h-300 justify-center" />
+                  )}
+                  <Button variant="contained" component="label" htmlFor="dropzone-file" className="mt-2">
+                    Upload Image
+                  </Button>
+                </Grid>
+              </Grid>
+              {/* Button Row */}
+              <form onSubmit={handleCreateUnit} encType="multipart/form-data">
+              <Grid container justifyContent="flex-end" className="mt-5">
+                <Button variant="contained" 
+                  sx={{ margin:1}}
+                  disableRipple
+                  component="a"
+                  // type="submit"
+                  onClick={handleCreateUnit}
+                  >
+                    Create
+                </Button>
+                <Button variant="contained" 
+                  sx={{ margin:1}}
+                  disableRipple
+                  color="error"
+                  component="a"
+                  onClick={() => router.push('/management/material')}
+                >
+                    Cancel
+                </Button>
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
+    </>
+  );
 }
 
-export default MaterialAdd;
+Forms.getLayout = (page: ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
+
+export default Forms;
