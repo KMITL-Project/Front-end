@@ -1,6 +1,6 @@
 import Head from "next/head";
 import SidebarLayout from "@/layout/SidebarLayout";
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useEffect } from "react";
 import {
   Grid,
   Card,
@@ -8,6 +8,7 @@ import {
   Button,
   CardHeader,
   Divider,
+  MenuItem
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useRouter } from 'next/router';
@@ -23,19 +24,64 @@ function Forms() {
     image: imageUrl,
     name: "ชั้นเครื่องมือ",
     detail: "ประแจ",
-    total: " ",
-    floor: " ",
-    unit: " ",
+    total: "100",
+    floor_id: "",  // เปลี่ยนนี้
+    unit_id: "",
 
   });
+
+  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState([]);
+  
+  useEffect(() => {
+    const fetchFloorData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          const responseFloor = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const responseUnit = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (responseFloor.ok && responseUnit.ok) {
+            const responseDataFloor = await responseFloor.json();
+            const responseDataUnit = await responseUnit.json();
+            console.log('Floor Data:', responseDataFloor.data);
+            setFloorOptions(responseDataFloor.data.map(floor => ({ value: floor.id, label: floor.name })));
+            setUnitOptions(responseDataUnit.data.map(unit => ({ value: unit.id, label: unit.name })));
+          } else if (responseFloor.status === 401 || responseUnit.status === 401) {
+            console.log('Token expired or invalid');
+            localStorage.removeItem('accessToken');
+          } else {
+            console.error('Failed to fetch floor or unit data. Response:', responseFloor, responseUnit);
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };    
+  
+    fetchFloorData();
+  }, []);  
 
   const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const token = localStorage.getItem('accessToken');
     const formDataToSend = new FormData();
-    formDataToSend.append('image_url', file);  // แนบรูปภาพ
     formDataToSend.append('name', formData.name);
+    formDataToSend.append('image_url', file);  // แนบรูปภาพ
     formDataToSend.append('detail', formData.detail);
+    formDataToSend.append('floor_id', formData.floor_id);
+    formDataToSend.append('total', formData.total);
+    formDataToSend.append('unit_id', formData.unit_id);
+
     try {
       if (token) {
         const response = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
@@ -46,15 +92,20 @@ function Forms() {
           body: formDataToSend,
         });
         console.log('formData:', formDataToSend);
+        console.log('name:', formDataToSend.get('name'));
+        console.log('detail:', formDataToSend.get('detail'));
+        console.log('floor_id:', formDataToSend.get('floor_id'));
+        console.log('total:', formDataToSend.get('total'));
+        console.log('unit_id:', formDataToSend.get('unit_id'));
         if (response.ok) {
-          console.log('name:', formDataToSend.get('name'));
-          console.log('detail:', formDataToSend.get('detail'));
+          // console.log('name:', formDataToSend.get('name'));
+          // console.log('detail:', formDataToSend.get('detail'));
           const responseData = await response.json();
           const uploadedImageUrl = responseData.imageUrl;
           setImageUrl(uploadedImageUrl);
           // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
           console.log('Unit created successfully!');
-          router.push('/setup/shelf/');
+          router.push('/');
         } else if (response.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง
           console.log('Token expired or invalid');
@@ -62,7 +113,7 @@ function Forms() {
           localStorage.removeItem('accessToken');
         } else {
           // ถ้าการสร้าง Unit ไม่สำเร็จ
-          console.error('Unit creation failed');
+          console.error('Material creation failed');
         }
       }
     } catch (error) {
@@ -71,10 +122,26 @@ function Forms() {
   };
 
   const handleChange = (event) => {
-    setFormData({
-      ...formData,
-      [event.target.id]: event.target.value,
-    });
+    const { id, value } = event.target;
+    
+    if (id === "floor_id") {
+      const selectedFloor = floorOptions.find((floor) => floor.id === value);
+      setFormData({
+        ...formData,
+        floor_id: selectedFloor ? selectedFloor.id : "",
+      });
+    } else if (id === "unit_id") {
+      const selectedUnit = unitOptions.find((unit) => unit.id === value);
+      setFormData({
+        ...formData,
+        unit_id: selectedUnit ? selectedUnit.id : "",
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [id]: value,
+      });
+    }
   };
   
   const handleFileChange = (event) => {
@@ -102,57 +169,66 @@ function Forms() {
         <Divider />
           <CardContent>
               <Grid container spacing={3} justifyContent="center">
-                {/* Column 1 - Label */}
-                {/* <Grid item xs={12} sm={1.5}>
-            
-                </Grid> */}
-                {/* Column 2 - Form */}
                 <Grid item xs={12} sm={6} className="mt-5">
                   <TextField
-                      required
-                      fullWidth
-                      className="mb-4" 
-                      id="name"
-                      label="Material Name"
-                      defaultValue={formData.name}
-                      onChange={handleChange}
-                      />
-                  <TextField
-                      required
-                      fullWidth
-                      className="mb-4" 
-                      id="detail"
-                      label="Material Detail"
-                      defaultValue={formData.detail}
-                      onChange={handleChange}
+                    required
+                    fullWidth
+                    className="mb-4" 
+                    id="name"
+                    label="Material Name"
+                    defaultValue={formData.name}
+                    onChange={handleChange}
                   />
                   <TextField
-                      required
-                      fullWidth
-                      className="mb-4" 
-                      id="detail"
-                      label="Material Total"
-                      defaultValue={formData.total}
-                      onChange={handleChange}
+                    required
+                    fullWidth
+                    className="mb-4" 
+                    id="detail"
+                    label="Material Detail"
+                    defaultValue={formData.detail}
+                    onChange={handleChange}
                   />
                   <TextField
-                      required
-                      fullWidth
-                      className="mb-4" 
-                      id="detail"
-                      label="Floor"
-                      defaultValue={formData.floor}
-                      onChange={handleChange}
+                    required
+                    fullWidth
+                    className="mb-4" 
+                    id="total"
+                    label="Material Total"
+                    defaultValue={formData.total}
+                    onChange={handleChange}
                   />
                   <TextField
-                      required
-                      fullWidth
-                      className="mb-4" 
-                      id="detail"
-                      label="Unit"
-                      defaultValue={formData.unit}
-                      onChange={handleChange}
-                  />
+                    required
+                    fullWidth
+                    className="mb-4" 
+                    id="floor_id"
+                    label="Floor"
+                    value={formData.floor_id}
+                    onChange={handleChange}
+                    select
+                    >
+                    {floorOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <TextField
+                    required
+                    fullWidth
+                    className="mb-4" 
+                    id="unit_id"  // ตรวจสอบว่า id ถูกต้อง
+                    label="Unit"
+                    value={formData.unit_id}
+                    onChange={handleChange}
+                    select
+                    >
+                    {unitOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                   <input
                     id="dropzone-file"
                     type="file"

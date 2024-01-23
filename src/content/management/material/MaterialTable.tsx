@@ -108,7 +108,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
         console.error('Error:', error);
       }
     };
-
+    
     fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
   }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
   
@@ -206,6 +206,57 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
     }
   };
 
+  const fetchUnitData = async (unitId: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit/${unitId}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log('Unit Data:', responseData.data);
+          // ทำตามความต้องการ เช่น อัพเดต state หรือแสดงผลข้อมูลในตาราง
+        } else if (response.status === 401) {
+          console.log('Token expired or invalid');
+          localStorage.removeItem('accessToken');
+        } else {
+          console.error('Failed to fetch unit data. Response:', response);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  const fetchFloorData = async (floorId: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}floor/${floorId}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log('Floor Data:', responseData.data);
+          // ทำตามความต้องการ เช่น อัพเดต state หรือแสดงผลข้อมูลในตาราง
+        } else if (response.status === 401) {
+          console.log('Token expired or invalid');
+          localStorage.removeItem('accessToken');
+        } else {
+          console.error('Failed to fetch floor data. Response:', response);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <Card>
       {selectedBulkActions && (
@@ -231,11 +282,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">Material ID</TableCell>
-              <TableCell align="center">Material Name</TableCell>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Name</TableCell>
               <TableCell align="center">Description</TableCell>
               <TableCell align="center">Unit</TableCell>
               <TableCell align="center">Total</TableCell>
+              <TableCell align="center">Floor</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -244,6 +296,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
               const isCryptoOrderSelected = selectedCryptoOrders.includes(
                 cryptoOrder.id
               );
+              fetchUnitData(cryptoOrder.unit_id);
+              fetchFloorData(cryptoOrder.floor_id);
               return (
                 <TableRow
                   hover
@@ -291,6 +345,39 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       noWrap
                     >
                       {cryptoOrder.detail}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.unit_id}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.total}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.floor_id}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
