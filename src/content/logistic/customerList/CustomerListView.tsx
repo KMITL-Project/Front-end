@@ -1,145 +1,111 @@
 import { Card } from '@mui/material';
-import { CryptoOrder } from '@/model/logsitic/crypto_order';
+import { Tracking } from '@/model/logistic/tracking';
 import RecentOrdersTable from './CustomerListTable';
 import { subDays } from 'date-fns';
 
 function RecentOrders() {
-  const cryptoOrders: CryptoOrder[] = [
+  const trackingOrders: Tracking[] = [
     {
       id: '1',
-      orderDetails: 'Fiat Deposit',
-      orderDate: new Date().getTime(),
+      shippingDate: new Date().getTime(),
       status: 'completed',
       orderID: 'VUVX709ET7BY',
-      sourceName: 'Rose',
-      sourceDesc: 'ประตู',
-      amountCrypto: 34.4565,
-      amount: 56787,
-      cryptoCurrency: 'ลาดกระบัง',
-      currency: '$'
+      customerName: 'Rose',
+      productName: 'ประตู',
+      customerAddress: 'ลาดกระบัง',
     },
     {
       id: '2',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 1).getTime(),
+
+      shippingDate: subDays(new Date(), 1).getTime(),
       status: 'completed',
       orderID: '23M3UOG65G8K',
-      sourceName: 'Jack Dawson',
-      sourceDesc: 'รั้ว',
-      amountCrypto: 6.58454334,
-      amount: 8734587,
-      cryptoCurrency: 'หนองจอก',
-      currency: '$'
+      customerName: 'Jack Dawson',
+      productName: 'รั้ว',
+      customerAddress: 'หนองจอก',
     },
     {
       id: '3',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 5).getTime(),
+
+      shippingDate: subDays(new Date(), 5).getTime(),
       status: 'failed',
       orderID: 'F6JHK65MS818',
-      sourceName: 'Billy',
-      sourceDesc: 'บานเลื่อน',
-      amountCrypto: 6.58454334,
-      amount: 8734587,
-      cryptoCurrency: 'อ่อนนุช',
-      currency: '$'
+      customerName: 'Billy',
+      productName: 'บานเลื่อน',
+      customerAddress: 'อ่อนนุช',
     },
     {
       id: '4',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 55).getTime(),
+
+      shippingDate: subDays(new Date(), 55).getTime(),
       status: 'completed',
       orderID: 'QJFAI7N84LGM',
-      sourceName: 'Max',
-      sourceDesc: 'ประตู',
-      amountCrypto: 6.58454334,
-      amount: 8734587,
-      cryptoCurrency: 'บางนา',
-      currency: '$'
+      customerName: 'Max',
+      productName: 'ประตู',
+      customerAddress: 'บางนา',
     },
     {
       id: '5',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 56).getTime(),
+
+      shippingDate: subDays(new Date(), 56).getTime(),
       status: 'pending',
       orderID: 'BO5KFSYGC0YW',
-      sourceName: 'Bob',
-      sourceDesc: 'รั้ว',
-      amountCrypto: 6.58454334,
-      amount: 8734587,
-      cryptoCurrency: 'พญาไท',
-      currency: '$'
+      customerName: 'Bob',
+      productName: 'รั้ว',
+      customerAddress: 'พญาไท',
     },
     {
       id: '6',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 33).getTime(),
+
+      shippingDate: subDays(new Date(), 33).getTime(),
       status: 'completed',
       orderID: '6RS606CBMKVQ',
-      sourceName: 'John',
-      sourceDesc: 'บานเลื่อน',
-      amountCrypto: 6.58454334,
-      amount: 8734587,
-      cryptoCurrency: 'ราชเทวี',
-      currency: '$'
+      customerName: 'John',
+      productName: 'บานเลื่อน',
+      customerAddress: 'ราชเทวี',
     },
     {
       id: '7',
-      orderDetails: 'Fiat Deposit',
-      orderDate: new Date().getTime(),
+
+      shippingDate: new Date().getTime(),
       status: 'pending',
       orderID: '479KUYHOBMJS',
-      sourceName: 'Paul',
-      sourceDesc: 'ประตู',
-      amountCrypto: 2.346546,
-      amount: 234234,
-      cryptoCurrency: 'รามคำแหง',
-      currency: '$'
+      customerName: 'Paul',
+      productName: 'ประตู',
+      customerAddress: 'รามคำแหง',
     },
     {
       id: '8',
-      orderDetails: 'Paypal Withdraw',
-      orderDate: subDays(new Date(), 22).getTime(),
+      shippingDate: subDays(new Date(), 22).getTime(),
       status: 'completed',
       orderID: 'W67CFZNT71KR',
-      sourceName: 'Kim',
-      sourceDesc: 'รั้ว',
-      amountCrypto: 3.345456,
-      amount: 34544,
-      cryptoCurrency: 'บางพลี',
-      currency: '$'
+      customerName: 'Kim',
+      productName: 'รั้ว',
+      customerAddress: 'บางพลี',
     },
     {
       id: '9',
-      orderDetails: 'Fiat Deposit',
-      orderDate: subDays(new Date(), 11).getTime(),
+      shippingDate: subDays(new Date(), 11).getTime(),
       status: 'completed',
       orderID: '63GJ5DJFKS4H',
-      sourceName: 'Park',
-      sourceDesc: 'บานเลื่อน',
-      amountCrypto: 1.4389567945,
-      amount: 123843,
-      cryptoCurrency: 'บึงกุ่ม',
-      currency: '$'
+      customerName: 'Park',
+      productName: 'บานเลื่อน',
+      customerAddress: 'บึงกุ่ม',
     },
     {
       id: '10',
-      orderDetails: 'Wallet Transfer',
-      orderDate: subDays(new Date(), 123).getTime(),
+      shippingDate: subDays(new Date(), 123).getTime(),
       status: 'failed',
       orderID: '17KRZHY8T05M',
-      sourceName: 'Ellen',
-      sourceDesc: "ประตู",
-      amountCrypto: 765.5695,
-      amount: 7567,
-      cryptoCurrency: 'บางแค',
-      currency: '$'
+      customerName: 'Ellen',
+      productName: "ประตู",
+      customerAddress: 'บางแค',
     }
   ];
 
   return (
     <Card>
-      <RecentOrdersTable cryptoOrders={cryptoOrders} />
+      <RecentOrdersTable Trackings={trackingOrders} />
     </Card>
   );
 }

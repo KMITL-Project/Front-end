@@ -6,14 +6,18 @@ import { Grid, Container } from '@mui/material';
 import Footer from '@/components/Footer';
 
 import RecentOrders from '@/content/logistic/customerList/CustomerListView';
+import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
+  const pageData: string = 'Home / รายการลูกค้า'; // ระบุเส้นทางของหน้าปัจจุบัน
+
   return (
     <>
       {/* <Head>
         <title>Transactions - Applications</title>
       </Head> */}
       <PageTitleWrapper>
+        <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
       <Container maxWidth="lg">

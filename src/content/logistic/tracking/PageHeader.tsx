@@ -15,7 +15,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Tracking
+          ติดตามการจัดส่ง
         </Typography>
         {/* <Typography variant="subtitle2">
           {user.name}, these are your recent transactions
@@ -23,7 +23,7 @@ function PageHeader() {
       </Grid>
 
 
-      <Grid item>
+      {/* <Grid item>
         <NextLink href="/setup/category/AddCategory/" passHref>
         <Button
             variant="contained" sx={{ margin:1}}
@@ -36,7 +36,7 @@ function PageHeader() {
             + Create Category{" "}
           </Button>
         </NextLink>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 }

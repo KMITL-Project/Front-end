@@ -1,7 +1,7 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
-import numeral from 'numeral';
-import PropTypes from 'prop-types';
+import { FC, ChangeEvent, useState } from "react";
+import { format } from "date-fns";
+import numeral from "numeral";
+import PropTypes from "prop-types";
 import {
   Tooltip,
   Divider,
@@ -22,56 +22,58 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader
-} from '@mui/material';
+  CardHeader,
+  TextField,
+  Button,
+} from "@mui/material";
 
-import Label from '@/components/Label';
-import { Tracking, TrackingStatus } from '@/model/logistic/tracking';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
+import Label from "@/components/Label";
+import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import NextLink from "next/link";
-
+import { useRouter } from "next/router";
+import BulkActions from "./BulkActions";
+import Modal from "@mui/material/Modal";
+import { Order, OrderStatus } from "@/model/logistic/order";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { LatLngTuple } from "leaflet";
 
 interface RecentOrdersTableProps {
   className?: string;
-  Trackings: Tracking[];
+  cryptoOrders: Order[];
 }
 
 interface Filters {
-  status?: TrackingStatus;
+  status?: OrderStatus;
 }
 
-// const getStatusLabel = (TrackingStatus: TrackingStatus): JSX.Element => {
-//   const map = {
-//     failed: {
-//       text: 'Failed',
-//       color: 'error'
-//     },
-//     completed: {
-//       text: 'Completed',
-//       color: 'success'
-//     },
-//     pending: {
-//       text: 'Pending',
-//       color: 'warning'
-//     }
-//   };
+const getStatusLabel = (listOrderStatus: OrderStatus): JSX.Element => {
+  const map = {
+    failed: {
+      text: "Failed",
+      color: "error",
+    },
+    completed: {
+      text: "Completed",
+      color: "success",
+    },
+    pending: {
+      text: "Pending",
+      color: "warning",
+    },
+  };
 
-//   const { text, color }: any = map[TrackingStatus];
+  const { text, color }: any = map[listOrderStatus];
 
-//   return <Label color={color}>{text}</Label>;
-// };
+  return <Label color={color}>{text}</Label>;
+};
 
-const applyFilters = (
-  Trackings: Tracking[],
-  filters: Filters
-): Tracking[] => {
-  return Trackings.filter((Tracking) => {
+const applyFilters = (cryptoOrders: Order[], filters: Filters): Order[] => {
+  return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
-    if (filters.status && Tracking.status !== filters.status) {
+    if (filters.status && cryptoOrder.status !== filters.status) {
       matches = false;
     }
 
@@ -80,78 +82,197 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  Trackings: Tracking[],
+  cryptoOrders: Order[],
   page: number,
   limit: number
-): Tracking[] => {
-  return Trackings.slice(page * limit, page * limit + limit);
+): Order[] => {
+  return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
-  const [selectedTrackings, setSelectedTrackings] = useState<string[]>(
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
+  // fuction for modal
+
+  const [selectedReports, setSelectedReports] = useState<string[]>([]);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>("");
+  const [fileType, setFileType] = useState<string>("pdf");
+
+  const handleExportClick = () => {
+    // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
+    if (selectedReports.length === 0) {
+      // แสดง popup แจ้งเตือนเมื่อไม่มีรายการที่ถูกเลือก
+      alert("Please select items to export.");
+      return;
+    }
+    // เปิด popup สำหรับการ Export
+    setShowExportModal(true);
+  };
+
+  const handleCloseModal = () => {
+    // ปิด popup สำหรับการ Export
+    setShowExportModal(false);
+  };
+
+  const handleExportConfirm = () => {
+    // ถ้าเลือก Export เป็น Excel
+    if (fileType === "excel") {
+      // สร้างชุดข้อมูลสำหรับ Excel
+      const dataForExcel = paginatedReports.map((report) => {
+        return {
+          "Material ID": report.orderDetails,
+          "Material Name": report.orderID,
+          Category: report.sourceName,
+          Unit: report.unit,
+          Shelf: report.shelf,
+          Floor: report.floor,
+        };
+      });
+
+      // สร้าง Workbook ของ Excel
+      const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+      // Merge เซลล์ A1 ถึง F1 เพื่อใส่หัวข้อ
+      worksheet["!merges"] = [
+        // สร้างการ Merge ให้กับเซลล์ A1 ถึง F1
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // A1:F1
+      ];
+
+      // กำหนดข้อความลงในเซลล์ A1 ให้เป็น "Material List"
+      const headerStyle = {
+        font: { bold: true },
+        alignment: { horizontal: "center" },
+      };
+
+      worksheet["A1"].s = headerStyle;
+      worksheet["A1"].v = "Material List";
+
+      // ใส่ข้อมูลลงในเซลล์ใน Worksheet และกำหนดรูปแบบให้กับหัวเรื่อง
+      worksheet["A2"].s = headerStyle;
+      worksheet["A2"].v = "Material ID";
+
+      worksheet["B2"].s = headerStyle;
+      worksheet["B2"].v = "Material Name";
+
+      worksheet["C2"].s = headerStyle;
+      worksheet["C2"].v = "Category";
+
+      worksheet["D2"].s = headerStyle;
+      worksheet["D2"].v = "Unit";
+
+      worksheet["E2"].s = headerStyle;
+      worksheet["E2"].v = "Shelf";
+
+      worksheet["F2"].s = headerStyle;
+      worksheet["F2"].v = "Floor";
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "MaterialList");
+
+      // แปลง Workbook ให้เป็นไฟล์ Excel
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const excelBlob = new Blob([excelBuffer], {
+        type: "application/octet-stream",
+      });
+
+      // ดาวน์โหลดไฟล์ Excel
+      saveAs(excelBlob, `${fileName}.xlsx`);
+      setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
+    } else if (fileType === "pdf") {
+      const generatePDF = () => {
+        // ลงทะเบียนฟอนต์
+        // Font.register({
+        //   family: 'AngsanaNew', // ตั้งชื่อฟอนต์ที่คุณต้องการให้แสดงผล
+        //   src: AngsanaNew, // ใช้ path ของฟอนต์ที่คุณนำเข้ามา
+        // });
+
+        const doc = new jsPDF();
+        let verticalOffset = 10;
+
+        paginatedReports.forEach((report) => {
+          // <Text style={{ fontFamily: 'AngsanaNew' }}>Text with your custom font</Text>
+          doc.text(report.orderDetails, 10, verticalOffset);
+          doc.text(report.orderID, 10, verticalOffset + 10);
+          // ... (add other content)
+          verticalOffset += 20;
+        });
+
+        doc.save(`${fileName}.pdf`);
+        setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
+      };
+
+      generatePDF();
+    }
+
+    return null; // Return null or any other fallback if fileType is not 'pdf'
+  };
+
+  const router = useRouter();
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
   );
-  const selectedBulkActions = selectedTrackings.length > 0;
+  const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null
+    status: null,
   });
 
   const statusOptions = [
     {
-      id: 'all',
-      name: 'All'
+      id: "all",
+      name: "All",
     },
     {
-      id: 'completed',
-      name: 'Completed'
+      id: "completed",
+      name: "Completed",
     },
     {
-      id: 'pending',
-      name: 'Pending'
+      id: "pending",
+      name: "Pending",
     },
     {
-      id: 'failed',
-      name: 'Failed'
-    }
+      id: "failed",
+      name: "Failed",
+    },
   ];
 
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
+    let value = null;
 
-    if (e.target.value !== 'all') {
+    if (e.target.value !== "all") {
       value = e.target.value;
     }
 
     setFilters((prevFilters) => ({
       ...prevFilters,
-      status: value
+      status: value,
     }));
   };
 
-  const handleSelectAllTrackings = (
+  const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedTrackings(
+    setSelectedCryptoOrders(
       event.target.checked
-        ? Trackings.map((Tracking) => Tracking.id)
+        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
         : []
     );
   };
 
-  const handleSelectOneTracking = (
+  const handleSelectOneCryptoOrder = (
     _event: ChangeEvent<HTMLInputElement>,
-    TrackingId: string
+    cryptoOrderId: string
   ): void => {
-    if (!selectedTrackings.includes(TrackingId)) {
-      setSelectedTrackings((prevSelected) => [
+    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
+      setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        TrackingId
+        cryptoOrderId,
       ]);
     } else {
-      setSelectedTrackings((prevSelected) =>
-        prevSelected.filter((id) => id !== TrackingId)
+      setSelectedCryptoOrders((prevSelected) =>
+        prevSelected.filter((id) => id !== cryptoOrderId)
       );
     }
   };
@@ -164,90 +285,71 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredTrackings = applyFilters(Trackings, filters);
-  const paginatedTrackings = applyPagination(
-    filteredTrackings,
+  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
+  const paginatedCryptoOrders = applyPagination(
+    filteredCryptoOrders,
     page,
     limit
   );
-  const selectedSomeTrackings =
-    selectedTrackings.length > 0 &&
-    selectedTrackings.length < Trackings.length;
-  const selectedAllTrackings =
-    selectedTrackings.length === Trackings.length;
+  const selectedSomeCryptoOrders =
+    selectedCryptoOrders.length > 0 &&
+    selectedCryptoOrders.length < cryptoOrders.length;
+  const selectedAllCryptoOrders =
+    selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
   return (
     <Card>
-      {selectedBulkActions && (
-        <Box flex={1} p={2}>
-          <BulkActions />
-        </Box>
-      )}
-      {!selectedBulkActions && (
-        <CardHeader
-          // action={
-          //   // <Box width={150}>
-          //   //   <FormControl fullWidth variant="outlined">
-          //   //     <InputLabel>Status</InputLabel>
-          //   //     <Select
-          //   //       value={filters.status || 'all'}
-          //   //       onChange={handleStatusChange}
-          //   //       label="Status"
-          //   //       autoWidth
-          //   //     >
-          //   //       {statusOptions.map((statusOption) => (
-          //   //         <MenuItem key={statusOption.id} value={statusOption.id}>
-          //   //           {statusOption.name}
-          //   //         </MenuItem>
-          //   //       ))}
-          //   //     </Select>
-          //   //   </FormControl>
-          //   // </Box>
-          // }
-          title="Category lists"
+      <MapContainer
+        center={[13.7563, 100.5018]} // ตำแหน่งศูนย์กลางของแผนที่
+        zoom={10} // ระดับการซูมของแผนที่
+        style={{ height: "400px", width: "100%" }} // กำหนดขนาดของแผนที่
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-      )}
-      <Divider />
+
+        {/* วนลูปแสดง Marker บนแผนที่ */}
+        {paginatedCryptoOrders.map((cryptoOrder, index) => {
+          // แปลงข้อมูลตำแหน่งเป็น LatLngTuple
+          const position: LatLngTuple = [
+            cryptoOrder.latitude,
+            cryptoOrder.longitude,
+          ];
+
+          return (
+            <Marker key={cryptoOrder.id} position={position}>
+              <Popup>
+                <Typography variant="body1">{cryptoOrder.orderName}</Typography>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  color="primary"
-                  checked={selectedAllTrackings}
-                  indeterminate={selectedSomeTrackings}
-                  onChange={handleSelectAllTrackings}
-                />
-              </TableCell>
-              <TableCell>Cat ID</TableCell>
-              <TableCell>Category Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>ลำดับ</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Customer</TableCell>
+              <TableCell>Adress</TableCell>
+              <TableCell>Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedTrackings.map((Tracking) => {
-              const isTrackingSelected = selectedTrackings.includes(
-                Tracking.id
+            {paginatedCryptoOrders.map((cryptoOrder, index) => {
+              const isCryptoOrderSelected = selectedCryptoOrders.includes(
+                cryptoOrder.id
               );
               return (
                 <TableRow
                   hover
-                  key={Tracking.id}
-                  selected={isTrackingSelected}
+                  key={cryptoOrder.id}
+                  selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      color="primary"
-                      checked={isTrackingSelected}
-                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneTracking(event, Tracking.id)
-                      }
-                      value={isTrackingSelected}
-                    />
-                  </TableCell>
                   <TableCell>
                     <Typography
                       variant="body1"
@@ -256,10 +358,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Tracking.orderDetails}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(Tracking.orderDate, 'MMMM dd yyyy')}
+                      {index + 1}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -270,7 +369,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Tracking.orderID}
+                      {cryptoOrder.orderID}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -281,13 +380,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Tracking.sourceName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {Tracking.sourceDesc}
+                      {cryptoOrder.orderName}
                     </Typography>
                   </TableCell>
-                  {/* <TableCell align="right">
+                  <TableCell>
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -295,62 +391,24 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Tracking.amountCrypto}
-                      {Tracking.cryptoCurrency}
+                      {cryptoOrder.customerName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {numeral(Tracking.amount).format(
-                        `${Tracking.currency}0,0.00`
-                      )}
-                    </Typography>
-                  </TableCell> */}
-                  {/* <TableCell align="right">
-                    {getStatusLabel(Tracking.status)}
-                  </TableCell> */}
-                  
+                  </TableCell>
                   <TableCell align="right">
-                  <Tooltip title="View Category" arrow>
-                      <NextLink href="/setup/category/AddCategory" passHref>
-                        <IconButton
-                          sx={{
-                            "&:hover": {
-                              background: theme.colors.info.lighter,
-                            },
-                            color: theme.palette.info.main,
-                          }}
-                          color="inherit"
-                          size="small"
-                        >
-                          <VisibilityTwoToneIcon fontSize="small" />
-                        </IconButton>
-                      </NextLink>
-                    </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
-                      <IconButton
-                        sx={{
-                          '&:hover': {
-                            background: theme.colors.primary.lighter
-                          },
-                          color: theme.palette.primary.main
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <EditTwoToneIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
-                      <IconButton
-                        sx={{
-                          '&:hover': { background: theme.colors.error.lighter },
-                          color: theme.palette.error.main
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <DeleteTwoToneIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.customerAddress}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {format(cryptoOrder.orderDate, "MMMM dd yyyy")}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               );
@@ -361,7 +419,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredTrackings.length}
+          count={filteredCryptoOrders.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -369,16 +427,97 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Trackings }) => {
           rowsPerPageOptions={[5, 10, 25, 30]}
         />
       </Box>
+      {/* Popup สำหรับการ สรุปรายการ */}
+      <Modal
+        open={showExportModal}
+        onClose={handleCloseModal}
+        aria-labelledby="export-modal-title"
+        aria-describedby="export-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500, // เพิ่มความกว้างให้พอดีกับ PDFViewer
+            height: 300, // เพิ่มความสูงให้พอดีกับ PDFViewer
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography
+            id="export-modal-title"
+            variant="h6"
+            component="h2"
+            gutterBottom
+            className="mb-5"
+          >
+            Export Data
+          </Typography>
+          {/* {pdfContent ? (
+            <PDFViewer width={500} height={300}>
+              {pdfContent}
+            </PDFViewer>
+          ) : (
+            <Typography variant="body1">No content to display</Typography>
+          )} */}
+          {/* ส่วนอื่น ๆ ใน Modal */}
+          <TextField
+            label="File Name"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            variant="outlined"
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="file-type-label">File Type</InputLabel>
+            <Select
+              labelId="file-type-label"
+              id="file-type-select"
+              value={fileType}
+              label="File Type"
+              onChange={(e) => setFileType(e.target.value as string)}
+            >
+              <MenuItem value="pdf">PDF</MenuItem>
+              <MenuItem value="excel">Excel</MenuItem>
+            </Select>
+          </FormControl>
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              className="mr-5"
+              onClick={handleExportConfirm}
+            >
+              Export
+            </Button>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              color="error"
+              onClick={handleCloseModal}
+              sx={{ mr: 2 }}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Card>
   );
 };
 
 RecentOrdersTable.propTypes = {
-  Trackings: PropTypes.array.isRequired
+  cryptoOrders: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  Trackings: []
+  cryptoOrders: [],
 };
 
 export default RecentOrdersTable;

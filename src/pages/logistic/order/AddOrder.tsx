@@ -1,20 +1,20 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/shelf/ShelfPageHeader';
+import PageHeader from '@/content/logistic/order/OrderPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container, Typography } from '@mui/material';
 
-import RecentOrders from '@/content/setup/shelf/ShelfView';
+import RecentOrders from '@/content/logistic/order/OrderView';
 import { ReactElement } from 'react';
-import Forms from '@/content/logistic/customerList/AddCustomerList';
+import Forms from '@/content/logistic/order/AddOrder';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Logistic/รายการลูกค้า/Add Order'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Order/Add Order'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
-      <Head>
+     <Head>
         <title></title>
       </Head>
 

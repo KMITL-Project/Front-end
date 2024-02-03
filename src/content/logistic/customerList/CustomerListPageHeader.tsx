@@ -16,7 +16,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Customer List
+          รายการลูกค้า
         </Typography>
         {/* <Typography variant="subtitle2">
           {user.name}, these are your recent transactions

@@ -1,6 +1,5 @@
 import { FC, ChangeEvent, useState } from 'react';
 import { format } from 'date-fns';
-import numeral from 'numeral';
 import PropTypes from 'prop-types';
 import {
   Tooltip,
@@ -26,7 +25,7 @@ import {
 } from '@mui/material';
 
 import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/models/crypto_order';
+import { Tracking, TrackingStatus } from '@/model/logistic/tracking';
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
@@ -34,16 +33,16 @@ import BulkActions from './BulkActions';
 import NextLink from "next/link";
 import { useRouter } from 'next/router';
 
-interface RecentOrdersTableProps {
+interface RecentTrackingStatussTableProps {
   className?: string;
-  cryptoOrders: CryptoOrder[];
+  Trackings: Tracking[];
 }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: TrackingStatus;
 }
 
-const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
+const getStatusLabel = (TrackingStatus: TrackingStatus): JSX.Element => {
   const map = {
     failed: {
       text: 'Failed',
@@ -59,19 +58,19 @@ const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
     }
   };
 
-  const { text, color }: any = map[cryptoOrderStatus];
+  const { text, color }: any = map[TrackingStatus];
 
   return <Label color={color}>{text}</Label>;
 };
 
 const applyFilters = (
-  cryptoOrders: CryptoOrder[],
+  Trackings: Tracking[],
   filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+): Tracking[] => {
+  return Trackings.filter((Tracking) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && Tracking.status !== filters.status) {
       matches = false;
     }
 
@@ -80,19 +79,19 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  cryptoOrders: CryptoOrder[],
+  Trackings: Tracking[],
   page: number,
   limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+): Tracking[] => {
+  return Trackings.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
+const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Trackings }) => {
   const router = useRouter();
-  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
+  const [selectedTrackings, setSelectedTrackings] = useState<string[]>(
     []
   );
-  const selectedBulkActions = selectedCryptoOrders.length > 0;
+  const selectedBulkActions = selectedTrackings.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
@@ -131,28 +130,28 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     }));
   };
 
-  const handleSelectAllCryptoOrders = (
+  const handleSelectAllTrackings = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedCryptoOrders(
+    setSelectedTrackings(
       event.target.checked
-        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
+        ? Trackings.map((Tracking) => Tracking.id)
         : []
     );
   };
 
-  const handleSelectOneCryptoOrder = (
+  const handleSelectOneTracking = (
     _event: ChangeEvent<HTMLInputElement>,
-    cryptoOrderId: string
+    TrackingId: string
   ): void => {
-    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
-      setSelectedCryptoOrders((prevSelected) => [
+    if (!selectedTrackings.includes(TrackingId)) {
+      setSelectedTrackings((prevSelected) => [
         ...prevSelected,
-        cryptoOrderId
+        TrackingId
       ]);
     } else {
-      setSelectedCryptoOrders((prevSelected) =>
-        prevSelected.filter((id) => id !== cryptoOrderId)
+      setSelectedTrackings((prevSelected) =>
+        prevSelected.filter((id) => id !== TrackingId)
       );
     }
   };
@@ -165,17 +164,17 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
-  const paginatedCryptoOrders = applyPagination(
-    filteredCryptoOrders,
+  const filteredTrackings = applyFilters(Trackings, filters);
+  const paginatedTrackings = applyPagination(
+    filteredTrackings,
     page,
     limit
   );
-  const selectedSomeCryptoOrders =
-    selectedCryptoOrders.length > 0 &&
-    selectedCryptoOrders.length < cryptoOrders.length;
-  const selectedAllCryptoOrders =
-    selectedCryptoOrders.length === cryptoOrders.length;
+  const selectedSomeTrackings =
+    selectedTrackings.length > 0 &&
+    selectedTrackings.length < Trackings.length;
+  const selectedAllTrackings =
+    selectedTrackings.length === Trackings.length;
   const theme = useTheme();
 
   return (
@@ -217,13 +216,13 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
               <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
-                  checked={selectedAllCryptoOrders}
-                  indeterminate={selectedSomeCryptoOrders}
-                  onChange={handleSelectAllCryptoOrders}
+                  checked={selectedAllTrackings}
+                  indeterminate={selectedSomeTrackings}
+                  onChange={handleSelectAllTrackings}
                 />
               </TableCell>
               <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
+              <TableCell>Product</TableCell>
               <TableCell>Customer</TableCell>
               <TableCell>Adress</TableCell>
               <TableCell>Date</TableCell>
@@ -232,24 +231,24 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedCryptoOrders.map((cryptoOrder) => {
-              const isCryptoOrderSelected = selectedCryptoOrders.includes(
-                cryptoOrder.id
+            {paginatedTrackings.map((Tracking) => {
+              const isTrackingSelected = selectedTrackings.includes(
+                Tracking.id
               );
               return (
                 <TableRow
                   hover
-                  key={cryptoOrder.id}
-                  selected={isCryptoOrderSelected}
+                  key={Tracking.id}
+                  selected={isTrackingSelected}
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
                       color="primary"
-                      checked={isCryptoOrderSelected}
+                      checked={isTrackingSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneCryptoOrder(event, cryptoOrder.id)
+                        handleSelectOneTracking(event, Tracking.id)
                       }
-                      value={isCryptoOrderSelected}
+                      value={isTrackingSelected}
                     />
                   </TableCell>
                   <TableCell>
@@ -260,7 +259,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderID}
+                      {Tracking.orderID}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -271,7 +270,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.sourceName}
+                      {Tracking.productName}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -282,10 +281,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.sourceDesc}
+                      {Tracking.customerName}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -293,19 +292,19 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.cryptoCurrency}
+                      {Tracking.customerAddress}
                     </Typography>
                   </TableCell>
                   <TableCell>
                   <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(cryptoOrder.orderDate, 'MMMM dd yyyy')}
+                      {format(Tracking.shippingDate, 'MMMM dd yyyy')}
                     </Typography>
                   </TableCell>
                   <TableCell align="right">
-                    {getStatusLabel(cryptoOrder.status)}
+                    {getStatusLabel(Tracking.status)}
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View Order" arrow>
+                    <Tooltip title="View TrackingStatus" arrow>
                       {/* <NextLink href="/logistic/customerList/AddCustomerList" passHref> */}
                         <IconButton
                           sx={{
@@ -314,7 +313,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                             },
                             color: theme.palette.info.main,
                           }}
-                          onClick={() => router.push('/logistic/customerList/AddCustomerList')}
+                          onClick={() => router.push('/logistic/customerList/ViewCustomerList')}
                           color="inherit"
                           size="small"
                         >
@@ -322,7 +321,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                         </IconButton>
                       {/* </NextLink> */}
                     </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
+                    <Tooltip title="Edit TrackingStatus" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -330,13 +329,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                           },
                           color: theme.palette.primary.main,
                         }}
+                        onClick={() => router.push('/logistic/customerList/EditCustomerList')}
                         color="inherit"
                         size="small"
                       >
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
+                    <Tooltip title="Delete TrackingStatus" arrow>
                       <IconButton
                         sx={{
                           "&:hover": { background: theme.colors.error.lighter },
@@ -358,7 +358,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredCryptoOrders.length}
+          count={filteredTrackings.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -370,12 +370,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   );
 };
 
-RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired
+RecentTrackingStatussTable.propTypes = {
+  Trackings: PropTypes.array.isRequired
 };
 
-RecentOrdersTable.defaultProps = {
-  cryptoOrders: []
+RecentTrackingStatussTable.defaultProps = {
+  Trackings: []
 };
 
-export default RecentOrdersTable;
+export default RecentTrackingStatussTable;

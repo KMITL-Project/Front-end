@@ -1,5 +1,5 @@
 import { Card } from '@mui/material';
-import { Order } from '@/model/order';
+import { Order } from '@/model/logistic/order';
 import RecentOrdersTable from './UnitTable';
 import { subDays } from 'date-fns';
 

@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/category/PageHeader';
+import PageHeader from '@/content/logistic/tracking/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container, Typography } from '@mui/material';
 

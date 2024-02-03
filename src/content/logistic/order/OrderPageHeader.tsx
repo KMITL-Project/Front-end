@@ -1,11 +1,12 @@
 import { Typography, Button, Grid } from "@mui/material";
 
 import AddTwoToneIcon from "@mui/icons-material/AddTwoTone";
-// import router from "next/router";
+import router from "next/router";
 import NextLink from 'next/link';
-
+import { useRouter } from 'next/router';
 
 function PageHeader() {
+  const router = useRouter();
   // const currentRoute = router.pathname;
   const user = {
     name: "Catherine Pike",
@@ -15,7 +16,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-        Order
+          ใบสั่ง
         </Typography>
         {/* <Typography variant="subtitle2">
           {user.name}, these are your recent transactions
@@ -24,18 +25,19 @@ function PageHeader() {
 
 
       <Grid item>
-        <NextLink href="/setup/material/AddMaterial/" passHref>
-        <Button
+        {/* <NextLink href="/logistic/customerList/AddCustomerList/" passHref> */}
+        {/* <Button
             variant="contained" sx={{ margin:1}}
-            // className={currentRoute === "/setup/material/AddMaterial/" ? "active" : ""}
+            // className={currentRoute === "/logistic/customerList/AddCustomerList/" ? "active" : ""}
             disableRipple
             component="a"
+            onClick={() => router.push('/logistic/customerList/AddCustomerList/')}
             // onClick={closeSidebar}
             // startIcon={<TableChartTwoToneIcon />}
           >
-            + Create Material{" "}
-          </Button>
-        </NextLink>
+            + Add{" "}
+          </Button> */}
+        {/* </NextLink> */}
       </Grid>
     </Grid>
   );

@@ -1,23 +1,21 @@
 import { Card } from '@mui/material';
-import { Order } from '@/model/order';
+// import { Order,Ordertatus } from '@/model/logsitic/order.ts';
+
 import RecentOrdersTable from './OrderTable';
 import { subDays } from 'date-fns';
+import { Order } from '@/model/logistic/order';
 
 function RecentOrders() {
-  const cryptoOrders: Order[] = [
+  const listOrders: Order[] = [
     {
       id: '1',
       orderDetails: 'Fiat Deposit',
       orderDate: new Date().getTime(),
       status: 'completed',
-      orderID: 'เหล็ก 8*8',
-      sourceName: 'เหล็ก',
-      unit: 'ชิ้น',
-      sourceDesc: '*** 1111',
-      amountOrder: 34.4565,
-      amount: 56787,
-      orderCurrency: 'ETH',
-      currency: '$'
+      orderID: 'VUVX709ET7BY',
+      customerName: 'Rose',
+      orderName: 'ประตู',
+      customerAddress: 'ลาดกระบัง',
     },
     {
       id: '2',
@@ -25,13 +23,9 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 1).getTime(),
       status: 'completed',
       orderID: '23M3UOG65G8K',
-      sourceName: 'ไม้',
-      unit: 'อัน',
-      sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
-      amount: 8734587,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'Jack Dawson',
+      orderName: 'รั้ว',
+      customerAddress: 'หนองจอก',
     },
     {
       id: '3',
@@ -39,13 +33,9 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 5).getTime(),
       status: 'failed',
       orderID: 'F6JHK65MS818',
-      sourceName: 'อลูมิเนียม',
-      unit: 'ชิ้น',
-      sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
-      amount: 8734587,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'Billy',
+      orderName: 'บานเลื่อน',
+      customerAddress: 'อ่อนนุช',
     },
     {
       id: '4',
@@ -53,13 +43,9 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 55).getTime(),
       status: 'completed',
       orderID: 'QJFAI7N84LGM',
-      sourceName: 'อลูมิเนียม',
-      unit: 'แผ่น',
-      sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
-      amount: 8734587,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'Max',
+      orderName: 'ประตู',
+      customerAddress: 'บางนา',
     },
     {
       id: '5',
@@ -67,13 +53,9 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 56).getTime(),
       status: 'pending',
       orderID: 'BO5KFSYGC0YW',
-      sourceName: 'อลูมิเนียม',
-      unit: 'ชิ้น',
-      sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
-      amount: 8734587,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'Bob',
+      orderName: 'รั้ว',
+      customerAddress: 'พญาไท',
     },
     {
       id: '6',
@@ -81,13 +63,9 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 33).getTime(),
       status: 'completed',
       orderID: '6RS606CBMKVQ',
-      sourceName: 'อลูมิเนียม',
-      unit: 'ชิ้น',
-      sourceDesc: '*** 1111',
-      amountOrder: 6.58454334,
-      amount: 8734587,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'John',
+      orderName: 'บานเลื่อน',
+      customerAddress: 'ราชเทวี',
     },
     {
       id: '7',
@@ -95,13 +73,9 @@ function RecentOrders() {
       orderDate: new Date().getTime(),
       status: 'pending',
       orderID: '479KUYHOBMJS',
-      sourceName: 'อลูมิเนียม',
-      unit: 'ชิ้น',
-      sourceDesc: '*** 1212',
-      amountOrder: 2.346546,
-      amount: 234234,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'Paul',
+      orderName: 'ประตู',
+      customerAddress: 'รามคำแหง',
     },
     {
       id: '8',
@@ -109,13 +83,9 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 22).getTime(),
       status: 'completed',
       orderID: 'W67CFZNT71KR',
-      sourceName: 'อลูมิเนียม',
-      unit: 'ชิ้น',
-      sourceDesc: '*** 1111',
-      amountOrder: 3.345456,
-      amount: 34544,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'Kim',
+      orderName: 'รั้ว',
+      customerAddress: 'บางพลี',
     },
     {
       id: '9',
@@ -123,13 +93,9 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 11).getTime(),
       status: 'completed',
       orderID: '63GJ5DJFKS4H',
-      sourceName: 'อลูมิเนียม',
-      unit: 'ชิ้น',
-      sourceDesc: '*** 2222',
-      amountOrder: 1.4389567945,
-      amount: 123843,
-      orderCurrency: 'BTC',
-      currency: '$'
+      customerName: 'Park',
+      orderName: 'บานเลื่อน',
+      customerAddress: 'บึงกุ่ม',
     },
     {
       id: '10',
@@ -137,19 +103,15 @@ function RecentOrders() {
       orderDate: subDays(new Date(), 123).getTime(),
       status: 'failed',
       orderID: '17KRZHY8T05M',
-      sourceName: 'อลูมิเนียม',
-      sourceDesc: "John's Cardano Wallet",
-      unit: '-',
-      amountOrder: 765.5695,
-      amount: 7567,
-      orderCurrency: 'ADA',
-      currency: '$'
+      customerName: 'Ellen',
+      orderName: "ประตู",
+      customerAddress: 'บางแค',
     }
   ];
 
   return (
     <Card>
-      <RecentOrdersTable cryptoOrders={cryptoOrders} />
+      <RecentOrdersTable cryptoOrders={listOrders} />
     </Card>
   );
 }
