@@ -1,6 +1,5 @@
-import { FC, ChangeEvent, useState } from "react";
+import { FC, ChangeEvent, useState, useEffect } from "react";
 import { format } from "date-fns";
-import numeral from "numeral";
 import PropTypes from "prop-types";
 import {
   Tooltip,
@@ -36,8 +35,20 @@ import { useRouter } from "next/router";
 import BulkActions from "./BulkActions";
 import Modal from "@mui/material/Modal";
 import { Order, OrderStatus } from "@/model/logistic/order";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+  useMap,
+} from "react-leaflet";
 import { LatLngTuple } from "leaflet";
+import L from "leaflet";
+import "leaflet-routing-machine";
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+import 'leaflet-routing-machine';
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -90,124 +101,6 @@ const applyPagination = (
 };
 
 const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
-  // fuction for modal
-
-  const [selectedReports, setSelectedReports] = useState<string[]>([]);
-  const [showExportModal, setShowExportModal] = useState<boolean>(false);
-  const [fileName, setFileName] = useState<string>("");
-  const [fileType, setFileType] = useState<string>("pdf");
-
-  const handleExportClick = () => {
-    // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
-    if (selectedReports.length === 0) {
-      // แสดง popup แจ้งเตือนเมื่อไม่มีรายการที่ถูกเลือก
-      alert("Please select items to export.");
-      return;
-    }
-    // เปิด popup สำหรับการ Export
-    setShowExportModal(true);
-  };
-
-  const handleCloseModal = () => {
-    // ปิด popup สำหรับการ Export
-    setShowExportModal(false);
-  };
-
-  const handleExportConfirm = () => {
-    // ถ้าเลือก Export เป็น Excel
-    if (fileType === "excel") {
-      // สร้างชุดข้อมูลสำหรับ Excel
-      const dataForExcel = paginatedReports.map((report) => {
-        return {
-          "Material ID": report.orderDetails,
-          "Material Name": report.orderID,
-          Category: report.sourceName,
-          Unit: report.unit,
-          Shelf: report.shelf,
-          Floor: report.floor,
-        };
-      });
-
-      // สร้าง Workbook ของ Excel
-      const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
-      // Merge เซลล์ A1 ถึง F1 เพื่อใส่หัวข้อ
-      worksheet["!merges"] = [
-        // สร้างการ Merge ให้กับเซลล์ A1 ถึง F1
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // A1:F1
-      ];
-
-      // กำหนดข้อความลงในเซลล์ A1 ให้เป็น "Material List"
-      const headerStyle = {
-        font: { bold: true },
-        alignment: { horizontal: "center" },
-      };
-
-      worksheet["A1"].s = headerStyle;
-      worksheet["A1"].v = "Material List";
-
-      // ใส่ข้อมูลลงในเซลล์ใน Worksheet และกำหนดรูปแบบให้กับหัวเรื่อง
-      worksheet["A2"].s = headerStyle;
-      worksheet["A2"].v = "Material ID";
-
-      worksheet["B2"].s = headerStyle;
-      worksheet["B2"].v = "Material Name";
-
-      worksheet["C2"].s = headerStyle;
-      worksheet["C2"].v = "Category";
-
-      worksheet["D2"].s = headerStyle;
-      worksheet["D2"].v = "Unit";
-
-      worksheet["E2"].s = headerStyle;
-      worksheet["E2"].v = "Shelf";
-
-      worksheet["F2"].s = headerStyle;
-      worksheet["F2"].v = "Floor";
-
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "MaterialList");
-
-      // แปลง Workbook ให้เป็นไฟล์ Excel
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      const excelBlob = new Blob([excelBuffer], {
-        type: "application/octet-stream",
-      });
-
-      // ดาวน์โหลดไฟล์ Excel
-      saveAs(excelBlob, `${fileName}.xlsx`);
-      setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
-    } else if (fileType === "pdf") {
-      const generatePDF = () => {
-        // ลงทะเบียนฟอนต์
-        // Font.register({
-        //   family: 'AngsanaNew', // ตั้งชื่อฟอนต์ที่คุณต้องการให้แสดงผล
-        //   src: AngsanaNew, // ใช้ path ของฟอนต์ที่คุณนำเข้ามา
-        // });
-
-        const doc = new jsPDF();
-        let verticalOffset = 10;
-
-        paginatedReports.forEach((report) => {
-          // <Text style={{ fontFamily: 'AngsanaNew' }}>Text with your custom font</Text>
-          doc.text(report.orderDetails, 10, verticalOffset);
-          doc.text(report.orderID, 10, verticalOffset + 10);
-          // ... (add other content)
-          verticalOffset += 20;
-        });
-
-        doc.save(`${fileName}.pdf`);
-        setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
-      };
-
-      generatePDF();
-    }
-
-    return null; // Return null or any other fallback if fileType is not 'pdf'
-  };
-
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
@@ -216,7 +109,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null,
   });
 
   const statusOptions = [
@@ -238,18 +130,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     },
   ];
 
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
-
-    if (e.target.value !== "all") {
-      value = e.target.value;
-    }
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      status: value,
-    }));
-  };
+  
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -298,35 +179,44 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
+  const RoutingMachine: React.FC = () => {
+    const map = useMap();
+
+    useEffect(() => {
+      if (map) {
+        const control = L.Routing.control({
+          waypoints: [
+            L.latLng(13.745471504363191, 100.62317090481594), // First destination
+            L.latLng(13.72887257810719, 100.77569625918126), // Second destination
+          ],
+        });
+        control.addTo(map);
+
+        return () => {
+          map.removeControl(control);
+        };
+      }
+    }, [map]);
+
+    return null;
+  };
+
   return (
     <Card>
-      <MapContainer
-        center={[13.7563, 100.5018]} // ตำแหน่งศูนย์กลางของแผนที่
-        zoom={10} // ระดับการซูมของแผนที่
-        style={{ height: "400px", width: "100%" }} // กำหนดขนาดของแผนที่
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
+      <div style={{ margin: "15px" }}>
+        <MapContainer
+          center={[13.7563, 100.5018]}
+          zoom={10}
+          style={{ height: "400px", width: "100%" }}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <RoutingMachine />
+        </MapContainer>
+      </div>
 
-        {/* วนลูปแสดง Marker บนแผนที่ */}
-        {paginatedCryptoOrders.map((cryptoOrder, index) => {
-          // แปลงข้อมูลตำแหน่งเป็น LatLngTuple
-          const position: LatLngTuple = [
-            cryptoOrder.latitude,
-            cryptoOrder.longitude,
-          ];
-
-          return (
-            <Marker key={cryptoOrder.id} position={position}>
-              <Popup>
-                <Typography variant="body1">{cryptoOrder.orderName}</Typography>
-              </Popup>
-            </Marker>
-          );
-        })}
-      </MapContainer>
       <TableContainer>
         <Table>
           <TableHead>
@@ -428,86 +318,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
         />
       </Box>
       {/* Popup สำหรับการ สรุปรายการ */}
-      <Modal
-        open={showExportModal}
-        onClose={handleCloseModal}
-        aria-labelledby="export-modal-title"
-        aria-describedby="export-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 500, // เพิ่มความกว้างให้พอดีกับ PDFViewer
-            height: 300, // เพิ่มความสูงให้พอดีกับ PDFViewer
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography
-            id="export-modal-title"
-            variant="h6"
-            component="h2"
-            gutterBottom
-            className="mb-5"
-          >
-            Export Data
-          </Typography>
-          {/* {pdfContent ? (
-            <PDFViewer width={500} height={300}>
-              {pdfContent}
-            </PDFViewer>
-          ) : (
-            <Typography variant="body1">No content to display</Typography>
-          )} */}
-          {/* ส่วนอื่น ๆ ใน Modal */}
-          <TextField
-            label="File Name"
-            value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
-            variant="outlined"
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="file-type-label">File Type</InputLabel>
-            <Select
-              labelId="file-type-label"
-              id="file-type-select"
-              value={fileType}
-              label="File Type"
-              onChange={(e) => setFileType(e.target.value as string)}
-            >
-              <MenuItem value="pdf">PDF</MenuItem>
-              <MenuItem value="excel">Excel</MenuItem>
-            </Select>
-          </FormControl>
-          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              variant="contained"
-              component="a"
-              disableRipple
-              className="mr-5"
-              onClick={handleExportConfirm}
-            >
-              Export
-            </Button>
-            <Button
-              variant="contained"
-              component="a"
-              disableRipple
-              color="error"
-              onClick={handleCloseModal}
-              sx={{ mr: 2 }}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
     </Card>
   );
 };
