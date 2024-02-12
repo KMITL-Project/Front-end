@@ -21,15 +21,15 @@ function Forms() {
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
   const [formData, setFormData] = useState({
-    material_id: "",
-    name: "Material",
-    price: "",
-    amount: "",
+    image: imageUrl,
+    name: "ชั้นเครื่องมือ",
     detail: "ประแจ",
-    // buy_date: ""
+    total: "0",
+    floor_id: "",  // เปลี่ยนนี้
+    unit_id: "",
+
   });
 
-  const [cryptoOrders, setCryptoOrders] = useState([]);
   const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
   const [unitOptions, setUnitOptions] = useState([]);
   
@@ -38,13 +38,6 @@ function Forms() {
       try {
         const token = localStorage.getItem('accessToken');
         if (token) {
-          const response = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          });
           const responseFloor = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
             method: 'GET',
             headers: {
@@ -58,11 +51,9 @@ function Forms() {
             },
           });
           if (responseFloor.ok && responseUnit.ok) {
-            const responseData = await response.json();
             const responseDataFloor = await responseFloor.json();
             const responseDataUnit = await responseUnit.json();
             console.log('Floor Data:', responseDataFloor.data);
-            setCryptoOrders(responseData.data.map(material => ({value: material.id, label: material.name})));
             setFloorOptions(responseDataFloor.data.map(floor => ({ value: floor.id, label: floor.name })));
             setUnitOptions(responseDataUnit.data.map(unit => ({ value: unit.id, label: unit.name })));
           } else if (responseFloor.status === 401 || responseUnit.status === 401) {
@@ -84,16 +75,16 @@ function Forms() {
     event.preventDefault();
     const token = localStorage.getItem('accessToken');
     const formDataToSend = new FormData();
-    formDataToSend.append('material_id', formData.material_id);
     formDataToSend.append('name', formData.name);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('amount', formData.amount);
+    formDataToSend.append('image_url', file);  // แนบรูปภาพ
     formDataToSend.append('detail', formData.detail);
-    // formDataToSend.append('buy_date', formData.buy_date);
+    formDataToSend.append('floor_id', formData.floor_id);
+    formDataToSend.append('total', formData.total);
+    formDataToSend.append('unit_id', formData.unit_id);
 
     try {
       if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}lot/deposit`, {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`
@@ -101,12 +92,11 @@ function Forms() {
           body: formDataToSend,
         });
         console.log('formData:', formDataToSend);
-        console.log('material_id:', formDataToSend.get('material_id'));
         console.log('name:', formDataToSend.get('name'));
-        console.log('price:', formDataToSend.get('price'));
-        console.log('amount:', formDataToSend.get('amount'));
         console.log('detail:', formDataToSend.get('detail'));
-        // console.log('buy_date:', formDataToSend.get('buy_date'));
+        console.log('floor_id:', formDataToSend.get('floor_id'));
+        console.log('total:', formDataToSend.get('total'));
+        console.log('unit_id:', formDataToSend.get('unit_id'));
         if (response.ok) {
           // console.log('name:', formDataToSend.get('name'));
           // console.log('detail:', formDataToSend.get('detail'));
@@ -115,7 +105,7 @@ function Forms() {
           setImageUrl(uploadedImageUrl);
           // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
           console.log('Unit created successfully!');
-          router.push('/management/material/');
+          router.push('/setup/materialtype/');
         } else if (response.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง
           console.log('Token expired or invalid');
@@ -134,17 +124,16 @@ function Forms() {
   const handleChange = (event, id) => {
     const { value } = event.target;
   
-    if (id === "material_id") {
+    if (id === "floor_id") {
       setFormData({
         ...formData,
-        material_id: value
+        floor_id: value
       });
-      
-    // } else if (id === "unit_id") {
-    //   setFormData({
-    //     ...formData,
-    //     unit_id: value
-    //   });
+    } else if (id === "unit_id") {
+      setFormData({
+        ...formData,
+        unit_id: value
+      });
     } else {
       setFormData({
         ...formData,
@@ -184,13 +173,31 @@ function Forms() {
                     required
                     fullWidth
                     className="mb-4" 
-                    id="material_id"
+                    id="name"
                     label="Material Name"
-                    value={formData.material_id}
-                    onChange={(e) => handleChange(e, "material_id")}
+                    value={formData.name}
+                    onChange={(e) => handleChange(e, "name")}
+                  />
+                  <TextField
+                    required
+                    fullWidth
+                    className="mb-4" 
+                    id="detail"
+                    label="Material Detail"
+                    value={formData.detail}
+                    onChange={(e) => handleChange(e, "detail")}
+                  />
+                  <TextField
+                    required
+                    fullWidth
+                    className="mb-4" 
+                    id="floor_id"
+                    label="Floor"
+                    value={formData.floor_id}
+                    onChange={(e) => handleChange(e, "floor_id")}
                     select
                   >
-                    {cryptoOrders.map((option) => (
+                    {floorOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
                       </MenuItem>
@@ -200,39 +207,20 @@ function Forms() {
                     required
                     fullWidth
                     className="mb-4" 
-                    id="price"
-                    label="Material price"
-                    value={formData.price}
-                    onChange={(e) => handleChange(e, "price")}
-                  />
-                  <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="amount"
-                    label="Material amount"
-                    value={formData.amount}
-                    onChange={(e) => handleChange(e, "amount")}
-                  />
-                  <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="detail"
-                    label="detail"
-                    value={formData.detail}
-                    onChange={(e) => handleChange(e, "detail")}
-                  />
-                  {/* <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="buy_date"
-                    label="buy_date"
-                    value={formData.buy_date}
-                    onChange={(e) => handleChange(e, "buy_date")}
-                  /> */}
-                  {/* <input
+                    id="unit_id"
+                    label="Unit"
+                    value={formData.unit_id}
+                    onChange={(e) => handleChange(e, "unit_id")}
+                    select
+                  >
+                    {unitOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <input
                     id="dropzone-file"
                     type="file"
                     className="hidden"
@@ -243,7 +231,7 @@ function Forms() {
                   )}
                   <Button variant="contained" component="label" htmlFor="dropzone-file" className="mt-2">
                     Upload Image
-                  </Button> */}
+                  </Button>
                 </Grid>
               </Grid>
               {/* Button Row */}
@@ -263,7 +251,7 @@ function Forms() {
                   disableRipple
                   color="error"
                   component="a"
-                  onClick={() => router.push('/management/material')}
+                  onClick={() => router.push('/setup/materialtype/')}
                 >
                     Cancel
                 </Button>

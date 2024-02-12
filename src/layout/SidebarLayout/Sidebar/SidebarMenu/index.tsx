@@ -36,6 +36,7 @@ import ShareLocationTwoToneIcon from '@mui/icons-material/ShareLocationTwoTone';
 import DescriptionTwoToneIcon from '@mui/icons-material/DescriptionTwoTone';
 import ListAltTwoToneIcon from '@mui/icons-material/ListAltTwoTone';
 
+
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { sidebarIsClose } from "@/store/systemStore";
@@ -232,9 +233,9 @@ const SidebarMenu = () => {
                     dispatch(sidebarIsClose);
                   }}
                   href="/management/material"
-                  startIcon={<TableChartTwoToneIcon />}
+                  startIcon={<BallotTwoToneIcon />}
                 >
-                   วัสดุทั้งหมด
+                   Material
                 </Button>
               </ListItem>
               <ListItem component="div">
@@ -247,7 +248,7 @@ const SidebarMenu = () => {
                   href="/management/materialAdd"
                   startIcon={<TableChartTwoToneIcon />}
                 >
-                  เพิ่มวัสดุ
+                 Add Material
                 </Button>
               </ListItem>
               <ListItem component="div">
@@ -271,9 +272,9 @@ const SidebarMenu = () => {
                     dispatch(sidebarIsClose);
                   }}
                   href="/management/report"
-                  startIcon={<TableChartTwoToneIcon />}
+                  startIcon={<DescriptionTwoToneIcon />}
                 >
-                  รายงาน
+                  Report
                 </Button>
               </ListItem>
             </List>
@@ -361,19 +362,6 @@ const SidebarMenu = () => {
                   onClick={() => {
                     dispatch(sidebarIsClose);
                   }}
-                  href="/setup/category/"
-                  startIcon={<CategoryIcon />}
-                >
-                  Category
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
                   href="/setup/unit/"
                   startIcon={<InventoryIcon />}
                 >
@@ -387,7 +375,7 @@ const SidebarMenu = () => {
                   onClick={() => {
                     dispatch(sidebarIsClose);
                   }}
-                  href="/setup/material"
+                  href="/setup/materialtype"
                   startIcon={<LayersIcon />}
                 >
                   Material type

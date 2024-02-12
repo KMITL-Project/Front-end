@@ -118,6 +118,15 @@ function HeaderUserbox() {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    // ทำการลบข้อมูล authentication หรืออื่น ๆ ตามที่คุณต้องการ
+    // ตัวอย่าง: ลบ token จาก localStorage
+    localStorage.removeItem("accessToken");
+
+    // ทำการ redirect ไปยังหน้า login หรือหน้าหลักของแอปพลิเคชัน
+    router.push("/auth/login"); // หรือ path ที่คุณต้องการ
+  };
+
   return (
     <>
       <UserBoxButton color="secondary" onClick={handleOpen}>
@@ -152,7 +161,7 @@ function HeaderUserbox() {
         </MenuUserBox>
         <Divider sx={{ mb: 0 }} />
         <List sx={{ p: 1 }} component="nav">
-          <ListItem href="/management/profile/details" component={Link}>
+          <ListItem href="/user" component={Link}>
             <AccountBoxTwoToneIcon fontSize="small" />
             <ListItemText primary="My Profile" />
           </ListItem>
@@ -167,7 +176,7 @@ function HeaderUserbox() {
         </List>
         <Divider />
         <Box sx={{ m: 1 }}>
-          <Button color="primary" fullWidth>
+          <Button color="primary" fullWidth onClick={handleLogout}>
             <LockOpenTwoToneIcon sx={{ mr: 1 }} />
             LogOut 
           </Button>

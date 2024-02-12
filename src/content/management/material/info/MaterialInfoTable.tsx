@@ -1,35 +1,57 @@
-import { FC, ChangeEvent, useState } from 'react';
+import { FC, ChangeEvent, useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import PropTypes from 'prop-types';
-import {Tooltip, Divider, Box, FormControl, InputLabel, Card, Checkbox, IconButton, Table,
-  TableBody, TableCell, TableHead, TablePagination, TableRow, TableContainer, Select,
-  MenuItem, Typography, useTheme, CardHeader
+import {
+  Tooltip,
+  Divider,
+  Box,
+  FormControl,
+  InputLabel,
+  Card,
+  Checkbox,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TableContainer,
+  Select,
+  MenuItem,
+  Typography,
+  useTheme,
+  CardHeader
 } from '@mui/material';
-import { MaterialInfo, MaterialInfoStatus } from "@/model/management/materialInfo";
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from '../BulkActions';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 interface RecentOrdersTableProps {
   className?: string;
-  MaterialInfos: MaterialInfo[];
+  cryptoOrders: CryptoOrder[];
+  lotData: any[];
 }
 
+
 interface Filters {
-  status?: MaterialInfoStatus;
+  status?: CryptoOrderStatus;
 }
 
 const applyFilters = (
-  MaterialInfos: MaterialInfo[],
+  cryptoOrders: CryptoOrder[],
   filters: Filters
-): MaterialInfo[] => {
-  return MaterialInfos.filter((MaterialInfo) => {
+): CryptoOrder[] => {
+  return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
-    if (filters.status && MaterialInfo.status !== filters.status) {
+    if (filters.status && cryptoOrder.status !== filters.status) {
       matches = false;
     }
 
@@ -38,24 +60,33 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  MaterialInfos: MaterialInfo[],
+  cryptoOrders: CryptoOrder[],
   page: number,
   limit: number
-): MaterialInfo[] => {
-  return MaterialInfos.slice(page * limit, page * limit + limit);
+): CryptoOrder[] => {
+  return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ MaterialInfos }) => {
-  const [selectedMaterialInfos, setSelectedMaterialInfos] = useState<string[]>(
-    []
-  );
-  const selectedBulkActions = selectedMaterialInfos.length > 0;
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
+  const router = useRouter();
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
+  const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
-  const [filters, setFilters] = useState<Filters>({status: 'completed'});
-
+  const [filters, setFilters] = useState<Filters>({
+    status: null
+  });
+  const [cryptoOrders, setCryptoOrders] = useState([]);
+  const [lotOrders, setlotOrders] = useState([]);
+  
+  useEffect(() => {
+    // console.log('Lot Data:', lotData);
+    setlotOrders(lotData);
+    // console.log('Lot Data:', lotOrders);
+  }, [lotData]);
+  
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
+    let value = null;
 
     if (e.target.value !== 'all') {
       value = e.target.value;
@@ -67,28 +98,28 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ MaterialInfos }) => {
     }));
   };
 
-  const handleSelectAllMaterialInfos = (
+  const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedMaterialInfos(
+    setSelectedCryptoOrders(
       event.target.checked
-        ? MaterialInfos.map((MaterialInfo) => MaterialInfo.id)
+        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
         : []
     );
   };
 
-  const handleSelectOneMaterialInfo = (
+  const handleSelectOneCryptoOrder = (
     _event: ChangeEvent<HTMLInputElement>,
-    MaterialInfoId: string
+    cryptoOrderId: string
   ): void => {
-    if (!selectedMaterialInfos.includes(MaterialInfoId)) {
-      setSelectedMaterialInfos((prevSelected) => [
+    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
+      setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        MaterialInfoId
+        cryptoOrderId
       ]);
     } else {
-      setSelectedMaterialInfos((prevSelected) =>
-        prevSelected.filter((id) => id !== MaterialInfoId)
+      setSelectedCryptoOrders((prevSelected) =>
+        prevSelected.filter((id) => id !== cryptoOrderId)
       );
     }
   };
@@ -101,19 +132,18 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ MaterialInfos }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredMaterialInfos = applyFilters(MaterialInfos, filters);
-  const paginatedMaterialInfos = applyPagination(
-    filteredMaterialInfos,
+  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
+  const paginatedCryptoOrders = applyPagination(
+    filteredCryptoOrders,
     page,
     limit
   );
-  const selectedSomeMaterialInfos =
-    selectedMaterialInfos.length > 0 &&
-    selectedMaterialInfos.length < MaterialInfos.length;
-  const selectedAllMaterialInfos =
-    selectedMaterialInfos.length === MaterialInfos.length;
+  const selectedSomeCryptoOrders =
+    selectedCryptoOrders.length > 0 &&
+    selectedCryptoOrders.length < cryptoOrders.length;
+  const selectedAllCryptoOrders =
+    selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
-  const router = useRouter();
 
   return (
     <Card>
@@ -124,7 +154,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ MaterialInfos }) => {
       )}
       {!selectedBulkActions && (
         <CardHeader
-          title="Lot lists"
+          title="lot lists"
         />
       )}
       <Divider />
@@ -132,113 +162,87 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ MaterialInfos }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox" align="center">
-                <Checkbox
-                  color="primary"
-                  checked={selectedAllMaterialInfos}
-                  indeterminate={selectedSomeMaterialInfos}
-                  onChange={handleSelectAllMaterialInfos}
-                />
-              </TableCell>
-              <TableCell align="center">Lot</TableCell>
-              <TableCell align="center">Price</TableCell>
-              <TableCell align="center">Amount</TableCell>
+              <TableCell align="center">ID</TableCell>
+              {/* <TableCell align="center">Name</TableCell> */}
+              <TableCell align="center">price</TableCell>
+              <TableCell align="center">amount</TableCell>
+              <TableCell align="center">detail</TableCell>
               <TableCell align="center">Date</TableCell>
-              {/* <TableCell>Action</TableCell> */}
-              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedMaterialInfos.map((MaterialInfo) => {
-              const isMaterialInfoSelected = selectedMaterialInfos.includes(
-                MaterialInfo.id
-              );
-              
+            {lotData.map((lot) => { // Use lotData instead of paginatedCryptoOrders
               return (
                 <TableRow
                   hover
-                  key={MaterialInfo.id}
-                  selected={isMaterialInfoSelected}
+                  key={lot.id}
+                  // selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox" align="center">
-                    <Checkbox
-                      color="primary"
-                      checked={isMaterialInfoSelected}
-                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneMaterialInfo(event, MaterialInfo.id)
-                      }
-                      value={isMaterialInfoSelected}
-                    />
-                  </TableCell>
-
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {MaterialInfo.lot}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {lot.id}
                     </Typography>
                   </TableCell>
-
+                  {/* <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {lot.name}
+                    </Typography>
+                  </TableCell> */}
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {MaterialInfo.price}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {lot.price}
                     </Typography>
                   </TableCell>
-
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {MaterialInfo.amount}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {lot.amount}
                     </Typography>
                   </TableCell>
-
                   <TableCell align="center">
-                    <Typography variant="body1" fontWeight="bold" color="text.primary" gutterBottom noWrap>
-                      {format(MaterialInfo.orderDate, 'MM/dd/yyyy')}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {lot.detail}
                     </Typography>
                   </TableCell>
-
                   <TableCell align="center">
-                    <Tooltip title="View material" arrow>
-                        <IconButton
-                          onClick={() => router.push(`/management/material/info/lotInfo/${MaterialInfo.lot}`)}
-                          sx={{
-                            '&:hover': {
-                              background: theme.colors.info.lighter
-                            },
-                            color: theme.palette.info.main
-                          }}
-                          color="inherit"
-                          size="small"
-                        >
-                          <VisibilityTwoToneIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-
-                    <Tooltip title="Edit material" arrow>
-                      <IconButton
-                        onClick={() => router.push(`/management/material/info/lotEdit/${MaterialInfo.lot}`)}
-                        sx={{
-                          '&:hover': {
-                            background: theme.colors.primary.lighter
-                          },
-                          color: theme.palette.primary.main
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <EditTwoToneIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete material" arrow>
-                      <IconButton
-                        sx={{
-                          '&:hover': { background: theme.colors.error.lighter },
-                          color: theme.palette.error.main
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <DeleteTwoToneIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {lot.buy_date ? format(new Date(lot.created_at), 'yyyy-MM-dd') : ''}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               );
@@ -249,7 +253,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ MaterialInfos }) => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredMaterialInfos.length}
+          count={filteredCryptoOrders.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -262,11 +266,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ MaterialInfos }) => {
 };
 
 RecentOrdersTable.propTypes = {
-  MaterialInfos: PropTypes.array.isRequired
+  cryptoOrders: PropTypes.array.isRequired,
+  lotData: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  MaterialInfos: []
+  cryptoOrders: [],
+  lotData: [],
 };
+
 
 export default RecentOrdersTable;

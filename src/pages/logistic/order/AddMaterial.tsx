@@ -6,7 +6,7 @@ import { Grid, Container, Typography } from '@mui/material';
 
 import RecentOrders from '@/content/setup/material/MaterialView';
 import { ReactElement } from 'react';
-import Forms from '@/content/setup/material/AddMaterial';
+import Forms from '@/content/setup/material/AddMaterialType/AddMaterial';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {

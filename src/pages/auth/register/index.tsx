@@ -1,10 +1,4 @@
 import Head from 'next/head';
-import SidebarLayout from "@/layout/SidebarLayout";
-import PageHeader from '@/content/dashboard/PageHeader';
-import { ReactElement } from "react";
-import WatchList from "@/content/dashboard/List";
-import PageTitleWrapper from "@/components/PageTitleWrapper";
-import Breadcrumb from "@/components/Breadcrumbs";
 import { Container, Grid } from "@mui/material";
 import SignUp from '@/content/autentication/SignUp';
 

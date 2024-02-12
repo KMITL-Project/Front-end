@@ -7,17 +7,8 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-        Material Type
+        Add Material Type
         </Typography>
-      </Grid>
-      <Grid item>
-        <Button
-            variant="contained" sx={{ margin:1}}
-            disableRipple
-            component="a"
-            onClick={() => router.push('/setup/materialtype/AddMaterial/')}>
-            + Create Material Type{" "}
-          </Button>
       </Grid>
     </Grid>
   );

@@ -127,7 +127,7 @@ const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
         setImageUrl(uploadedImageUrl);
         // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
         console.log('Material Updated successfully!');
-        router.push('/management/material/');
+        router.push('/setup/materialtype/');
       } else if (response.status === 401) {
         // Token หมดอายุหรือไม่ถูกต้อง
         console.log('Token expired or invalid');
@@ -197,7 +197,7 @@ const handleFileChange = (event) => {
             justifyContent="center"
             >
             <Card>
-              <CardHeader title="Material Edit" />
+              <CardHeader title="Material Type Edit" />
               <Divider />
               <CardContent>
                 <Grid container spacing={3} justifyContent="center">
@@ -287,7 +287,7 @@ const handleFileChange = (event) => {
                     variant="contained" 
                     sx={{ margin:1}}
                     color="error"
-                    onClick={() => router.push('/management/material/')}
+                    onClick={() => router.push('/setup/materialtype/')}
                     disableRipple
                     component="a"
                     >

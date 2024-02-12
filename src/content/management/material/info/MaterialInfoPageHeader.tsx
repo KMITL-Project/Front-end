@@ -17,9 +17,7 @@ function PageHeader() {
             variant="contained"
             component="a"
             sx={{ margin: 1 }}
-            onClick={() => {
-              router.push('/management/materialAdd/'); // ใส่ path ที่ต้องการทำการ redirect ไปที่นั้น
-            }}
+            onClick={() => {router.push('/management/materialAdd/');}}
             disableRipple
           >
             + Create Material{" "}

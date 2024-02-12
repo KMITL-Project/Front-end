@@ -1,22 +1,22 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/management/pickUp/PageHeader';
-import Breadcrumb from '@/components/Breadcrumbs';
+import PageHeader from '@/content/setup/material/Edit/TypeEditPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 import { ReactElement } from 'react';
-import Pickup from '@/content/management/pickUp/pickup'
+import MaterialEditPage from '@/content/setup/material/Edit/TypeEdit';
+import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
-
-  const pageData: string = 'Home/Withdraw Material'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Material/Material Edit'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
       <Head>
-        <title>Withdraw Material</title>
+        <title></title>
       </Head>
       <PageTitleWrapper>
+        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
         <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
@@ -29,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <Pickup />
+            <MaterialEditPage/>
           </Grid>
         </Grid>
       </Container>
@@ -42,3 +42,6 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
+
+
+

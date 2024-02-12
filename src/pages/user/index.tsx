@@ -1,29 +1,27 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/material/PageHeader';
+import PageHeader from '@/content/user/profile/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container, Typography } from '@mui/material';
-
-import RecentOrders from '@/content/setup/material/MaterialView';
+import { Grid, Container } from '@mui/material';
 import { ReactElement } from 'react';
-import Forms from '@/content/setup/material/AddMaterial';
+import Profile from '@/content/user/profile/Profile';
 import Breadcrumb from '@/components/Breadcrumbs';
 
+
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Material/Add Material Type'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Profile'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
-     <Head>
+      <Head>
         <title></title>
       </Head>
-
+      <PageTitleWrapper>
+        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
+        <Breadcrumb pageData={pageData} />
+        <PageHeader />
+      </PageTitleWrapper>
       <Container maxWidth="lg">
-      <Grid item padding={3}>   
-      <Breadcrumb pageData={pageData} />
-   
-      <Typography variant="h3">Add Material Type</Typography>
-      </Grid>
         <Grid
           container
           direction="row"
@@ -32,7 +30,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <Forms />
+            <Profile/>
           </Grid>
         </Grid>
       </Container>
@@ -45,6 +43,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

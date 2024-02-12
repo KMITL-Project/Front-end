@@ -4,15 +4,11 @@ import { ReactElement, useState } from "react";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
   Button,
-  Checkbox,
   Grid,
-  Card,
   TextField,
-  CardContent,
   Typography,
   Avatar,
   CssBaseline,
-  FormControlLabel,
   Box,
   Container,
 } from '@mui/material';
@@ -21,8 +17,6 @@ import { useRouter } from 'next/router';
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
-
-const queryClient = new QueryClient();
 
 function SignUp() {
   const router = useRouter();
@@ -57,7 +51,7 @@ function SignUp() {
       if (response.ok) {
         // ดำเนินการหลังจากการเรียก API ที่สำเร็จ
         const responseData = await response.json();
-        const uploadedImageUrl = responseData.upload_image;
+        const uploadedImageUrl = responseData.imageUrl;
         setImageUrl(uploadedImageUrl);
         console.log('Response Data:', responseData);
         console.log('Registed successfully!');
@@ -87,6 +81,10 @@ function SignUp() {
   };
 
   return (
+    <>
+      <Head>
+        <title></title>
+      </Head>
       <div className="flex items-center justify-center min-h-screen">
         <Container component="main" maxWidth="xs">
           <CssBaseline />
@@ -180,6 +178,7 @@ function SignUp() {
           </Box>
         </Container>
       </div>
+    </>
   );
 }
 export default SignUp;
