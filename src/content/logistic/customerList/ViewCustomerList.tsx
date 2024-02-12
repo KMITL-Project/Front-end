@@ -16,6 +16,7 @@ import {
   Avatar,
   IconButton,
   Link,
+  Typography,
 } from "@mui/material";
 import Footer from "@/components/Footer";
 
@@ -43,7 +44,10 @@ import UploadTwoToneIcon from "@mui/icons-material/UploadTwoTone";
 import { Upload } from "@mui/icons-material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Paper from "@mui/material/Paper";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
+import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -130,94 +134,79 @@ function Forms() {
   const handleChange2 = (_event: any, newValue: any) => {
     setValue(newValue);
   };
-  
 
   return (
     <>
-      <Head>
-        <title></title>
-      </Head>
-
-      <Container maxWidth="lg">
-        <Grid container spacing={0}>
-          <Grid item xs={12} direction="column" justifyContent="center">
-            <Card>
-              <CardHeader title="Order Details" />
-              <Divider />
-              <CardContent>
-                <Box
-                  component="form"
-                  sx={{
-                    "& .MuiTextField-root": { m: 1, width: "60ch" },
-                  }}
-                  noValidate
-                  autoComplete="off"
-                >
-                  <div>
-                    <Grid item>
-                      {" "}
-                      <TextField
-                        required
-                        id="outlined-required"
-                        label="Customer Name"
-                      />
-            
-                      <TextField
-                        required
-                        id="outlined-required"
-                        label="Details"
-                      />
-
-<TextField
-                        required
-                        id="outlined-required"
-                        label="Address"
-                      />
-                      <TextField
-                        required
-                        id="outlined-required"
-                        label="Date"
-                      />
-                    </Grid>
- 
-                    <Grid container justifyContent={"center"} paddingTop={2}>
-                      {/* <NextLink href="/logistic/customerList/" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/customerList/')}
-                          disableRipple
-                          component="a"
-                        >
-                          Save{" "}
-                        </Button>
-                      {/* </NextLink> */}
-                      {/* <NextLink href="/logistic/customerList//" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          color="error"
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/customerList/')}
-                          disableRipple
-                          component="a"
-                        >
-                          Cancel{" "}
-                        </Button>
-                      {/* </NextLink> */}
-                    </Grid>
-                  </div>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="body1">
+                <Grid container spacing={0}>
+                  <Grid item xs={12} sm={4} md={3} textAlign={{ sm: "right" }}>
+                    <Box pr={3} pb={2}>
+                      ID:
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9}>
+                    <b>#1342</b>
+                  </Grid>
+                  <Grid item xs={12} sm={4} md={3} textAlign={{ sm: "right" }}>
+                    <Box pr={3} pb={2}>
+                      Name:
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9}>
+                    <b>ป้าย 5*2 ม.</b>
+                  </Grid>
+                  <Grid item xs={12} sm={4} md={3} textAlign={{ sm: "right" }}>
+                    <Box pr={3} pb={2}>
+                      Customer:
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9}>
+                    การประปาส่วนภูมิภาค สาขาเชียงใหม่
+                  </Grid>
+                  <Grid item xs={12} sm={4} md={3} textAlign={{ sm: "right" }}>
+                    <Box pr={3} pb={2}>
+                      Details:
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9}>
+                    ป้ายแนะนำองค์กร 5*2 ม.
+                  </Grid>
+                  <Grid item xs={12} sm={4} md={3} textAlign={{ sm: "right" }}>
+                    <Box pr={3} pb={2}>
+                      Address:
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9}>
+                    <Box sx={{ maxWidth: { xs: "auto", sm: 300 } }}>
+                      330 ถ.เชียงใหม่-ลำปาง ต.ป่าตัน อ.เมือง 50300
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={4} md={3} textAlign={{ sm: "right" }}>
+                    <Box pr={3} pb={2}>
+                      Date:
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9}>
+                    7 กันยายยน 2566
+                  </Grid>
+                  <Grid item xs={12} sm={4} md={3} textAlign={{ sm: "right" }}>
+                    <Box pr={3} pb={2}>
+                      Status:
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9}>
+                    กำลังจัดส่ง
+                  </Grid>
+                </Grid>
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
-      </Container>
+      </Grid>
     </>
   );
 }

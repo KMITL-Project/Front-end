@@ -6,11 +6,11 @@ import { Grid, Container, Typography } from '@mui/material';
 
 import RecentOrders from '@/content/setup/shelf/ShelfView';
 import { ReactElement } from 'react';
-import Forms from '@/content/logistic/customerList/AddCustomerList';
+import Forms from '@/content/logistic/customerList/EditCustomerList';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Logistic/รายการลูกค้า/Add Order'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Logistic/รายการลูกค้า/Edit Order'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -22,7 +22,7 @@ function ApplicationsTransactions() {
       <Grid item padding={3}>   
       <Breadcrumb pageData={pageData} />
    
-      <Typography variant="h3">Add Order</Typography>
+      <Typography variant="h3">Edit Order</Typography>
       </Grid>
         <Grid
           container

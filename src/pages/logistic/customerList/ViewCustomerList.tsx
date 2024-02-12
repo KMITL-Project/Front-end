@@ -6,7 +6,7 @@ import { Grid, Container, Typography } from '@mui/material';
 
 import RecentOrders from '@/content/setup/shelf/ShelfView';
 import { ReactElement } from 'react';
-import Forms from '@/content/logistic/customerList/AddCustomerList';
+import Forms from '@/content/logistic/customerList/ViewCustomerList';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
@@ -22,7 +22,7 @@ function ApplicationsTransactions() {
       <Grid item padding={3}>   
       <Breadcrumb pageData={pageData} />
    
-      <Typography variant="h3">Add Order</Typography>
+      <Typography variant="h3">View Order #1342</Typography>
       </Grid>
         <Grid
           container

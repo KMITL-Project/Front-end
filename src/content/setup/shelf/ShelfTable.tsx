@@ -30,22 +30,23 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
 import { useRouter } from 'next/router';
 import getConfig from "next/config";
+import { Shelf, ShelfStatus } from '@/model/setup/shelf';
 
 const { publicRuntimeConfig } = getConfig();
 
 interface RecentOrdersTableProps {
   className?: string;
-  cryptoOrders: CryptoOrder[];
+  mockShelves: Shelf[];
 }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: ShelfStatus;
 }
 
 const applyFilters = (
-  cryptoOrders: CryptoOrder[],
+  cryptoOrders: Shelf[],
   filters: Filters
-): CryptoOrder[] => {
+): Shelf[] => {
   return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
@@ -58,10 +59,10 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  cryptoOrders: CryptoOrder[],
+  cryptoOrders: Shelf[],
   page: number,
   limit: number
-): CryptoOrder[] => {
+): Shelf[] => {
   return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
@@ -277,7 +278,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.name}
+                      {cryptoOrder.shelfName}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -288,7 +289,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.detail}
+                      {cryptoOrder.shelfDescription}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -358,11 +359,11 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
 };
 
 RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired,
+  mockShelves: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  cryptoOrders: []
+  mockShelves: []
 };
 
 export default RecentOrdersTable;

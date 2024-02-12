@@ -2,14 +2,10 @@ export type TrackingStatus = 'completed' | 'pending' | 'failed';
 
 export interface Tracking {
   id: string;
-  shelfID: string;
+  orderID: string;
   status: TrackingStatus;
-  shelfDate: number;
-  shelfName: string;
-  shelfDescription: string;
-  sourceDesc: string;
-  amountShelf: number;
-  amount: number;
-  shelfCurrency: string;
-  currency: string;
+  productName: string;
+  customerName: string;
+  customerAddress: string;
+  shippingDate: number;
 }

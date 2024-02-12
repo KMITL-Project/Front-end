@@ -160,23 +160,27 @@ function Forms() {
                         required
                         id="outlined-required"
                         label="Customer Name"
+                        defaultValue="Jack Dawson"
                       />
             
                       <TextField
                         required
                         id="outlined-required"
                         label="Details"
+                        defaultValue="ประแจ"
                       />
 
 <TextField
                         required
                         id="outlined-required"
                         label="Address"
+                        defaultValue="KMITL"
                       />
                       <TextField
                         required
                         id="outlined-required"
                         label="Date"
+                        defaultValue="ประแจ"
                       />
                     </Grid>
  

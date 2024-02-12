@@ -188,7 +188,7 @@ function Forms() {
                           // className={
                           //   currentRoute === "/logistic/customerList/" ? "active" : ""
                           // }
-                          onClick={() => router.push('/logistic/customerList/')}
+                          onClick={() => router.push('/logistic/order/')}
                           disableRipple
                           component="a"
                         >
@@ -203,7 +203,7 @@ function Forms() {
                           // className={
                           //   currentRoute === "/logistic/customerList/" ? "active" : ""
                           // }
-                          onClick={() => router.push('/logistic/customerList/')}
+                          onClick={() => router.push('/logistic/order/')}
                           disableRipple
                           component="a"
                         >

@@ -1,7 +1,7 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
-import numeral from 'numeral';
-import PropTypes from 'prop-types';
+import { FC, ChangeEvent, useState } from "react";
+import { format } from "date-fns";
+import numeral from "numeral";
+import PropTypes from "prop-types";
 import {
   Tooltip,
   Divider,
@@ -22,51 +22,55 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader
-} from '@mui/material';
+  CardHeader,
+  TextField,
+  Button,
+} from "@mui/material";
 
-import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/material';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
+import Label from "@/components/Label";
+import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
+import BulkActions from "./BulkActions";
+import Modal from "@mui/material/Modal";
+import { Order, OrderStatus } from "@/model/logistic/order";
 
 interface RecentOrdersTableProps {
   className?: string;
-  cryptoOrders: CryptoOrder[];
+  cryptoOrders: Order[];
 }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: OrderStatus;
 }
 
-// const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
-//   const map = {
-//     failed: {
-//       text: 'Failed',
-//       color: 'error'
-//     },
-//     completed: {
-//       text: 'Completed',
-//       color: 'success'
-//     },
-//     pending: {
-//       text: 'Pending',
-//       color: 'warning'
-//     }
-//   };
+const getStatusLabel = (listOrderStatus: OrderStatus): JSX.Element => {
+  const map = {
+    failed: {
+      text: "Failed",
+      color: "error",
+    },
+    completed: {
+      text: "Completed",
+      color: "success",
+    },
+    pending: {
+      text: "Pending",
+      color: "warning",
+    },
+  };
 
-//   const { text, color }: any = map[cryptoOrderStatus];
+  const { text, color }: any = map[listOrderStatus];
 
-//   return <Label color={color}>{text}</Label>;
-// };
+  return <Label color={color}>{text}</Label>;
+};
 
 const applyFilters = (
-  cryptoOrders: CryptoOrder[],
+  cryptoOrders: Order[],
   filters: Filters
-): CryptoOrder[] => {
+): Order[] => {
   return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
@@ -79,14 +83,133 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  cryptoOrders: CryptoOrder[],
+  cryptoOrders: Order[],
   page: number,
   limit: number
-): CryptoOrder[] => {
+): Order[] => {
   return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
 const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
+  // fuction for modal
+  
+  const [selectedReports, setSelectedReports] = useState<string[]>([]);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>("");
+  const [fileType, setFileType] = useState<string>("pdf");
+
+  const handleExportClick = () => {
+    // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
+    if (selectedReports.length === 0) {
+      // แสดง popup แจ้งเตือนเมื่อไม่มีรายการที่ถูกเลือก
+      alert("Please select items to export.");
+      return;
+    }
+    // เปิด popup สำหรับการ Export
+    setShowExportModal(true);
+  };
+
+  const handleCloseModal = () => {
+    // ปิด popup สำหรับการ Export
+    setShowExportModal(false);
+  };
+
+  const handleExportConfirm = () => {
+    // ถ้าเลือก Export เป็น Excel
+    if (fileType === "excel") {
+      // สร้างชุดข้อมูลสำหรับ Excel
+      const dataForExcel = paginatedReports.map((report) => {
+        return {
+          "Material ID": report.orderDetails,
+          "Material Name": report.orderID,
+          Category: report.sourceName,
+          Unit: report.unit,
+          Shelf: report.shelf,
+          Floor: report.floor,
+        };
+      });
+
+      // สร้าง Workbook ของ Excel
+      const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+      // Merge เซลล์ A1 ถึง F1 เพื่อใส่หัวข้อ
+      worksheet["!merges"] = [
+        // สร้างการ Merge ให้กับเซลล์ A1 ถึง F1
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // A1:F1
+      ];
+
+      // กำหนดข้อความลงในเซลล์ A1 ให้เป็น "Material List"
+      const headerStyle = {
+        font: { bold: true },
+        alignment: { horizontal: "center" },
+      };
+
+      worksheet["A1"].s = headerStyle;
+      worksheet["A1"].v = "Material List";
+
+      // ใส่ข้อมูลลงในเซลล์ใน Worksheet และกำหนดรูปแบบให้กับหัวเรื่อง
+      worksheet["A2"].s = headerStyle;
+      worksheet["A2"].v = "Material ID";
+
+      worksheet["B2"].s = headerStyle;
+      worksheet["B2"].v = "Material Name";
+
+      worksheet["C2"].s = headerStyle;
+      worksheet["C2"].v = "Category";
+
+      worksheet["D2"].s = headerStyle;
+      worksheet["D2"].v = "Unit";
+
+      worksheet["E2"].s = headerStyle;
+      worksheet["E2"].v = "Shelf";
+
+      worksheet["F2"].s = headerStyle;
+      worksheet["F2"].v = "Floor";
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "MaterialList");
+
+      // แปลง Workbook ให้เป็นไฟล์ Excel
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const excelBlob = new Blob([excelBuffer], {
+        type: "application/octet-stream",
+      });
+
+      // ดาวน์โหลดไฟล์ Excel
+      saveAs(excelBlob, `${fileName}.xlsx`);
+      setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
+    } else if (fileType === "pdf") {
+      const generatePDF = () => {
+        // ลงทะเบียนฟอนต์
+        // Font.register({
+        //   family: 'AngsanaNew', // ตั้งชื่อฟอนต์ที่คุณต้องการให้แสดงผล
+        //   src: AngsanaNew, // ใช้ path ของฟอนต์ที่คุณนำเข้ามา
+        // });
+
+        const doc = new jsPDF();
+        let verticalOffset = 10;
+
+        paginatedReports.forEach((report) => {
+          // <Text style={{ fontFamily: 'AngsanaNew' }}>Text with your custom font</Text>
+          doc.text(report.orderDetails, 10, verticalOffset);
+          doc.text(report.orderID, 10, verticalOffset + 10);
+          // ... (add other content)
+          verticalOffset += 20;
+        });
+
+        doc.save(`${fileName}.pdf`);
+        setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
+      };
+
+      generatePDF();
+    }
+
+    return null; // Return null or any other fallback if fileType is not 'pdf'
+  };
+
+  const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
   );
@@ -94,38 +217,38 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null
+    status: null,
   });
 
   const statusOptions = [
     {
-      id: 'all',
-      name: 'All'
+      id: "all",
+      name: "All",
     },
     {
-      id: 'completed',
-      name: 'Completed'
+      id: "completed",
+      name: "Completed",
     },
     {
-      id: 'pending',
-      name: 'Pending'
+      id: "pending",
+      name: "Pending",
     },
     {
-      id: 'failed',
-      name: 'Failed'
-    }
+      id: "failed",
+      name: "Failed",
+    },
   ];
 
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
+    let value = null;
 
-    if (e.target.value !== 'all') {
+    if (e.target.value !== "all") {
       value = e.target.value;
     }
 
     setFilters((prevFilters) => ({
       ...prevFilters,
-      status: value
+      status: value,
     }));
   };
 
@@ -146,7 +269,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     if (!selectedCryptoOrders.includes(cryptoOrderId)) {
       setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        cryptoOrderId
+        cryptoOrderId,
       ]);
     } else {
       setSelectedCryptoOrders((prevSelected) =>
@@ -176,35 +299,46 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
+
   return (
     <Card>
       {selectedBulkActions && (
         <Box flex={1} p={2}>
-          <BulkActions />
+          <BulkActions Orders={paginatedCryptoOrders.filter(value => {
+    const isCryptoOrderSelected = selectedCryptoOrders.includes(
+      value.id
+    )
+      return isCryptoOrderSelected
+    })}/>
         </Box>
       )}
       {!selectedBulkActions && (
         <CardHeader
-          // action={
-          //   // <Box width={150}>
-          //   //   <FormControl fullWidth variant="outlined">
-          //   //     <InputLabel>Status</InputLabel>
-          //   //     <Select
-          //   //       value={filters.status || 'all'}
-          //   //       onChange={handleStatusChange}
-          //   //       label="Status"
-          //   //       autoWidth
-          //   //     >
-          //   //       {statusOptions.map((statusOption) => (
-          //   //         <MenuItem key={statusOption.id} value={statusOption.id}>
-          //   //           {statusOption.name}
-          //   //         </MenuItem>
-          //   //       ))}
-          //   //     </Select>
-          //   //   </FormControl>
-          //   // </Box>
-          // }
-          title="Order lists"
+          action={
+            <Box width={150}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={filters.status || "all"}
+                  onChange={handleStatusChange}
+                  label="Status"
+                  autoWidth
+                  onClose={() => {
+                    // Handle the dropdown close event
+                    // เปิด Modal สำหรับการสรุปรายการ (Summary List Modal) เมื่อคลิก "Add"
+                    setShowExportModal(false);
+                  }}
+                >
+                  {statusOptions.map((statusOption) => (
+                    <MenuItem key={statusOption.id} value={statusOption.id}>
+                      {statusOption.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          }
+          title="Customer Lists"
         />
       )}
       <Divider />
@@ -212,7 +346,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox" align="center">
+              <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
                   checked={selectedAllCryptoOrders}
@@ -220,13 +354,13 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">ID</TableCell>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Customer</TableCell>
-              <TableCell align="center">Address</TableCell>
-              <TableCell align="center">Date</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Customer</TableCell>
+              <TableCell>Adress</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell align="right">Status</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -240,7 +374,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   key={cryptoOrder.id}
                   selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox" align="center">
+                  <TableCell padding="checkbox">
                     <Checkbox
                       color="primary"
                       checked={isCryptoOrderSelected}
@@ -269,24 +403,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderDetails}
+                      {cryptoOrder.orderName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(cryptoOrder.orderDate, 'MMMM dd yyyy')}
-                    </Typography>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.sourceName}
-                    </Typography>
-
                   </TableCell>
                   <TableCell>
                     <Typography
@@ -296,54 +414,59 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.unit}
+                      {cryptoOrder.customerName}
                     </Typography>
                   </TableCell>
-                  {/* <TableCell align="right">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.amountCrypto}
-                      {cryptoOrder.cryptoCurrency}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {numeral(cryptoOrder.amount).format(
-                        `${cryptoOrder.currency}0,0.00`
-                      )}
-                    </Typography>
-                  </TableCell> */}
-                  {/* <TableCell align="right">
-                    {getStatusLabel(cryptoOrder.status)}
-                  </TableCell> */}
                   <TableCell align="right">
-                  <Tooltip title="View Material" arrow>
-                      <NextLink href="/setup/material/AddMaterial" passHref>
-                        <IconButton
-                          sx={{
-                            "&:hover": {
-                              background: theme.colors.info.lighter,
-                            },
-                            color: theme.palette.info.main,
-                          }}
-                          color="inherit"
-                          size="small"
-                        >
-                          <VisibilityTwoToneIcon fontSize="small" />
-                        </IconButton>
-                      </NextLink>
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.customerAddress}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {format(cryptoOrder.orderDate, "MMMM dd yyyy")}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    {getStatusLabel(cryptoOrder.status)}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="View Order" arrow>
+                      {/* <NextLink href="/logistic/customerList/AddCustomerList" passHref> */}
+                      <IconButton
+                        sx={{
+                          "&:hover": {
+                            background: theme.colors.info.lighter,
+                          },
+                          color: theme.palette.info.main,
+                        }}
+                        onClick={() =>
+                          router.push("/logistic/customerList/ViewCustomerList")
+                        }
+                        color="inherit"
+                        size="small"
+                      >
+                        <VisibilityTwoToneIcon fontSize="small" />
+                      </IconButton>
+                      {/* </NextLink> */}
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton
                         sx={{
-                          '&:hover': {
-                            background: theme.colors.primary.lighter
+                          "&:hover": {
+                            background: theme.colors.primary.lighter,
                           },
-                          color: theme.palette.primary.main
+                          color: theme.palette.primary.main,
                         }}
+                        onClick={() =>
+                          router.push("/logistic/customerList/EditCustomerList")
+                        }
                         color="inherit"
                         size="small"
                       >
@@ -353,8 +476,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     <Tooltip title="Delete Order" arrow>
                       <IconButton
                         sx={{
-                          '&:hover': { background: theme.colors.error.lighter },
-                          color: theme.palette.error.main
+                          "&:hover": { background: theme.colors.error.lighter },
+                          color: theme.palette.error.main,
                         }}
                         color="inherit"
                         size="small"
@@ -380,16 +503,97 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           rowsPerPageOptions={[5, 10, 25, 30]}
         />
       </Box>
+      {/* Popup สำหรับการ สรุปรายการ */}
+      <Modal
+        open={showExportModal}
+        onClose={handleCloseModal}
+        aria-labelledby="export-modal-title"
+        aria-describedby="export-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500, // เพิ่มความกว้างให้พอดีกับ PDFViewer
+            height: 300, // เพิ่มความสูงให้พอดีกับ PDFViewer
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography
+            id="export-modal-title"
+            variant="h6"
+            component="h2"
+            gutterBottom
+            className="mb-5"
+          >
+            Export Data
+          </Typography>
+          {/* {pdfContent ? (
+            <PDFViewer width={500} height={300}>
+              {pdfContent}
+            </PDFViewer>
+          ) : (
+            <Typography variant="body1">No content to display</Typography>
+          )} */}
+          {/* ส่วนอื่น ๆ ใน Modal */}
+          <TextField
+            label="File Name"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            variant="outlined"
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="file-type-label">File Type</InputLabel>
+            <Select
+              labelId="file-type-label"
+              id="file-type-select"
+              value={fileType}
+              label="File Type"
+              onChange={(e) => setFileType(e.target.value as string)}
+            >
+              <MenuItem value="pdf">PDF</MenuItem>
+              <MenuItem value="excel">Excel</MenuItem>
+            </Select>
+          </FormControl>
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              className="mr-5"
+              onClick={handleExportConfirm}
+            >
+              Export
+            </Button>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              color="error"
+              onClick={handleCloseModal}
+              sx={{ mr: 2 }}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Card>
   );
 };
 
 RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired
+  cryptoOrders: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  cryptoOrders: []
+  cryptoOrders: [],
 };
 
 export default RecentOrdersTable;

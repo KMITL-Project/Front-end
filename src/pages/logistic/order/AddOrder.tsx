@@ -1,16 +1,20 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/material/PageHeader';
+import PageHeader from '@/content/logistic/order/OrderPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container, Typography } from '@mui/material';
 
-import RecentOrders from '@/content/setup/material/MaterialView';
+import RecentOrders from '@/content/logistic/order/OrderView';
 import { ReactElement } from 'react';
+<<<<<<< HEAD:src/pages/logistic/order/AddMaterial.tsx
 import Forms from '@/content/setup/material/AddMaterialType/AddMaterial';
+=======
+import Forms from '@/content/logistic/order/AddOrder';
+>>>>>>> 80806d7a3ffc7ee30df6756e41707b73ce0bfc73:src/pages/logistic/order/AddOrder.tsx
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Material/Add Material Type'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Order/Add Order'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -22,7 +26,7 @@ function ApplicationsTransactions() {
       <Grid item padding={3}>   
       <Breadcrumb pageData={pageData} />
    
-      <Typography variant="h3">Add Material Type</Typography>
+      <Typography variant="h3">Add Order</Typography>
       </Grid>
         <Grid
           container
