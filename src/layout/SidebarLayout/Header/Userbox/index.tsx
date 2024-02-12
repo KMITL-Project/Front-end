@@ -78,7 +78,7 @@ function HeaderUserbox() {
         const token = localStorage.getItem('accessToken');
         if (token) {
           const response = await fetch(`${publicRuntimeConfig.BackEnd}users/user-info`, {
-            method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+            method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -91,6 +91,7 @@ function HeaderUserbox() {
               name: userData.data.full_name,
               avatar: userData.data.image_url,
             });
+            // console.log(user.avatar);
           
           } else if (response.status === 401) {
             // Token หมดอายุหรือไม่ถูกต้อง

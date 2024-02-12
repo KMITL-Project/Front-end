@@ -1,29 +1,28 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/permission/PageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container, Typography } from '@mui/material';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/permission/AddPermission/AddPreHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container, Typography } from "@mui/material";
 
-import RecentOrders from '@/content/setup/permission/PermissionView';
-import { ReactElement } from 'react';
-import Forms from '@/content/setup/permission/EditPermission';
-import Breadcrumb from '@/components/Breadcrumbs';
+import RecentOrders from "@/content/setup/shelf/ShelfView";
+import { ReactElement } from "react";
+import AddPermission from "@/content/setup/permission/AddPermission/AddPermission";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Permission/Edit Permission'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/User Permission/Add Permission"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
-     <Head>
+      <Head>
         <title></title>
       </Head>
-
+      <PageTitleWrapper>
+        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
+        <Breadcrumb pageData={pageData} />
+        <PageHeader />
+      </PageTitleWrapper>
       <Container maxWidth="lg">
-      <Grid item padding={3}>   
-      <Breadcrumb pageData={pageData} />
-   
-      <Typography variant="h3">User Permission</Typography>
-      </Grid>
         <Grid
           container
           direction="row"
@@ -32,7 +31,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <Forms />
+            <AddPermission />
           </Grid>
         </Grid>
       </Container>
@@ -45,6 +44,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-
