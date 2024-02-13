@@ -1,15 +1,16 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/logistic/tracking/PageHeader';
+import PageHeader from '@/content/logistic/tracking/status/StatusPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 
-import RecentOrders from '@/content/logistic/tracking/TrackingView';
+import RecentOrders from '@/content/logistic/tracking/status/OrderView';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
+import Footer from '@/components/Footer';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Tracking'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Tracking Status'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -34,6 +35,8 @@ function ApplicationsTransactions() {
           </Grid>
         </Grid>
       </Container>
+      <Footer />
+
     </>
   );
 }
