@@ -212,7 +212,7 @@ const SidebarMenu = () => {
             console.log('ok', userData);
             setUser(userData.data);
 
-            const responseRole = await fetch(`${publicRuntimeConfig.BackEnd}role/role-user/${user.id}`, {
+            const responseRole = await fetch(`${publicRuntimeConfig.BackEnd}role/role-user/${userData.data.id}`, {
               method: 'GET',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -220,7 +220,7 @@ const SidebarMenu = () => {
             });
             if (responseRole.ok){
               const roleData = await responseRole.json();
-              console.log('ok', roleData);
+              console.log('role', roleData);
               setRole(roleData.data);
               
               // Assuming roleData.data is an array and you want to get the first role's name
@@ -293,62 +293,75 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-              {userRole === 'Admin' && (
+              {(userRole === 'stock' || userRole === 'Admin') && (
                 <>
                   <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/material"
-                  startIcon={<BallotTwoToneIcon />}
-                >
-                   Material
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/materialAdd"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                 Add Material
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/pickup"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                  เบิกวัสดุ
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/report"
-                  startIcon={<DescriptionTwoToneIcon />}
-                >
-                  Report
-                </Button>
-              </ListItem>
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/material"
+                      startIcon={<BallotTwoToneIcon />}
+                    >
+                      Material
+                    </Button>
+                  </ListItem>
                 </>
               )}
+              {(userRole === 'stock' || userRole === 'Admin') && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/materialAdd"
+                      startIcon={<TableChartTwoToneIcon />}
+                    >
+                    Add Material
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole === 'stock' || userRole === 'Admin') && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/pickup"
+                      startIcon={<TableChartTwoToneIcon />}
+                    >
+                      เบิกวัสดุ
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole === 'stock' || userRole === 'Admin' || userRole === 'Manager') && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/report"
+                      startIcon={<DescriptionTwoToneIcon />}
+                    >
+                      Report
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+  
             </List>
           </SubMenuWrapper>
         </List>
@@ -362,49 +375,58 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-            {userRole === 'stock' && (
+            {(userRole === 'Manager' || userRole === 'Admin') && (
               <>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/logistic/customerList"
-                  startIcon={<ListAltTwoToneIcon />}
-                >
-                  รายการลูกค้า
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/logistic/order"
-                  startIcon={<DescriptionTwoToneIcon />}
-                >
-                  ใบสั่ง
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/logistic/tracking"
-                  startIcon={<ShareLocationTwoToneIcon />}
-                >
-                  ติดตามการขนส่ง
-                </Button>
-              </ListItem>
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={Link}
+                    onClick={() => {
+                      dispatch(sidebarIsClose);
+                    }}
+                    href="/logistic/customerList"
+                    startIcon={<ListAltTwoToneIcon />}
+                  >
+                    รายการลูกค้า
+                  </Button>
+                </ListItem>
               </>
             )}
+            {(userRole === 'Manager' || userRole === 'Admin' || userRole === 'Delivery') && (
+              <>
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={Link}
+                    onClick={() => {
+                      dispatch(sidebarIsClose);
+                    }}
+                    href="/logistic/order"
+                    startIcon={<DescriptionTwoToneIcon />}
+                  >
+                    ใบสั่ง
+                  </Button>
+                </ListItem>
+              </>
+            )}
+            {(userRole === 'Manager' || userRole === 'Admin' || userRole === 'Delivery') && (
+              <>
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={Link}
+                    onClick={() => {
+                      dispatch(sidebarIsClose);
+                    }}
+                    href="/logistic/tracking"
+                    startIcon={<ShareLocationTwoToneIcon />}
+                  >
+                    ติดตามการขนส่ง
+                  </Button>
+                </ListItem>
+              </>
+            )}
+              
             </List>
           </SubMenuWrapper>
         </List>
@@ -418,58 +440,74 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/shelf/"
-                  startIcon={<DoorSlidingIcon />}
-                >
-                  Shelf
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/unit/"
-                  startIcon={<InventoryIcon />}
-                >
-                  Unit of products
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/materialtype"
-                  startIcon={<LayersIcon />}
-                >
-                  Material type
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/permission"
-                  startIcon={<AdminPanelSettingsIcon />}
-                >
-                  User Permission
-                </Button>
-              </ListItem>
+              {(userRole === 'Manager' || userRole === 'Admin') && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/shelf/"
+                      startIcon={<DoorSlidingIcon />}
+                    >
+                      Shelf
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole === 'Manager' || userRole === 'Admin') && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/unit/"
+                      startIcon={<InventoryIcon />}
+                    >
+                      Unit of products
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole === 'Manager' || userRole === 'Admin') && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/materialtype"
+                      startIcon={<LayersIcon />}
+                    >
+                      Material type
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole === 'Manager' || userRole === 'Admin') && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/permission"
+                      startIcon={<AdminPanelSettingsIcon />}
+                    >
+                      User Permission
+                    </Button>
+                  </ListItem>
+                </>
+              )}
             </List>
           </SubMenuWrapper>
         </List>
