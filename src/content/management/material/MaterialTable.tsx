@@ -75,7 +75,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
     status: null
   });
   const [cryptoOrders, setCryptoOrders] = useState([]);
-  
+  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState([]);
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -88,10 +91,26 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (response.ok) {
+        const responseFloor = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const responseUnit = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok && responseFloor.ok && responseUnit.ok) {
           const responseData = await response.json();
+          const responseDataFloor = await responseFloor.json();
+          const responseDataUnit = await responseUnit.json();
           if (responseData && responseData.data && Array.isArray(responseData.data)) {
             setCryptoOrders(responseData.data);
+            setFloorOptions(responseDataFloor.data.map(floor => ({ value: floor.id, label: floor.name })));
+            setUnitOptions(responseDataUnit.data.map(unit => ({ value: unit.id, label: unit.name })));
           } else {
             console.error('Invalid data format from API');
           }
@@ -111,19 +130,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
     
     fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
   }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
-  
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
-
-    if (e.target.value !== 'all') {
-      value = e.target.value;
-    }
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      status: value
-    }));
-  };
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -206,57 +212,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
     }
   };
 
-  const fetchUnitData = async (unitId: string) => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit/${unitId}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const responseData = await response.json();
-          console.log('Unit Data:', responseData.data);
-          // ทำตามความต้องการ เช่น อัพเดต state หรือแสดงผลข้อมูลในตาราง
-        } else if (response.status === 401) {
-          console.log('Token expired or invalid');
-          localStorage.removeItem('accessToken');
-        } else {
-          console.error('Failed to fetch unit data. Response:', response);
-        }
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-  const fetchFloorData = async (floorId: string) => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}floor/${floorId}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const responseData = await response.json();
-          console.log('Floor Data:', responseData.data);
-          // ทำตามความต้องการ เช่น อัพเดต state หรือแสดงผลข้อมูลในตาราง
-        } else if (response.status === 401) {
-          console.log('Token expired or invalid');
-          localStorage.removeItem('accessToken');
-        } else {
-          console.error('Failed to fetch floor data. Response:', response);
-        }
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
   return (
     <Card>
       {selectedBulkActions && (
@@ -296,8 +251,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
               const isCryptoOrderSelected = selectedCryptoOrders.includes(
                 cryptoOrder.id
               );
-              fetchUnitData(cryptoOrder.unit_id);
-              fetchFloorData(cryptoOrder.floor_id);
               return (
                 <TableRow
                   hover
@@ -355,7 +308,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.unit_id}
+                      {unitOptions.find(unit => unit.value === cryptoOrder.unit_id)?.label || ''}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -377,11 +330,11 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.floor_id}
+                      {floorOptions.find(floor => floor.value === cryptoOrder.floor_id)?.label || ''}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                  <Tooltip title="View Unit" arrow>
+                  <Tooltip title="View Material" arrow>
                         <IconButton
                           sx={{
                             "&:hover": {
@@ -389,14 +342,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                             },
                             color: theme.palette.info.main,
                           }}
-                          onClick={() => router.push(`/setup/shelf/info/${cryptoOrder.id}`)}
+                          onClick={() => router.push(`/management/material/info/${cryptoOrder.id}`)}
                           color="inherit"
                           size="small"
                         >
                           <VisibilityTwoToneIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
+                    <Tooltip title="Edit Material" arrow>
                       <IconButton
                         sx={{
                           '&:hover': {
@@ -404,14 +357,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                           },
                           color: theme.palette.primary.main
                         }}
-                        onClick={() => router.push(`/setup/shelf/edit/${cryptoOrder.id}`)}
+                        onClick={() => router.push(`/management/material/edit/${cryptoOrder.id}`)}
                         color="inherit"
                         size="small"
                       >
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
+                    <Tooltip title="Delete Material" arrow>
                       <IconButton
                         sx={{
                           '&:hover': { background: theme.colors.error.lighter },

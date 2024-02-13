@@ -1,5 +1,5 @@
 import { Typography, Button, Grid } from "@mui/material";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 function PageHeader() {
   const router = useRouter();
@@ -7,17 +7,19 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-        Material Type
+          User Permission
         </Typography>
       </Grid>
       <Grid item>
         <Button
-            variant="contained" sx={{ margin:1}}
-            disableRipple
-            component="a"
-            onClick={() => router.push('/setup/materialtype/AddMaterial/')}>
-            + Create Material Type{" "}
-          </Button>
+          variant="contained"
+          sx={{ margin: 1 }}
+          disableRipple
+          component="a"
+          onClick={() => router.push("/setup/permission/AddPermission/")}
+        >
+          + Permission{" "}
+        </Button>
       </Grid>
     </Grid>
   );

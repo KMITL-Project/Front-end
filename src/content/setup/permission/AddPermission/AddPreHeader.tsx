@@ -6,7 +6,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-        Withdraw Material
+          Add Permission
         </Typography>
       </Grid>
     </Grid>

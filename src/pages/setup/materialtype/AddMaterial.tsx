@@ -1,15 +1,16 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/material/PageHeader';
+import PageHeader from '@/content/setup/material/AddMaterialType/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
+import { Grid, Container, Typography } from '@mui/material';
 
 import RecentOrders from '@/content/setup/material/MaterialView';
 import { ReactElement } from 'react';
+import Forms from '@/content/setup/material/AddMaterialType/AddMaterial';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Material'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Material Type/Add Material Type'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -29,7 +30,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <RecentOrders />
+            <Forms />
           </Grid>
         </Grid>
       </Container>

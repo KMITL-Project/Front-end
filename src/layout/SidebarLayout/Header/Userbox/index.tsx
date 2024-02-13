@@ -78,7 +78,7 @@ function HeaderUserbox() {
         const token = localStorage.getItem('accessToken');
         if (token) {
           const response = await fetch(`${publicRuntimeConfig.BackEnd}users/user-info`, {
-            method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+            method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -91,6 +91,7 @@ function HeaderUserbox() {
               name: userData.data.full_name,
               avatar: userData.data.image_url,
             });
+            // console.log(user.avatar);
           
           } else if (response.status === 401) {
             // Token หมดอายุหรือไม่ถูกต้อง
@@ -116,6 +117,15 @@ function HeaderUserbox() {
 
   const handleClose = (): void => {
     setOpen(false);
+  };
+
+  const handleLogout = () => {
+    // ทำการลบข้อมูล authentication หรืออื่น ๆ ตามที่คุณต้องการ
+    // ตัวอย่าง: ลบ token จาก localStorage
+    localStorage.removeItem("accessToken");
+
+    // ทำการ redirect ไปยังหน้า login หรือหน้าหลักของแอปพลิเคชัน
+    router.push("/auth/login"); // หรือ path ที่คุณต้องการ
   };
 
   return (
@@ -152,7 +162,7 @@ function HeaderUserbox() {
         </MenuUserBox>
         <Divider sx={{ mb: 0 }} />
         <List sx={{ p: 1 }} component="nav">
-          <ListItem href="/management/profile/details" component={Link}>
+          <ListItem href="/user" component={Link}>
             <AccountBoxTwoToneIcon fontSize="small" />
             <ListItemText primary="My Profile" />
           </ListItem>
@@ -167,7 +177,7 @@ function HeaderUserbox() {
         </List>
         <Divider />
         <Box sx={{ m: 1 }}>
-          <Button color="primary" fullWidth>
+          <Button color="primary" fullWidth onClick={handleLogout}>
             <LockOpenTwoToneIcon sx={{ mr: 1 }} />
             LogOut 
           </Button>

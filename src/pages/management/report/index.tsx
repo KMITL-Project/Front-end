@@ -5,6 +5,7 @@ import PageHeader from '@/content/management/report/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 import ReportOrders from '@/content/management/report/ReportView';
+import RecentOrdersTable from '@/content/management/report/ReportTable';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
 
@@ -31,7 +32,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <ReportOrders />
+            <RecentOrdersTable />
           </Grid>
         </Grid>
       </Container>

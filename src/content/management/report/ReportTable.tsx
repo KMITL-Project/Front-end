@@ -1,16 +1,17 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
+import { FC, ChangeEvent, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import * as FileSaver from 'file-saver';
-import { saveAs } from 'file-saver';
-import  toBlob  from '@react-pdf/renderer';
-import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
 import {
+  Tooltip,
   Divider,
   Box,
+  FormControl,
+  InputLabel,
   Card,
   Checkbox,
+  IconButton,
+  Button,
+  Modal,
+  TextField,
   Table,
   TableBody,
   TableCell,
@@ -18,43 +19,43 @@ import {
   TablePagination,
   TableRow,
   TableContainer,
-  Typography,
-  useTheme,
-  CardHeader,
-  Button,
-  Modal,
-  TextField,
   Select,
   MenuItem,
-  FormControl,
-  InputLabel,
+  Typography,
+  useTheme,
+  CardHeader
 } from '@mui/material';
 
-import { Report, ReportStatus } from '@/model/management/report';
+// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
+import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
-import { PDFViewer, Document, Page, Text, View, PDFDownloadLink, Font } from '@react-pdf/renderer';
-// import SarabunRegular from './fonts/Sarabun-Regular.ttf';
-// import SarabunBold from './fonts/Sarabun-Bold.ttf';
-// import AngsanaNew from '@/fonts/AngsanaNew.ttf';
+import { useRouter } from 'next/router';
+import getConfig from "next/config";
+import * as ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { format } from 'date-fns';
 
+const { publicRuntimeConfig } = getConfig();
 
 interface RecentOrdersTableProps {
   className?: string;
-  Reports: Report[];
+  cryptoOrders: CryptoOrder[];
 }
 
 interface Filters {
-  status?: ReportStatus;
+  status?: CryptoOrderStatus;
 }
 
 const applyFilters = (
-  Reports: Report[],
+  cryptoOrders: CryptoOrder[],
   filters: Filters
-): Report[] => {
-  return Reports.filter((Report) => {
+): CryptoOrder[] => {
+  return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
-    if (filters.status && Report.status !== filters.status) {
+    if (filters.status && cryptoOrder.status !== filters.status) {
       matches = false;
     }
 
@@ -63,62 +64,128 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  Reports: Report[],
+  cryptoOrders: CryptoOrder[],
   page: number,
   limit: number
-): Report[] => {
-  return Reports.slice(page * limit, page * limit + limit);
+): CryptoOrder[] => {
+  return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
-  const [selectedReports, setSelectedReports] = useState<string[]>([]);
+interface User {
+  id: string; // หรือชนิดข้อมูลที่ 'id' เป็น
+  full_name: string; // หรือชนิดข้อมูลที่ 'full_name' เป็น
+  // เพิ่มคุณสมบัติผู้ใช้อื่น ๆ ตามต้องการ
+}
+
+const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
+  const router = useRouter();
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
+  const selectedBulkActions = selectedCryptoOrders.length > 0;
+  const [page, setPage] = useState<number>(0);
+  const [limit, setLimit] = useState<number>(5);
+  const [filters, setFilters] = useState<Filters>({
+    status: null
+  });
+  const [cryptoOrders, setCryptoOrders] = useState([]);
+  const [materials, setMaterials] = useState({});
+  const [unitData, setUnitData] = useState({});
+  const [floorData, setFloorData] = useState({});
+  const [users, setUsers] = useState<{ [key: string]: User }>({});
+  
+  // Export
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>('');
   const [fileType, setFileType] = useState<string>('pdf');
 
-  const selectedBulkActions = selectedReports.length > 0;
-  const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(5);
-  const [filters, setFilters] = useState<Filters>({
-    status: 'completed'
-  });
-  const [pdfContent, setPdfContent] = useState<any>(null);
 
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}material-history`, {
+          method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const responseMaterial = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const responseUser = await fetch(`${publicRuntimeConfig.BackEnd}users/user-info`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok && responseMaterial.ok && responseUser.ok) {
+          const responseData = await response.json();
+          const responseDataMaterial = await responseMaterial.json();
+          const responseDataUser = await responseUser.json();
+          console.log('User', responseDataUser)
+          
+          console.log('UserChack', users)
+          if (responseData && responseData.data && Array.isArray(responseData.data)) {
+            setCryptoOrders(responseData.data);
+            setUsers(responseDataUser.data)
+            setMaterials(responseDataMaterial.data.reduce((acc, material) => {
+              acc[material.id] = { value: material.id, label: material.name };
+              return acc;
+            }, {}));
+            // setUsers(
+            //   responseDataUser.data.reduce((acc, user) => {
+            //     acc[user.id] = { id: user.id, full_name: user.full_name };
+            //     return acc;
+            //   }, {})
+            // );              
+            // console.log('Update By:', cryptoOrder.update_by);
+            // console.log('User Data for Update By:', users[cryptoOrder.update_by]);
+                        
+            console.error('Invalid data format from API');
+          }
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log('Token expired or invalid');
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem('accessToken');
+        } else {
+          console.error('Failed to fetch crypto orders');
+        }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+    console.log('Chack', users)
+    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
+  }, []);
 
-    if (e.target.value !== 'all') {
-      value = e.target.value;
-    }
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      status: value
-    }));
-  };
-
-  const handleSelectAllReports = (
+  const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedReports(
+    setSelectedCryptoOrders(
       event.target.checked
-        ? Reports.map((Report) => Report.id)
+        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
         : []
     );
   };
 
-  const handleSelectOneReport = (
+  const handleSelectOneCryptoOrder = (
     _event: ChangeEvent<HTMLInputElement>,
-    ReportId: string
+    cryptoOrderId: string
   ): void => {
-    if (!selectedReports.includes(ReportId)) {
-      setSelectedReports((prevSelected) => [
+    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
+      setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        ReportId
+        cryptoOrderId
       ]);
     } else {
-      setSelectedReports((prevSelected) =>
-        prevSelected.filter((id) => id !== ReportId)
+      setSelectedCryptoOrders((prevSelected) =>
+        prevSelected.filter((id) => id !== cryptoOrderId)
       );
     }
   };
@@ -131,9 +198,22 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
     setLimit(parseInt(event.target.value));
   };
 
+  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
+  const paginatedCryptoOrders = applyPagination(
+    filteredCryptoOrders,
+    page,
+    limit
+  );
+  const selectedSomeCryptoOrders =
+    selectedCryptoOrders.length > 0 &&
+    selectedCryptoOrders.length < cryptoOrders.length;
+  const selectedAllCryptoOrders =
+    selectedCryptoOrders.length === cryptoOrders.length;
+  const theme = useTheme();
+
   const handleExportClick = () => {
     // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
-    if (selectedReports.length === 0) {
+    if (selectedCryptoOrders.length === 0) {
       // แสดง popup แจ้งเตือนเมื่อไม่มีรายการที่ถูกเลือก
       alert('Please select items to export.');
       return;
@@ -147,111 +227,59 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
     setShowExportModal(false);
   };
 
-  const handleExportConfirm = () => {
-    // ถ้าเลือก Export เป็น Excel
-    if (fileType === 'excel') {
-      // สร้างชุดข้อมูลสำหรับ Excel
-      const dataForExcel: any[][] = paginatedReports.map((report, index) => [
+  const handleExportConfirm = async () => {
+  
+    if (fileType === 'xlsx') {
+      // สร้าง Workbook
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('MaterialList');
+  
+      // เพิ่มหัวข้อ
+      worksheet.addRow(['No', 'ID', 'Material', 'Detail', 'Amount', 'Update by', 'Date',]);
+  
+      // เพิ่มข้อมูล
+      const dataForExcel: any[][] = paginatedCryptoOrders.map((cryptoOrder, index) => [
         index + 1, // เลขลำดับอัตโนมัติ
-        report.orderDetails,
-        report.orderID,
-        report.sourceName,
-        report.unit,
-        report.shelf,
-        report.floor,
+        cryptoOrder.id,
+        materials[cryptoOrder.material_id]?.label || 'N/A',
+        cryptoOrder.type,
+        cryptoOrder.amount,
+        users.full_name,
+        cryptoOrder.created_at ? format(new Date(cryptoOrder.created_at), 'yyyy-MM-dd') : '',
       ]);
-    
-      // เพิ่มข้อความที่ A1
-      const worksheet = XLSX.utils.aoa_to_sheet([
-        ['ชื่อบริษัทภาษาไทย', '', '', '', '', '', '', '', '', '', 'เลขที่', ''], // เพิ่มข้อความที่ A1
-        ['ชื่อบริษัทภาษาอังกฤษ'], // เพิ่มข้อความที่ A2
-        ['', '', '', '', 'รายการสินค้า', ''],
-        ['', '', '', '', '', '', '', '', '', '', 'วันที่', ''],
-        ['', '', '', '', '', ''],
-        ['', '', '', '', '', ''],
-        ['ลำดับ', 'วันที่', 'รหัสสินค้า', 'รายการ', 'หมวดหมู่', 'หน่วย', 'ชั้นวาง', 'ชั้น', 'ล็อต', 'จำนวน', 'ราคา', 'หมายเหตุ'],
-        ...dataForExcel,
-      ]);
-    
-      if (worksheet['!ref']) {
-        const range = XLSX.utils.decode_range(worksheet['!ref']);
-      
-        // เพิ่ม border ในแต่ละเซลล์
-        for (let R = range.s.r; R <= range.e.r; ++R) {
-          for (let C = range.s.c; C <= range.e.c; ++C) {
-            const cellAddress = { r: R, c: C };
-            const cellStyle = worksheet[XLSX.utils.encode_cell(cellAddress)] || {};
-            cellStyle.s = {
-              border: {
-                top: { style: 'thin', color: { auto: 1 } },
-                bottom: { style: 'thin', color: { auto: 1 } },
-                left: { style: 'thin', color: { auto: 1 } },
-                right: { style: 'thin', color: { auto: 1 } },
-              },
-              ...cellStyle.s,
-            };
-            worksheet[XLSX.utils.encode_cell(cellAddress)] = cellStyle;
-          }
-        }
-      }
-    
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'MaterialList');
-    
-      // แปลง Workbook ให้เป็นไฟล์ Excel
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const excelBlob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    
-      // ดาวน์โหลดไฟล์ Excel
-      saveAs(excelBlob, `${fileName}.xlsx`);
+  
+      worksheet.addRows(dataForExcel);
+  
+      // บันทึกไฟล์ Excel
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        const excelBlob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(excelBlob, `${fileName}.xlsx`);
+        setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
+      });
+    }
+    // ถ้าเลือก Export เป็น CSV
+    else if (fileType === 'csv') {
+      // สร้างข้อมูลสำหรับ CSV
+      const csvContent = [
+        'ID,Name,Description,Unit,Total,Floor',
+        ...paginatedCryptoOrders.map(cryptoOrder =>
+          `${cryptoOrder.id},${cryptoOrder.name},${cryptoOrder.detail},${unitData[cryptoOrder.unit_id]?.name || 'N/A'},${cryptoOrder.total},${floorData[cryptoOrder.floor_id]?.name || 'N/A'}`
+        )
+      ].join('\n');
+  
+      // บันทึกไฟล์ CSV
+      const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+      saveAs(csvBlob, `${fileName}.csv`);
       setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
     }
-    else if (fileType === 'pdf') {
-      const generatePDF = () => {
-        // ลงทะเบียนฟอนต์
-        // Font.register({
-        //   family: 'AngsanaNew', // ตั้งชื่อฟอนต์ที่คุณต้องการให้แสดงผล
-        //   src: AngsanaNew, // ใช้ path ของฟอนต์ที่คุณนำเข้ามา
-        // });
-
-        const doc = new jsPDF();
-        let verticalOffset = 10;
-
-        paginatedReports.forEach((report) => {
-          // <Text style={{ fontFamily: 'AngsanaNew' }}>Text with your custom font</Text>
-          doc.text(report.orderDetails, 10, verticalOffset);
-          doc.text(report.orderID, 10, verticalOffset + 10);
-          // ... (add other content)
-          verticalOffset += 20;
-        });
-
-        doc.save(`${fileName}.pdf`);
-        setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
-      };
-
-      generatePDF();
-    }
-
-    return null; // Return null or any other fallback if fileType is not 'pdf'
-  };
-
-  const filteredReports = applyFilters(Reports, filters);
-  const paginatedReports = applyPagination(
-    filteredReports,
-    page,
-    limit
-  );
-  const selectedSomeReports =
-    selectedReports.length > 0 &&
-    selectedReports.length < Reports.length;
-  const selectedAllReports =
-    selectedReports.length === Reports.length;
-  const theme = useTheme();
+  
+    return null;
+  };  
 
   return (
     <Card>
       <CardHeader
-        title="Material lists"
+        title="History"
         action={
           <Button
             variant="contained"
@@ -272,39 +300,38 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
               <TableCell padding="checkbox" align="center">
                 <Checkbox
                   color="primary"
-                  checked={selectedAllReports}
-                  indeterminate={selectedSomeReports}
-                  onChange={handleSelectAllReports}
+                  checked={selectedAllCryptoOrders}
+                  indeterminate={selectedSomeCryptoOrders}
+                  onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">Material ID</TableCell>
-              <TableCell align="center">Material Name</TableCell>
-              <TableCell align="center">Category</TableCell>
-              <TableCell align="center">Unit</TableCell>
-              <TableCell align="center">Shelf</TableCell>
-              <TableCell align="center">Floor</TableCell>
-              {/* <TableCell align="right">Actions</TableCell> */}
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Material</TableCell>
+              <TableCell align="center">Detail</TableCell>
+              <TableCell align="center">Amount</TableCell>
+              <TableCell align="center">Update by</TableCell>
+              <TableCell align="center">Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedReports.map((Report) => {
-              const isReportSelected = selectedReports.includes(
-                Report.id
+            {paginatedCryptoOrders.map((cryptoOrder) => {
+              const isCryptoOrderSelected = selectedCryptoOrders.includes(
+                cryptoOrder.id
               );
               return (
                 <TableRow
                   hover
-                  key={Report.id}
-                  selected={isReportSelected}
+                  key={cryptoOrder.id}
+                  selected={isCryptoOrderSelected}
                 >
                   <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
-                      checked={isReportSelected}
+                      checked={isCryptoOrderSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneReport(event, Report.id)
+                        handleSelectOneCryptoOrder(event, cryptoOrder.id)
                       }
-                      value={isReportSelected}
+                      value={isCryptoOrderSelected}
                     />
                   </TableCell>
                   <TableCell align="center">
@@ -315,10 +342,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Report.orderDetails}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(Report.orderDate, 'MMMM dd yyyy')}
+                      {cryptoOrder.id}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -329,7 +353,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Report.orderID}
+                      {/* ใช้ material_id ใน cryptoOrder เพื่อดึงข้อมูลวัสดุจาก materials */}
+                      {materials[cryptoOrder.material_id]?.label || 'N/A'}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -340,19 +365,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Report.sourceName}
-                    </Typography>
-
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {Report.unit}
+                      {cryptoOrder.type}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -363,7 +376,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Report.shelf}
+                      {cryptoOrder.amount}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -374,7 +387,20 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
                       gutterBottom
                       noWrap
                     >
-                      {Report.floor}
+                      {users.full_name}
+                      {/* {users[cryptoOrder.update_by]?.full_name || 'N/A'} */}
+                      {/* {users[cryptoOrder.update_by]?.name || 'N/A'} */}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {cryptoOrder.created_at ? format(new Date(cryptoOrder.created_at), 'yyyy-MM-dd') : ''}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -386,7 +412,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredReports.length}
+          count={filteredCryptoOrders.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -417,14 +443,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
           <Typography id="export-modal-title" variant="h6" component="h2" gutterBottom className='mb-5'>
             Export Data
           </Typography>
-          {/* {pdfContent ? (
-            <PDFViewer width={500} height={300}>
-              {pdfContent}
-            </PDFViewer>
-          ) : (
-            <Typography variant="body1">No content to display</Typography>
-          )} */}
-          {/* ส่วนอื่น ๆ ใน Modal */}
           <TextField
             label="File Name"
             value={fileName}
@@ -442,8 +460,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
               label="File Type"
               onChange={(e) => setFileType(e.target.value as string)}
             >
-              <MenuItem value="pdf">PDF</MenuItem>
-              <MenuItem value="excel">Excel</MenuItem>
+              <MenuItem value="xlsx">xlsx</MenuItem>
+              <MenuItem value="csv">csv</MenuItem>
             </Select>
           </FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -456,17 +474,16 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ Reports }) => {
           </Box>
         </Box>
       </Modal>
-
     </Card>
   );
 };
 
 RecentOrdersTable.propTypes = {
-  Reports: PropTypes.array.isRequired
+  cryptoOrders: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  Reports: []
+  cryptoOrders: []
 };
 
 export default RecentOrdersTable;

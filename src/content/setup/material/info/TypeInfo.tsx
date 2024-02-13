@@ -36,7 +36,6 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
   });
   const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
   const [unitOptions, setUnitOptions] = useState([]);
-  const [lotData, setLotData] = useState<any[]>([]);
   
   useEffect(() => {
     if (materialId) {
@@ -63,25 +62,15 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                 Authorization: `Bearer ${token}`,
               },
             });
-            const responseLot = await fetch(`${publicRuntimeConfig.BackEnd}lot/${materialId}`, {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            if (response.ok && responseFloor.ok && responseUnit.ok && responseLot.ok) {
+            if (response.ok && responseFloor.ok && responseUnit.ok) {
               const responseData = await response.json();
               const responseDataFloor = await responseFloor.json();
               const responseDataUnit = await responseUnit.json();
-              const responseDataLot = await responseLot.json();
               console.log('ok', responseData);
               if (responseData && responseData.data) {
                 setmaterialData(responseData.data);
-                setLotData(responseDataLot.data);
                 setFloorOptions(responseDataFloor.data.map(floor => ({ value: floor.id, label: floor.name })));
                 setUnitOptions(responseDataUnit.data.map(unit => ({ value: unit.id, label: unit.name })));
-                console.log('lo from id', lotData)
-                console.log('UnitOptions', unitOptions);
               } else {
                 console.error('Invalid data format from API');
               }
@@ -104,8 +93,8 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
   }, [materialId]);
 
 if (!materialId) {return <div>Loading...</div>;}
-
-  return (
+  
+return (
     <>
       <Head>
         <title></title>
@@ -124,7 +113,7 @@ if (!materialId) {return <div>Loading...</div>;}
             justifyContent="center"
             >
             <Card>
-              <CardHeader title="Material Info"/>
+              <CardHeader title="Material Type Info"/>
               <Divider />
               <CardContent>
                 <Grid container spacing={3} justifyContent="center">
@@ -134,7 +123,10 @@ if (!materialId) {return <div>Loading...</div>;}
                     <Grid container justifyContent="center" alignItems="center" className="mb-5 flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 rounded-lg bg-gray-50">
                         <img src="/path/to/your/image.jpg" alt="Uploaded Image" className="max-h-48 max-w-full" />
                     </Grid>
-                    <TextField
+                  </Grid>
+                  {/* Column 2 - Form */}
+                  <Grid item xs={12} sm={7}>
+                  <TextField
                       required
                       fullWidth
                       className="mb-5"
@@ -174,15 +166,6 @@ if (!materialId) {return <div>Loading...</div>;}
                       required
                       fullWidth
                       className="mb-5"
-                      label="total"
-                      variant="outlined"
-                      value={materialData.total}
-                      InputProps={{ readOnly: true }}
-                    />
-                    <TextField
-                      required
-                      fullWidth
-                      className="mb-5"
                       label="Floor"
                       variant="outlined"
                       value={floorOptions.find(floor => floor.value === materialData.floor_id)?.label || ''}
@@ -198,11 +181,6 @@ if (!materialId) {return <div>Loading...</div>;}
                       InputProps={{ readOnly: true }}
                     />
                   </Grid>
-                  {/* Column 2 - Form */}
-                  <Grid item xs={12} sm={7}>
-                    <SetupMaterialInfoTable materialId={materialId} lotData={lotData}/>
-                    
-                  </Grid>
                 </Grid>
                 {/* Button Row */}
                 <Grid container justifyContent="flex-end">
@@ -212,7 +190,7 @@ if (!materialId) {return <div>Loading...</div>;}
                         sx={{ margin:1}}
                         disableRipple
                         component="a"
-                        onClick={() => router.push('/management/material')}
+                        onClick={() => router.push('/setup/materialtype')}
                       >Back
                     </Button>
                   </Grid>
