@@ -61,6 +61,13 @@ interface Filters {
   status?: OrderStatus;
 }
 
+const customIcon = new L.Icon({
+  iconUrl: '/location.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
 const getStatusLabel = (listOrderStatus: OrderStatus): JSX.Element => {
   const map = {
     failed: {
@@ -215,7 +222,16 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          
+                              <Marker
+                            position={[13.7563, 100.5018]}
+                            draggable={true}
+                            icon={customIcon} // Use the custom icon
+
+                          >
+                            <Popup>
+                              A pretty CSS3 popup. <br /> Easily customizable.
+                            </Popup>
+                          </Marker>
           <RoutingMachine />
         </MapContainer>
       </div>
