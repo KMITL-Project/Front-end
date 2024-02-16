@@ -21,7 +21,7 @@ const { publicRuntimeConfig } = getConfig();
 function SignUp() {
   const router = useRouter();
   const [file, setFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     full_name: "",
     username: "",
@@ -35,7 +35,7 @@ function SignUp() {
     formRegister.append('full_name', formData.full_name);
     formRegister.append('username', formData.username);
     formRegister.append('password', formData.password);
-    formRegister.append('upload_image', file);  // แนบรูปภาพ
+    formRegister.append('upload_image', file!);  // แนบรูปภาพ
     try {
       const response = await fetch(`${publicRuntimeConfig.BackEnd}auth/register`, {
         method: 'POST',
@@ -65,14 +65,14 @@ function SignUp() {
     }
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
   
     if (selectedFile) {
       // ทำการอ่านไฟล์รูปภาพ
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageUrl(reader.result);
+        setImageUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
   

@@ -47,12 +47,12 @@ function SignIn() {
           console.error('API returned errors:', responseData.errors);
     
           // สามารถทำการจัดการกับข้อผิดพลาดได้ตามต้องการ
-          responseData.errors.forEach(error => {
-            console.error('Type:', error.type);
-            console.error('Message:', error.msg);
-            console.error('Path:', error.path);
-            console.error('Location:', error.location);
-          });
+          // responseData.errors.forEach(error => {
+          //   console.error('Type:', error.type);
+          //   console.error('Message:', error.msg);
+          //   console.error('Path:', error.path);
+          //   console.error('Location:', error.location);
+          // });
         } else {
           // ไม่มีข้อผิดพลาด
           console.log('Login successful:', responseData);
