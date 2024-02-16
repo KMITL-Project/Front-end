@@ -1,4 +1,4 @@
-import { FC, ChangeEvent, useState, useEffect } from "react";
+import { FC, ChangeEvent, useState } from "react";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
 import {
@@ -22,33 +22,63 @@ import {
   Typography,
   useTheme,
   CardHeader,
+  TextField,
+  Button,
+  styled,
 } from "@mui/material";
 
 import Label from "@/components/Label";
-// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/material';
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
-import BulkActions from "./BulkActions";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
-import getConfig from "next/config";
+import BulkActions from "./BulkActions";
+import Modal from "@mui/material/Modal";
+import { Tracking, TrackingStatus } from "@/model/logistic/tracking";
+import { Order } from "@/model/logistic/order";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
 
-const { publicRuntimeConfig } = getConfig();
-
-// interface RecentOrdersTableProps {
-//   className?: string;
-//   cryptoOrders: CryptoOrder[];
-// }
-
-interface Filters {
-  status?: any;
+interface RecentOrdersTableProps {
+  className?: string;
+  cryptoOrders: Tracking[];
 }
 
-const applyFilters = (orders: any[], filters: Filters) => {
-  return orders.filter((order) => {
+interface Filters {
+  status?: TrackingStatus;
+}
+
+const getStatusLabel = (listOrderStatus: TrackingStatus): JSX.Element => {
+  const map = {
+    failed: {
+      text: "Failed",
+      color: "error",
+    },
+    completed: {
+      text: "Completed",
+      color: "success",
+    },
+    pending: {
+      text: "Pending",
+      color: "warning",
+    },
+  };
+
+  const { text, color }: any = map[listOrderStatus];
+
+  return <Label color={color}>{text}</Label>;
+};
+
+const applyFilters = (
+  cryptoOrders: Tracking[],
+  filters: Filters
+): Tracking[] => {
+  return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
-    if (filters.status && order.status !== filters.status) {
+    if (filters.status && cryptoOrder.status !== filters.status) {
       matches = false;
     }
 
@@ -56,12 +86,38 @@ const applyFilters = (orders: any[], filters: Filters) => {
   });
 };
 
-const applyPagination = (orders: any[], page: number, limit: number) => {
-  const startIndex = page * limit;
-  return orders.slice(startIndex, startIndex + limit);
+const applyPagination = (
+  cryptoOrders: Tracking[],
+  page: number,
+  limit: number
+): Tracking[] => {
+  return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const PermissionTable: FC = () => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
+  // fuction for modal
+
+  const [selectedReports, setSelectedReports] = useState<string[]>([]);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>("");
+  const [fileType, setFileType] = useState<string>("pdf");
+
+  const handleExportClick = () => {
+    // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
+    if (selectedReports.length === 0) {
+      // แสดง popup แจ้งเตือนเมื่อไม่มีรายการที่ถูกเลือก
+      alert("Please select items to export.");
+      return;
+    }
+    // เปิด popup สำหรับการ Export
+    setShowExportModal(true);
+  };
+
+  const handleCloseModal = () => {
+    // ปิด popup สำหรับการ Export
+    setShowExportModal(false);
+  };
+
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
@@ -72,78 +128,38 @@ const PermissionTable: FC = () => {
   const [filters, setFilters] = useState<Filters>({
     status: null,
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
-  const [user, setUser] = useState([]);
-  const [role, setRole] = useState([]);
-  const [userRoles, setUserRoles] = useState<Record<string, any>>({});
 
-  useEffect(() => {
-    const fetchAllUsersInfo = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        if (token) {
-          // Fetch all users
-          const usersResponse = await fetch(
-            `${publicRuntimeConfig.BackEnd}users/user`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+  const statusOptions = [
+    {
+      id: "all",
+      name: "All",
+    },
+    {
+      id: "completed",
+      name: "Completed",
+    },
+    {
+      id: "pending",
+      name: "Pending",
+    },
+    {
+      id: "failed",
+      name: "Failed",
+    },
+  ];
 
-          if (usersResponse.ok) {
-            const usersData = await usersResponse.json();
-            console.log("Users data:", usersData);
-            setCryptoOrders(usersData.data);
+  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    let value = null;
 
-            // Iterate through each user
-            for (const user of usersData.data) {
-              // Fetch roles for each user
-              const responseRole = await fetch(
-                `${publicRuntimeConfig.BackEnd}role/role-user/${user.id}`,
-                {
-                  method: "GET",
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              );
+    if (e.target.value !== "all") {
+      value = e.target.value;
+    }
 
-              if (responseRole.ok) {
-                const roleData = await responseRole.json();
-                console.log(`Roles for user ${user.id}:`, roleData.data);
-                // อัปเดต state userRoles โดยใช้ ID ของผู้ใช้เป็นคีย์
-                setUserRoles((prevUserRoles) => ({
-                  ...prevUserRoles,
-                  [user.id]: roleData.data,
-                }));
-              } else {
-                // Handle error when fetching user roles
-                console.error(
-                  `Error fetching Roles for user ${user.id}:`,
-                  responseRole.statusText
-                );
-              }
-            }
-          } else if (usersResponse.status === 401) {
-            // Token หมดอายุหรือไม่ถูกต้อง
-            console.log("Token expired or invalid");
-            // ทำการลบ token ที่หมดอายุจาก localStorage
-            localStorage.removeItem("accessToken");
-          } else {
-            // Handle error when fetching user info
-            console.error("Error fetching users:", usersResponse.statusText);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-
-    fetchAllUsersInfo();
-  }, []);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      status: value,
+    }));
+  };
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -192,20 +208,62 @@ const PermissionTable: FC = () => {
     selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
+  //stepper const
+  const [activeStep, setActiveStep] = useState<number>(0);
+  const steps = ["Step 1", "Step 2", "Step 3"]; // Add your own step names
+  const TransparentStepper = styled(Stepper)({
+    background: "transparent", // Set the background to transparent
+  });
+
   return (
     <Card>
       {selectedBulkActions && (
         <Box flex={1} p={2}>
-          <BulkActions />
+          <BulkActions
+            Tracks={paginatedCryptoOrders.filter((value) => {
+              const isCryptoOrderSelected = selectedCryptoOrders.includes(
+                value.id
+              );
+              return isCryptoOrderSelected;
+            })}
+          />
         </Box>
       )}
-      {!selectedBulkActions && <CardHeader title="User lists" />}
+      {!selectedBulkActions && (
+        <CardHeader
+          action={
+            <Box width={150}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={filters.status || "all"}
+                  onChange={handleStatusChange}
+                  label="Status"
+                  autoWidth
+                  onClose={() => {
+                    // Handle the dropdown close event
+                    // เปิด Modal สำหรับการสรุปรายการ (Summary List Modal) เมื่อคลิก "Add"
+                    setShowExportModal(false);
+                  }}
+                >
+                  {statusOptions.map((statusOption) => (
+                    <MenuItem key={statusOption.id} value={statusOption.id}>
+                      {statusOption.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          }
+          title="Tracking Status"
+        />
+      )}
       <Divider />
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox" align="center">
+              <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
                   checked={selectedAllCryptoOrders}
@@ -213,10 +271,13 @@ const PermissionTable: FC = () => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">ID</TableCell>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Role</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell align="center" sx={{ width: "480px" }}>
+                Details
+              </TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell align="right">Status</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -230,7 +291,7 @@ const PermissionTable: FC = () => {
                   key={cryptoOrder.id}
                   selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox" align="center">
+                  <TableCell padding="checkbox">
                     <Checkbox
                       color="primary"
                       checked={isCryptoOrderSelected}
@@ -240,7 +301,7 @@ const PermissionTable: FC = () => {
                       value={isCryptoOrderSelected}
                     />
                   </TableCell>
-                  <TableCell align="center">
+                  <TableCell>
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -248,42 +309,32 @@ const PermissionTable: FC = () => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.id}
+                      {cryptoOrder.orderID}
                     </Typography>
                   </TableCell>
-                  <TableCell align="center">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
+                  <TableCell>
+                    <TransparentStepper
+                      activeStep={activeStep}
+                      alternativeLabel
                     >
-                      {cryptoOrder.full_name}
+                      {steps.map((label, index) => (
+                        <Step key={index}>
+                          <StepLabel>{label}</StepLabel>
+                        </Step>
+                      ))}
+                    </TransparentStepper>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {format(cryptoOrder.shippingDate, "MMMM dd yyyy")}
                     </Typography>
                   </TableCell>
-                  <TableCell align="center">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {userRoles[cryptoOrder.id] &&
-                      userRoles[cryptoOrder.id].length > 0 ? (
-                        <ul>
-                          {userRoles[cryptoOrder.id].map((roleItem: any) => (
-                            <li key={roleItem.id}>{roleItem.name}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        "N/A"
-                      )}
-                    </Typography>
+                  <TableCell align="right">
+                    {getStatusLabel(cryptoOrder.status)}
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View User" arrow>
+                    <Tooltip title="View Order" arrow>
+                      {/* <NextLink href="/logistic/customerList/AddCustomerList" passHref> */}
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -291,14 +342,13 @@ const PermissionTable: FC = () => {
                           },
                           color: theme.palette.info.main,
                         }}
-                        onClick={() =>
-                          router.push("/setup/permission/AddPermission")
-                        }
+                        onClick={() => router.push("/logistic/tracking/map/")}
                         color="inherit"
                         size="small"
                       >
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
+                      {/* </NextLink> */}
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton
@@ -308,6 +358,9 @@ const PermissionTable: FC = () => {
                           },
                           color: theme.palette.primary.main,
                         }}
+                        onClick={() =>
+                          router.push("/logistic/customerList/EditCustomerList")
+                        }
                         color="inherit"
                         size="small"
                       >
@@ -348,12 +401,12 @@ const PermissionTable: FC = () => {
   );
 };
 
-PermissionTable.propTypes = {
+RecentOrdersTable.propTypes = {
   cryptoOrders: PropTypes.array.isRequired,
 };
 
-PermissionTable.defaultProps = {
+RecentOrdersTable.defaultProps = {
   cryptoOrders: [],
 };
 
-export default PermissionTable;
+export default RecentOrdersTable;

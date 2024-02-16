@@ -1,5 +1,5 @@
-import { FC, ChangeEvent, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { FC, ChangeEvent, useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   Tooltip,
   Divider,
@@ -20,36 +20,33 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader
-} from '@mui/material';
+  CardHeader,
+} from "@mui/material";
 
 // import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
-import { useRouter } from 'next/router';
+import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
+import BulkActions from "./BulkActions";
+import { useRouter } from "next/router";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-interface RecentOrdersTableProps {
-  className?: string;
-  cryptoOrders: CryptoOrder[];
-}
+// interface RecentOrdersTableProps {
+//   className?: string;
+//   cryptoOrders: CryptoOrder[];
+// }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: any;
 }
 
-const applyFilters = (
-  cryptoOrders: CryptoOrder[],
-  filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+const applyFilters = (orders: any[], filters: Filters) => {
+  return orders.filter((order) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && order.status !== filters.status) {
       matches = false;
     }
 
@@ -57,73 +54,63 @@ const applyFilters = (
   });
 };
 
-const applyPagination = (
-  cryptoOrders: CryptoOrder[],
-  page: number,
-  limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+const applyPagination = (orders: any[], page: number, limit: number) => {
+  const startIndex = page * limit;
+  return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
+const RecentOrdersTable: FC = () => {
   const router = useRouter();
-  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
+    []
+  );
   const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null
+    status: null,
   });
   const [cryptoOrders, setCryptoOrders] = useState([]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem("accessToken");
         if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
-          method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const responseData = await response.json();
-          if (responseData && responseData.data && Array.isArray(responseData.data)) {
-            setCryptoOrders(responseData.data);
+          const response = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
+            method: "GET", // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            const responseData = await response.json();
+            if (
+              responseData &&
+              responseData.data &&
+              Array.isArray(responseData.data)
+            ) {
+              setCryptoOrders(responseData.data);
+            } else {
+              console.error("Invalid data format from API");
+            }
+          } else if (response.status === 401) {
+            // Token หมดอายุหรือไม่ถูกต้อง
+            console.log("Token expired or invalid");
+            // ทำการลบ token ที่หมดอายุจาก localStorage
+            localStorage.removeItem("accessToken");
           } else {
-            console.error('Invalid data format from API');
+            console.error("Failed to fetch crypto orders");
           }
-        } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
-          console.log('Token expired or invalid');
-          // ทำการลบ token ที่หมดอายุจาก localStorage
-          localStorage.removeItem('accessToken');
-        } else {
-          console.error('Failed to fetch crypto orders');
-        }
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     };
 
     fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
   }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
-  
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
-
-    if (e.target.value !== 'all') {
-      value = e.target.value;
-    }
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      status: value
-    }));
-  };
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -138,18 +125,17 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
   const handleSelectOneCryptoOrder = (
     _event: ChangeEvent<HTMLInputElement>,
     cryptoOrderId: string
-): void => {
+  ): void => {
     if (!selectedCryptoOrders.includes(cryptoOrderId)) {
       setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        cryptoOrderId
+        cryptoOrderId,
       ]);
     } else {
       setSelectedCryptoOrders((prevSelected) =>
         prevSelected.filter((id) => id !== cryptoOrderId)
       );
     }
-
   };
 
   const handlePageChange = (_event: any, newPage: number): void => {
@@ -175,15 +161,18 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
 
   const handleDeleteCryptoOrder = async (cryptoOrderId: string) => {
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem("accessToken");
       if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit/${cryptoOrderId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${publicRuntimeConfig.BackEnd}unit/${cryptoOrderId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (response.ok) {
           // ดำเนินการหลังจากการลบ Unit สำเร็จ
@@ -194,16 +183,16 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
           router.reload();
         } else if (response.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง
-          console.log('Token expired or invalid');
+          console.log("Token expired or invalid");
           // ทำการลบ token ที่หมดอายุจาก localStorage
-          localStorage.removeItem('accessToken');
+          localStorage.removeItem("accessToken");
         } else {
           // ถ้าการลบ Unit ไม่สำเร็จ
           console.error(`Failed to delete Unit with ID ${cryptoOrderId}`);
         }
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
@@ -214,11 +203,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && (
-        <CardHeader
-          title="Unit lists"
-        />
-      )}
+      {!selectedBulkActions && <CardHeader title="Unit lists" />}
       <Divider />
       <TableContainer>
         <Table>
@@ -232,9 +217,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">Unit ID</TableCell>
-              <TableCell align="center">Unit Name</TableCell>
-              <TableCell align="center">Description</TableCell>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Name</TableCell>
+              {/* <TableCell align="center">Description</TableCell> */}
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -281,7 +266,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       {cryptoOrder.name}
                     </Typography>
                   </TableCell>
-                  <TableCell align="center">
+                  {/* <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -291,32 +276,36 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                     >
                       {cryptoOrder.sourceName}
                     </Typography>
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center">
-                  <Tooltip title="View Unit" arrow>
-                        <IconButton
-                          sx={{
-                            "&:hover": {
-                              background: theme.colors.info.lighter,
-                            },
-                            color: theme.palette.info.main,
-                          }}
-                          onClick={() => router.push(`/setup/unit/info/${cryptoOrder.id}`)}
-                          color="inherit"
-                          size="small"
-                        >
-                          <VisibilityTwoToneIcon fontSize="small" />
-                        </IconButton>
+                    <Tooltip title="View Unit" arrow>
+                      <IconButton
+                        sx={{
+                          "&:hover": {
+                            background: theme.colors.info.lighter,
+                          },
+                          color: theme.palette.info.main,
+                        }}
+                        onClick={() =>
+                          router.push(`/setup/unit/info/${cryptoOrder.id}`)
+                        }
+                        color="inherit"
+                        size="small"
+                      >
+                        <VisibilityTwoToneIcon fontSize="small" />
+                      </IconButton>
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton
                         sx={{
-                          '&:hover': {
-                            background: theme.colors.primary.lighter
+                          "&:hover": {
+                            background: theme.colors.primary.lighter,
                           },
-                          color: theme.palette.primary.main
+                          color: theme.palette.primary.main,
                         }}
-                        onClick={() => router.push(`/setup/unit/edit/${cryptoOrder.id}`)}
+                        onClick={() =>
+                          router.push(`/setup/unit/edit/${cryptoOrder.id}`)
+                        }
                         color="inherit"
                         size="small"
                       >
@@ -326,8 +315,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                     <Tooltip title="Delete Order" arrow>
                       <IconButton
                         sx={{
-                          '&:hover': { background: theme.colors.error.lighter },
-                          color: theme.palette.error.main
+                          "&:hover": { background: theme.colors.error.lighter },
+                          color: theme.palette.error.main,
                         }}
                         color="inherit"
                         size="small"
@@ -363,7 +352,7 @@ RecentOrdersTable.propTypes = {
 };
 
 RecentOrdersTable.defaultProps = {
-  cryptoOrders: []
+  cryptoOrders: [],
 };
 
 export default RecentOrdersTable;

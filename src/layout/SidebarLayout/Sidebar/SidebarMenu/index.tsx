@@ -218,6 +218,7 @@ const SidebarMenu = () => {
                 Authorization: `Bearer ${token}`,
               },
             });
+            
             if (responseRole.ok){
               const roleData = await responseRole.json();
               console.log('role', roleData);
@@ -293,7 +294,7 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-              {(userRole === 'stock' || userRole === 'Admin') && (
+              {(userRole === 'Stock' || userRole === 'Admin') && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -310,7 +311,7 @@ const SidebarMenu = () => {
                   </ListItem>
                 </>
               )}
-              {(userRole === 'stock' || userRole === 'Admin') && (
+              {(userRole === 'Stock' || userRole === 'Admin') && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -327,7 +328,7 @@ const SidebarMenu = () => {
                   </ListItem>
                 </>
               )}
-              {(userRole === 'stock' || userRole === 'Admin') && (
+              {(userRole === 'Stock' || userRole === 'Admin') && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -344,7 +345,7 @@ const SidebarMenu = () => {
                   </ListItem>
                 </>
               )}
-              {(userRole === 'stock' || userRole === 'Admin' || userRole === 'Manager') && (
+              {(userRole === 'Stock' || userRole === 'Admin' || userRole === 'Manager') && (
                 <>
                   <ListItem component="div">
                     <Button

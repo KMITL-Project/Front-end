@@ -67,10 +67,7 @@ const getStatusLabel = (listOrderStatus: OrderStatus): JSX.Element => {
   return <Label color={color}>{text}</Label>;
 };
 
-const applyFilters = (
-  cryptoOrders: Order[],
-  filters: Filters
-): Order[] => {
+const applyFilters = (cryptoOrders: Order[], filters: Filters): Order[] => {
   return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
@@ -92,7 +89,7 @@ const applyPagination = (
 
 const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   // fuction for modal
-  
+
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>("");
@@ -299,17 +296,18 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
-
   return (
     <Card>
       {selectedBulkActions && (
         <Box flex={1} p={2}>
-          <BulkActions Orders={paginatedCryptoOrders.filter(value => {
-    const isCryptoOrderSelected = selectedCryptoOrders.includes(
-      value.id
-    )
-      return isCryptoOrderSelected
-    })}/>
+          <BulkActions
+            Orders={paginatedCryptoOrders.filter((value) => {
+              const isCryptoOrderSelected = selectedCryptoOrders.includes(
+                value.id
+              );
+              return isCryptoOrderSelected;
+            })}
+          />
         </Box>
       )}
       {!selectedBulkActions && (

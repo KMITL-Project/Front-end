@@ -1,16 +1,14 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/shelf/AddShelfPageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container, Typography } from '@mui/material';
-
-import RecentOrders from '@/content/setup/shelf/ShelfView';
-import { ReactElement } from 'react';
-import Forms from '@/content/setup/shelf/AddShelf';
-import Breadcrumb from '@/components/Breadcrumbs';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/shelf/AddShelf/AddShelfPageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container, Typography } from "@mui/material";
+import { ReactElement } from "react";
+import Forms from "@/content/setup/shelf/AddShelf/AddShelf";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Shelf/Add Shelf'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Shelf/Create Shelf"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -44,6 +42,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

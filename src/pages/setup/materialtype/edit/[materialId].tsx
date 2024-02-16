@@ -1,14 +1,14 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/material/Edit/TypeEditPageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
-import { ReactElement } from 'react';
-import MaterialEditPage from '@/content/setup/material/Edit/TypeEdit';
-import Breadcrumb from '@/components/Breadcrumbs';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/material/Edit/TypeEditPageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container } from "@mui/material";
+import { ReactElement } from "react";
+import MaterialEditPage from "@/content/setup/material/Edit/TypeEdit";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Material/Material Edit'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Material/Material Edit"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -29,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <MaterialEditPage/>
+            <MaterialEditPage />
           </Grid>
         </Grid>
       </Container>
@@ -42,6 +42,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

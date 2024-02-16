@@ -23,6 +23,7 @@ import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import MoreVertTwoToneIcon from "@mui/icons-material/MoreVertTwoTone";
 import { format } from "date-fns";
 import { Order, OrderStatus } from "@/model/logistic/order";
+import { Tracking } from "@/model/logistic/tracking";
 
 const ButtonError = styled(Button)(
   ({ theme }) => `
@@ -36,10 +37,10 @@ const ButtonError = styled(Button)(
 );
 
 interface BulkActionsProps {
-  Orders: Order[];
+  Tracks: Tracking[];
 }
 
-function BulkActions({ Orders }: BulkActionsProps) {
+function BulkActions({ Tracks }: BulkActionsProps) {
   const [onMenuOpen, menuOpen] = useState<boolean>(false);
   const [isBulkAddModalOpen, setBulkAddModalOpen] = useState<boolean>(false);
   const [selectedData, setSelectedData] = useState<string[]>([]);
@@ -167,7 +168,7 @@ function BulkActions({ Orders }: BulkActionsProps) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Orders.map((item, index) => (
+                {Tracks.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{item.orderID}</TableCell>

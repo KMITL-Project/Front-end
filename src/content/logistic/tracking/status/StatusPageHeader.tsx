@@ -16,7 +16,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          รายการลูกค้า
+          ติดตามการขนส่ง
         </Typography>
         {/* <Typography variant="subtitle2">
           {user.name}, these are your recent transactions
@@ -25,18 +25,17 @@ function PageHeader() {
 
       <Grid item>
         {/* <NextLink href="/logistic/customerList/AddCustomerList/" passHref> */}
-        <Button
-          variant="contained"
-          sx={{ margin: 1 }}
-          // className={currentRoute === "/logistic/customerList/AddCustomerList/" ? "active" : ""}
-          disableRipple
-          component="a"
-          onClick={() => router.push("/logistic/customerList/AddCustomerList/")}
-          // onClick={closeSidebar}
-          // startIcon={<TableChartTwoToneIcon />}
-        >
-          + Order{" "}
-        </Button>
+        {/* <Button
+            variant="contained" sx={{ margin:1}}
+            // className={currentRoute === "/logistic/customerList/AddCustomerList/" ? "active" : ""}
+            disableRipple
+            component="a"
+            onClick={() => router.push('/logistic/customerList/AddCustomerList/')}
+            // onClick={closeSidebar}
+            // startIcon={<TableChartTwoToneIcon />}
+          >
+            + Add{" "}
+          </Button> */}
         {/* </NextLink> */}
       </Grid>
     </Grid>

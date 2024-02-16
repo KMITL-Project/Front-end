@@ -10,56 +10,53 @@ import {
   Divider,
   Button,
 } from "@mui/material";
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-function Forms() {
+function AddUnit() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "เครื่องมืองานเหล็ก",
-    description: "ใช้สำหรับงานเหล็ก",
+    name: "เมตร",
+    description: "หน่วยความยาว",
   });
   const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // const data = new FormData(event.currentTarget); // ใช้ event.currentTarget เพื่อให้ได้ form element ที่ถูกต้อง
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     const requestData = {
-      method: 'POST', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json', // กำหนด Content-Type ตาม API ของคุณ
-        Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        name: formData.name, // ใช้ 'username' เนื่องจากชื่อฟิลด์ในฟอร์มคือ 'username'
+        name: formData.name,
         detail: formData.description,
       }),
     };
     try {
       if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}unit`, requestData);
+        const response = await fetch(
+          `${publicRuntimeConfig.BackEnd}unit`,
+          requestData
+        );
         if (response.ok) {
-          // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
-          console.log('Unit created successfully!');
-          router.push('/setup/unit/');
+          console.log("Unit created successfully!");
+          router.push("/setup/unit/");
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
-          console.log('Token expired or invalid');
-          // ทำการลบ token ที่หมดอายุจาก localStorage
-          localStorage.removeItem('accessToken');
+          console.log("Token expired or invalid");
+          localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการสร้าง Unit ไม่สำเร็จ
-          console.error('Unit creation failed');
+          console.error("Unit creation failed");
         }
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setFormData({
       ...formData,
       [event.target.id]: event.target.value,
@@ -80,19 +77,18 @@ function Forms() {
               <TextField
                 required
                 fullWidth
-                className="mb-4" 
+                className="mb-4"
                 id="name"
-                label="Unit Name"
+                label="Name"
                 defaultValue={formData.name}
                 onChange={handleChange}
               />
-
               <TextField
                 required
                 fullWidth
-                className="mb-4" 
+                className="mb-4"
                 id="description"
-                label="Unit Description"
+                label="Detail"
                 defaultValue={formData.description}
                 onChange={handleChange}
               />
@@ -100,20 +96,19 @@ function Forms() {
             <Grid container justifyContent="flex-end" className="mt-5">
               <Button
                 // type="submit"
-                variant="contained" 
-                sx={{ margin:1}}
+                variant="contained"
+                sx={{ margin: 1 }}
                 onClick={handleCreateUnit}
                 disableRipple
                 component="a"
-
-              >Create
-                {" "}
+              >
+                Create{" "}
               </Button>
               <Button
-                variant="contained" 
-                sx={{ margin:1}}
+                variant="contained"
+                sx={{ margin: 1 }}
                 color="error"
-                onClick={() => router.push('/setup/unit/')}
+                onClick={() => router.push("/setup/unit/")}
                 disableRipple
                 component="a"
               >
@@ -127,6 +122,8 @@ function Forms() {
   );
 }
 
-Forms.getLayout = (page : ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
+AddUnit.getLayout = (page: ReactElement) => (
+  <SidebarLayout>{page}</SidebarLayout>
+);
 
-export default Forms;
+export default AddUnit;

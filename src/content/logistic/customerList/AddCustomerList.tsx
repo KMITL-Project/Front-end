@@ -1,7 +1,7 @@
 import Head from "next/head";
 import SidebarLayout from "@/layout/SidebarLayout";
 import PageTitle from "@/components/PageTitle";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 import PageTitleWrapper from "@/components/PageTitleWrapper";
 import {
@@ -43,9 +43,23 @@ import UploadTwoToneIcon from "@mui/icons-material/UploadTwoTone";
 import { Upload } from "@mui/icons-material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Paper from "@mui/material/Paper";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
+// Change the import statement to the correct path
+
+import "leaflet/dist/leaflet.css";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css"; // Re-uses images from ~leaflet package
+import * as L from "leaflet";
+import "leaflet-defaulticon-compatibility";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
+
+const customIcon = new L.Icon({
+  iconUrl: "/location.png",
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
 
 const currencies = [
   {
@@ -114,23 +128,73 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
   color: theme.palette.text.secondary,
 }));
+const handleSearch = () => {
+  // Handle the search action here
+  // You can use a geocoding API to get the coordinates for the searched place
+};
+
+type LatLngTuple = [number, number];
 
 function Forms() {
+  const initialPosition: LatLngTuple = [51.505, -0.09];
+  const [currentPosition, setCurrentPosition] = useState<LatLngTuple | null>(
+    null
+  );
+  const [markerPosition, setMarkerPosition] = useState<LatLngTuple | null>(
+    null
+  );
+
   const router = useRouter();
   // const currentRoute = router.pathname;
 
-  const [currency, setCurrency] = useState("EUR");
-
-  const handleChange = (event: any) => {
-    setCurrency(event.target.value);
-  };
+  useEffect(() => {
+    // Fetch current location using the browser's geolocation API
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCurrentPosition([latitude, longitude]);
+        setMarkerPosition([latitude, longitude]);
+      },
+      (error) => {
+        console.error("Error getting current location:", error);
+      }
+    );
+  }, []);
 
   const [value, setValue] = useState(30);
 
   const handleChange2 = (_event: any, newValue: any) => {
     setValue(newValue);
   };
-  
+
+  const handleMarkerDrag = (event: L.LeafletEvent) => {
+    const marker = event.target;
+    const newPosition = marker.getLatLng();
+    setMarkerPosition([newPosition.lat, newPosition.lng]);
+    updateTextFieldValue(newPosition);
+  };
+
+  const updateTextFieldValue = (newPosition: L.LatLng) => {
+    const latitude = newPosition.lat.toFixed(6);
+    const longitude = newPosition.lng.toFixed(6);
+    setTextFieldValue({ latitude, longitude });
+  };
+
+  const [textFieldValue, setTextFieldValue] = useState<{
+    latitude: string;
+    longitude: string;
+  }>({
+    latitude: "",
+    longitude: "",
+  });
+
+  useEffect(() => {
+    if (currentPosition) {
+      const latitude = currentPosition[0].toFixed(6);
+      const longitude = currentPosition[1].toFixed(6);
+      setTextFieldValue({ latitude, longitude });
+    }
+  }, [currentPosition]);
 
   return (
     <>
@@ -145,30 +209,28 @@ function Forms() {
               <CardHeader title="Order Details" />
               <Divider />
               <CardContent>
-                <Box
-                  component="form"
-                  sx={{
-                    "& .MuiTextField-root": { m: 1, width: "60ch" },
-                  }}
-                  noValidate
-                  autoComplete="off"
-                >
-                  <div>
-                    <Grid item>
-                      {" "}
+                <Grid container spacing={2}>
+                  {/* Left Column */}
+                  <Grid item xs={12} sm={6}>
+                    <Box
+                      component="form"
+                      sx={{
+                        "& .MuiTextField-root": { m: 1, width: "100%" },
+                      }}
+                      noValidate
+                      autoComplete="off"
+                    >
                       <TextField
                         required
                         id="outlined-required"
                         label="Customer Name"
                       />
-            
                       <TextField
                         required
                         id="outlined-required"
                         label="Details"
                       />
-
-<TextField
+                      <TextField
                         required
                         id="outlined-required"
                         label="Address"
@@ -176,43 +238,81 @@ function Forms() {
                       <TextField
                         required
                         id="outlined-required"
-                        label="Date"
+                        label="Latitude"
+                        value={textFieldValue.latitude}
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
+
+                      <TextField
+                        required
+                        id="outlined-required"
+                        label="Longitude"
+                        value={textFieldValue.longitude}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      <TextField required id="outlined-required" label="Date" />
+                    </Box>
+                    <Grid container justifyContent="center" paddingTop={2}>
+                      <Button
+                        variant="contained"
+                        sx={{ margin: 1 }}
+                        onClick={() => router.push("/logistic/customerList/")}
+                        disableRipple
+                        component="a"
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        variant="contained"
+                        sx={{ margin: 1 }}
+                        color="error"
+                        onClick={() => router.push("/logistic/customerList/")}
+                        disableRipple
+                        component="a"
+                      >
+                        Cancel
+                      </Button>
                     </Grid>
- 
-                    <Grid container justifyContent={"center"} paddingTop={2}>
-                      {/* <NextLink href="/logistic/customerList/" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/customerList/')}
-                          disableRipple
-                          component="a"
+                  </Grid>
+
+                  {/* Right Column */}
+                  <Grid item xs={12} sm={6}>
+                    {/* Leaflet Map */}
+                    <div>
+                      {currentPosition ? (
+                        <MapContainer
+                          center={currentPosition}
+                          zoom={13}
+                          style={{ height: "400px", width: "100%" }}
+                          scrollWheelZoom={false}
                         >
-                          Save{" "}
-                        </Button>
-                      {/* </NextLink> */}
-                      {/* <NextLink href="/logistic/customerList//" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          color="error"
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/customerList/')}
-                          disableRipple
-                          component="a"
-                        >
-                          Cancel{" "}
-                        </Button>
-                      {/* </NextLink> */}
-                    </Grid>
-                  </div>
-                </Box>
+                          <TileLayer
+                            attribution="&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          <Marker
+                            position={markerPosition || [0, 0]}
+                            draggable={true}
+                            eventHandlers={{ dragend: handleMarkerDrag }}
+                            icon={customIcon} // Use the custom icon
+                          >
+                            <Popup>
+                              A pretty CSS3 popup. <br /> Easily customizable.
+                            </Popup>
+                            <Tooltip>{`Latitude: ${markerPosition?.[0]}, Longitude: ${markerPosition?.[1]}`}</Tooltip>
+                          </Marker>
+                        </MapContainer>
+                      ) : (
+                        <p>Loading map...</p>
+                      )}
+                    </div>
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
           </Grid>

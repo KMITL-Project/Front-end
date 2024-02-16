@@ -66,19 +66,19 @@ function AddPermission() {
             const responseDataRole = await responseRole.json();
             // console.log('Floor Data:', responseDataFloor.data);
             setCryptoOrders(
-              responseData.data.map((material) => ({
+              responseData.data.map((material: any) => ({
                 value: material.id,
                 label: material.name,
               }))
             );
             setUserData(
-              responseDataUser.data.map((user) => ({
+              responseDataUser.data.map((user: any) => ({
                 value: user.id,
                 label: user.username,
               }))
             );
             setRoleData(
-              responseDataRole.data.map((role) => ({
+              responseDataRole.data.map((role: any) => ({
                 value: role.id,
                 label: role.name,
               }))
@@ -148,7 +148,7 @@ function AddPermission() {
     }
   };
 
-  const handleChange = (event, id) => {
+  const handleChange = (event: any, id: any) => {
     const { value } = event.target;
 
     if (id === "user_id") {

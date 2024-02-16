@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-
 import {
   Avatar,
   Box,
@@ -22,7 +21,7 @@ import LockOpenTwoToneIcon from "@mui/icons-material/LockOpenTwoTone";
 import AccountTreeTwoToneIcon from "@mui/icons-material/AccountTreeTwoTone";
 import Link from "next/link";
 import getConfig from "next/config";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -71,45 +70,65 @@ function HeaderUserbox() {
   const ref = useRef<any>(null);
   // const [isOpen, setOpen] = useState<boolean>(false);
   const [isOpen, setOpen] = useState(false);
+  const [image, setImage] = useState<Blob | undefined>(undefined);
 
-  useEffect(() => { 
+  useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem("accessToken");
         if (token) {
-          const response = await fetch(`${publicRuntimeConfig.BackEnd}users/user-info`, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await fetch(
+            `${publicRuntimeConfig.BackEnd}users/user-info`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           if (response.ok) {
             const userData = await response.json();
-            console.log('ok', userData);
+            console.log("ok", userData);
             setUser({
               name: userData.data.full_name,
               avatar: userData.data.image_url,
             });
-            // console.log(user.avatar);
-          
+
+            const responseImage = await fetch(
+              `${publicRuntimeConfig.BackEnd}upload/${userData.data.image_url}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (responseImage.ok) {
+              const imageData = await responseImage.blob(); // หรือ responseImage.text() ตามที่เหมาะสม
+              console.log("image", imageData);
+              setImage(imageData);
+            } else {
+              console.error("Error fetching image:", responseImage.statusText);
+            }
           } else if (response.status === 401) {
             // Token หมดอายุหรือไม่ถูกต้อง
-            console.log('Token expired or invalid');
+            console.log("Token expired or invalid");
             // ทำการลบ token ที่หมดอายุจาก localStorage
-            localStorage.removeItem('accessToken');
+            localStorage.removeItem("accessToken");
           } else {
             // Handle error when fetching user info
-            console.error('Error fetching user info:', response.statusText);
+            console.error("Error fetching user info:", response.statusText);
           }
         }
       } catch (error) {
-        console.error('Error fetching user info:', error);
+        console.error("Error fetching user info:", error);
       }
     };
-    // console.log('user state:', user);
+
     fetchUserInfo();
-  },[]);
+  }, []);
 
   const handleOpen = (): void => {
     setOpen(true);
@@ -120,18 +139,17 @@ function HeaderUserbox() {
   };
 
   const handleLogout = () => {
-    // ทำการลบข้อมูล authentication หรืออื่น ๆ ตามที่คุณต้องการ
-    // ตัวอย่าง: ลบ token จาก localStorage
     localStorage.removeItem("accessToken");
-
-    // ทำการ redirect ไปยังหน้า login หรือหน้าหลักของแอปพลิเคชัน
     router.push("/auth/login"); // หรือ path ที่คุณต้องการ
   };
 
   return (
     <>
       <UserBoxButton color="secondary" onClick={handleOpen}>
-        <Avatar variant="rounded" alt={user.name} src={user.avatar} />
+        <Avatar
+          variant="rounded"
+          src={image ? URL.createObjectURL(image) : ""}
+        />
         <Hidden mdDown>
           <UserBoxText>
             <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
@@ -155,7 +173,11 @@ function HeaderUserbox() {
         }}
       >
         <MenuUserBox sx={{ minWidth: 210 }} display="flex">
-          <Avatar variant="rounded" alt={user.name} src={user.avatar} />
+          <Avatar
+            variant="rounded"
+            alt={user.name}
+            src={image ? URL.createObjectURL(image) : ""}
+          />
           <UserBoxText>
             <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
           </UserBoxText>
@@ -179,7 +201,7 @@ function HeaderUserbox() {
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth onClick={handleLogout}>
             <LockOpenTwoToneIcon sx={{ mr: 1 }} />
-            LogOut 
+            LogOut
           </Button>
         </Box>
       </Popover>

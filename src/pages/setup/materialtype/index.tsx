@@ -1,15 +1,15 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/material/PageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/material/PageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container } from "@mui/material";
 
-import RecentOrders from '@/content/setup/material/MaterialView';
-import { ReactElement } from 'react';
-import Breadcrumb from '@/components/Breadcrumbs';
+import RecentOrdersTable from "@/content/setup/material/MaterialTable";
+import { ReactElement } from "react";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Material Type'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Material Type"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -17,7 +17,7 @@ function ApplicationsTransactions() {
         <title></title>
       </Head>
       <PageTitleWrapper>
-      <Breadcrumb pageData={pageData} />
+        <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
       <Container maxWidth="lg">
@@ -29,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <RecentOrders />
+            <RecentOrdersTable />
           </Grid>
         </Grid>
       </Container>
@@ -42,6 +42,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

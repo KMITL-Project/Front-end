@@ -8,10 +8,10 @@ import {
   Button,
   CardHeader,
   Divider,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
@@ -26,125 +26,116 @@ function Forms() {
     price: "",
     amount: "",
     detail: "ประแจ",
-    // buy_date: ""
+    buy_date: new Date().toISOString().split('T')[0],
   });
-
   const [cryptoOrders, setCryptoOrders] = useState([]);
-  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState([]);
-  
+
   useEffect(() => {
     const fetchFloorData = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem("accessToken");
         if (token) {
-          const response = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const responseFloor = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const responseUnit = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (responseFloor.ok && responseUnit.ok) {
+          const response = await fetch(
+            `${publicRuntimeConfig.BackEnd}material`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.ok) {
             const responseData = await response.json();
-            const responseDataFloor = await responseFloor.json();
-            const responseDataUnit = await responseUnit.json();
-            console.log('Floor Data:', responseDataFloor.data);
-            setCryptoOrders(responseData.data.map(material => ({value: material.id, label: material.name})));
-            setFloorOptions(responseDataFloor.data.map(floor => ({ value: floor.id, label: floor.name })));
-            setUnitOptions(responseDataUnit.data.map(unit => ({ value: unit.id, label: unit.name })));
-          } else if (responseFloor.status === 401 || responseUnit.status === 401) {
-            console.log('Token expired or invalid');
-            localStorage.removeItem('accessToken');
+            setCryptoOrders(
+              responseData.data.map((material: any) => ({
+                value: material.id,
+                label: material.name,
+              }))
+            );
+          } else if (
+            response.status === 401
+          ) {
+            console.log("Token expired or invalid");
+            localStorage.removeItem("accessToken");
           } else {
-            console.error('Failed to fetch floor or unit data. Response:', responseFloor, responseUnit);
+            console.error(
+              "Failed to fetch floor or unit data. Response:",
+              response
+            );
           }
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
-    };    
-  
+    };
+
     fetchFloorData();
-  }, []);  
+  }, []);
 
   const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
-    formDataToSend.append('material_id', formData.material_id);
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('amount', formData.amount);
-    formDataToSend.append('detail', formData.detail);
-    // formDataToSend.append('buy_date', formData.buy_date);
+    formDataToSend.append("material_id", formData.material_id);
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("price", formData.price);
+    formDataToSend.append("amount", formData.amount);
+    formDataToSend.append("detail", formData.detail);
+    formDataToSend.append('buy_date', formData.buy_date);
 
     try {
       if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}lot/deposit`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          body: formDataToSend,
-        });
-        console.log('formData:', formDataToSend);
-        console.log('material_id:', formDataToSend.get('material_id'));
-        console.log('name:', formDataToSend.get('name'));
-        console.log('price:', formDataToSend.get('price'));
-        console.log('amount:', formDataToSend.get('amount'));
-        console.log('detail:', formDataToSend.get('detail'));
-        // console.log('buy_date:', formDataToSend.get('buy_date'));
+        const response = await fetch(
+          `${publicRuntimeConfig.BackEnd}lot/deposit`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formDataToSend,
+          }
+        );
+        console.log("formData:", formDataToSend);
+        console.log("material_id:", formDataToSend.get("material_id"));
+        console.log("name:", formDataToSend.get("name"));
+        console.log("price:", formDataToSend.get("price"));
+        console.log("amount:", formDataToSend.get("amount"));
+        console.log("detail:", formDataToSend.get("detail"));
         if (response.ok) {
-          // console.log('name:', formDataToSend.get('name'));
-          // console.log('detail:', formDataToSend.get('detail'));
           const responseData = await response.json();
-          const uploadedImageUrl = responseData.imageUrl;
-          setImageUrl(uploadedImageUrl);
           // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
-          console.log('Unit created successfully!');
-          router.push('/management/material/');
+          console.log("Unit created successfully!");
+          router.push("/management/material/");
         } else if (response.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง
-          console.log('Token expired or invalid');
+          console.log("Token expired or invalid");
           // ทำการลบ token ที่หมดอายุจาก localStorage
-          localStorage.removeItem('accessToken');
+          localStorage.removeItem("accessToken");
         } else {
           // ถ้าการสร้าง Unit ไม่สำเร็จ
-          console.error('Material creation failed');
+          console.error("Material creation failed");
         }
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
-  const handleChange = (event, id) => {
+  const handleChange = (event: any, id: any) => {
     const { value } = event.target;
-  
+
     if (id === "material_id") {
       setFormData({
         ...formData,
-        material_id: value
+        material_id: value,
       });
-      
-    // } else if (id === "unit_id") {
-    //   setFormData({
-    //     ...formData,
-    //     unit_id: value
-    //   });
+
+      // } else if (id === "unit_id") {
+      //   setFormData({
+      //     ...formData,
+      //     unit_id: value
+      //   });
     } else {
       setFormData({
         ...formData,
@@ -152,11 +143,10 @@ function Forms() {
       });
     }
   };
-  
-  
-  const handleFileChange = (event) => {
+
+  const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
-  
+
     if (selectedFile) {
       // ทำการอ่านไฟล์รูปภาพ
       const reader = new FileReader();
@@ -164,8 +154,8 @@ function Forms() {
         setImageUrl(reader.result);
       };
       reader.readAsDataURL(selectedFile);
-  
-      setFile(selectedFile);  // เซ็ตค่า file ใน state
+
+      setFile(selectedFile); // เซ็ตค่า file ใน state
     }
   };
 
@@ -174,56 +164,56 @@ function Forms() {
       <Head>
         <title></title>
       </Head>
-        <Card>
+      <Card>
         <CardHeader title="Create Material" />
         <Divider />
-          <CardContent>
-              <Grid container spacing={3} justifyContent="center">
-                <Grid item xs={12} sm={6} className="mt-5">
-                  <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="material_id"
-                    label="Material Name"
-                    value={formData.material_id}
-                    onChange={(e) => handleChange(e, "material_id")}
-                    select
-                  >
-                    {cryptoOrders.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="price"
-                    label="Material price"
-                    value={formData.price}
-                    onChange={(e) => handleChange(e, "price")}
-                  />
-                  <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="amount"
-                    label="Material amount"
-                    value={formData.amount}
-                    onChange={(e) => handleChange(e, "amount")}
-                  />
-                  <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="detail"
-                    label="detail"
-                    value={formData.detail}
-                    onChange={(e) => handleChange(e, "detail")}
-                  />
-                  {/* <TextField
+        <CardContent>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item xs={12} sm={6} className="mt-5">
+              <TextField
+                required
+                fullWidth
+                className="mb-4"
+                id="material_id"
+                label="Material Name"
+                value={formData.material_id}
+                onChange={(e) => handleChange(e, "material_id")}
+                select
+              >
+                {cryptoOrders.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                required
+                fullWidth
+                className="mb-4"
+                id="price"
+                label="Material price"
+                value={formData.price}
+                onChange={(e) => handleChange(e, "price")}
+              />
+              <TextField
+                required
+                fullWidth
+                className="mb-4"
+                id="amount"
+                label="Material amount"
+                value={formData.amount}
+                onChange={(e) => handleChange(e, "amount")}
+              />
+              <TextField
+                required
+                fullWidth
+                className="mb-4"
+                id="detail"
+                label="detail"
+                value={formData.detail}
+                onChange={(e) => handleChange(e, "detail")}
+              />
+              {/* <TextField
                     required
                     fullWidth
                     className="mb-4" 
@@ -232,7 +222,7 @@ function Forms() {
                     value={formData.buy_date}
                     onChange={(e) => handleChange(e, "buy_date")}
                   /> */}
-                  {/* <input
+              {/* <input
                     id="dropzone-file"
                     type="file"
                     className="hidden"
@@ -244,33 +234,35 @@ function Forms() {
                   <Button variant="contained" component="label" htmlFor="dropzone-file" className="mt-2">
                     Upload Image
                   </Button> */}
-                </Grid>
-              </Grid>
-              {/* Button Row */}
-              <form onSubmit={handleCreateUnit} encType="multipart/form-data">
-              <Grid container justifyContent="flex-end" className="mt-5">
-                <Button variant="contained" 
-                  sx={{ margin:1}}
-                  disableRipple
-                  component="a"
-                  // type="submit"
-                  onClick={handleCreateUnit}
-                  >
-                    Create
-                </Button>
-                <Button variant="contained" 
-                  sx={{ margin:1}}
-                  disableRipple
-                  color="error"
-                  component="a"
-                  onClick={() => router.push('/management/material')}
-                >
-                    Cancel
-                </Button>
-              </Grid>
-            </form>
-          </CardContent>
-        </Card>
+            </Grid>
+          </Grid>
+          {/* Button Row */}
+          <form onSubmit={handleCreateUnit} encType="multipart/form-data">
+            <Grid container justifyContent="flex-end" className="mt-5">
+              <Button
+                variant="contained"
+                sx={{ margin: 1 }}
+                disableRipple
+                component="a"
+                // type="submit"
+                onClick={handleCreateUnit}
+              >
+                Create
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ margin: 1 }}
+                disableRipple
+                color="error"
+                component="a"
+                onClick={() => router.push("/management/material")}
+              >
+                Cancel
+              </Button>
+            </Grid>
+          </form>
+        </CardContent>
+      </Card>
     </>
   );
 }

@@ -16,16 +16,16 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-function Forms() {
+function AddMaterial() {
   const router = useRouter();
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
   const [formData, setFormData] = useState({
     image: imageUrl,
-    name: "ชั้นเครื่องมือ",
-    detail: "ประแจ",
+    name: "",
+    detail: "",
     total: "0",
-    floor_id: "",  // เปลี่ยนนี้
+    floor_id: "",
     unit_id: "",
 
   });
@@ -121,7 +121,7 @@ function Forms() {
     }
   };
 
-  const handleChange = (event, id) => {
+  const handleChange = (event: any, id: any) => {
     const { value } = event.target;
   
     if (id === "floor_id") {
@@ -143,7 +143,7 @@ function Forms() {
   };
   
   
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
   
     if (selectedFile) {
@@ -174,7 +174,7 @@ function Forms() {
                     fullWidth
                     className="mb-4" 
                     id="name"
-                    label="Material Name"
+                    label="Name"
                     value={formData.name}
                     onChange={(e) => handleChange(e, "name")}
                   />
@@ -183,7 +183,7 @@ function Forms() {
                     fullWidth
                     className="mb-4" 
                     id="detail"
-                    label="Material Detail"
+                    label="Detail"
                     value={formData.detail}
                     onChange={(e) => handleChange(e, "detail")}
                   />
@@ -263,6 +263,6 @@ function Forms() {
   );
 }
 
-Forms.getLayout = (page: ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
+AddMaterial.getLayout = (page: ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
 
-export default Forms;
+export default AddMaterial;

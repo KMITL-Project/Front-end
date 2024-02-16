@@ -70,14 +70,14 @@ function Forms() {
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setFormData({
       ...formData,
       [event.target.id]: event.target.value,
     });
   };
   
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
   
     if (selectedFile) {
@@ -102,11 +102,6 @@ function Forms() {
         <Divider />
           <CardContent>
               <Grid container spacing={3} justifyContent="center">
-                {/* Column 1 - Label */}
-                {/* <Grid item xs={12} sm={1.5}>
-            
-                </Grid> */}
-                {/* Column 2 - Form */}
                 <Grid item xs={12} sm={6} className="mt-5">
                   <TextField
                       required
@@ -170,5 +165,4 @@ function Forms() {
 }
 
 Forms.getLayout = (page: ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
-
 export default Forms;

@@ -35,45 +35,30 @@ import VolumeUp from "@mui/icons-material/VolumeUp";
 import Switch from "@mui/material/Switch";
 import NextLink from "next/link";
 import router from "next/router";
-import Autocomplete from "@mui/material/Autocomplete";
-import Chip from "@mui/material/Chip";
-import { useRouter } from 'next/router';
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
-const status = [
+const currencies = [
   {
-    value: "Active",
-    label: "Active",
+    value: "USD",
+    label: "$",
   },
   {
-    value: "InActive",
-    label: "InActive",
-  },
-];
-
-const permission = [
-  {
-    value: "Admin",
-    label: "Admin",
+    value: "EUR",
+    label: "€",
   },
   {
-    value: "Super Admin",
-    label: "Super Admin",
+    value: "BTC",
+    label: "฿",
   },
   {
-    value: "User",
-    label: "User",
-  },
-  {
-    value: "Guest",
-    label: "Guest",
+    value: "JPY",
+    label: "¥",
   },
 ];
 
 function Forms() {
-  const router = useRouter();
-  // const currentRoute = router.pathname;
+  const currentRoute = router.pathname;
 
   const [currency, setCurrency] = useState("EUR");
 
@@ -85,17 +70,6 @@ function Forms() {
 
   const handleChange2 = (_event: any, newValue: any) => {
     setValue(newValue);
-  };
-
-  const [selectedStatus, setSelectedStatus] = useState([]);
-  const [selectedPermission, setSelectedPermission] = useState([]);
-
-  const handleStatusChange = (_event: any, newValue: any) => {
-    setSelectedStatus(newValue);
-  };
-
-  const handlePermissionChange = (_event: any, newValue: any) => {
-    setSelectedPermission(newValue);
   };
 
   return (
@@ -114,7 +88,7 @@ function Forms() {
         >
           <Grid item xs={10} direction="column" justifyContent="center">
             <Card>
-              <CardHeader title="User Permission Details" />
+              <CardHeader title="Category Details" />
               <Divider />
               <CardContent>
                 <Box
@@ -127,78 +101,47 @@ function Forms() {
                 >
                   <div>
                     <TextField
-                      disabled
-                      id="outlined-disabled"
-                      label="User Name"
-                      defaultValue="วินัย"
+                      required
+                      id="outlined-required"
+                      label="Category Name"
+                      defaultValue="อลูมิเนียม"
                     />
+
                     <TextField
-                      id="outlined-select-currency"
-                      select
-                      label="Status"
-                      defaultValue="เลือก Status"
-                      helperText="กรุณาเลือก Status"
-                    >
-                      {status.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                    <Autocomplete
-                      multiple
-                      id="permission-select"
-                      options={permission}
-                      getOptionLabel={(option) => option.label}
-                      defaultValue={[]}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label=""
-                          helperText="กรุณาเลือก Permission"
-                        />
-                      )}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            key={option.value}
-                            label={option.label}
-                            {...getTagProps({ index })}
-                          />
-                        ))
-                      }
+                      required
+                      id="outlined-required"
+                      label="Category Description"
+                      defaultValue="อลูมิเนียมแผ่น"
                     />
 
                     <Grid item>
-                      {/* <NextLink href="/setup/permission/" passHref> */}
+                      <NextLink href="/setup/category/" passHref>
                         <Button
                           variant="contained"
                           sx={{ margin: 1 }}
-                          // className={
-                          //   currentRoute === "/setup/permission/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/setup/permission/')}
+                          className={
+                            currentRoute === "/setup/category/" ? "active" : ""
+                          }
                           disableRipple
                           component="a"
                         >
                           Save{" "}
                         </Button>
-                      {/* </NextLink> */}
-                      {/* <NextLink href="/setup/permission/" passHref> */}
+                      </NextLink>
+                      <NextLink href="/setup/category/" passHref>
                         <Button
                           variant="contained"
                           sx={{ margin: 1 }}
                           color="error"
-                          // className={
-                          //   currentRoute === "/setup/permission/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/setup/permission/')}
+                          className={
+                            currentRoute === "/setup/category/" ? "active" : ""
+                          }
                           disableRipple
                           component="a"
                         >
                           Cancel{" "}
                         </Button>
-                      {/* </NextLink> */}
+                      </NextLink>
                     </Grid>
                   </div>
                 </Box>
