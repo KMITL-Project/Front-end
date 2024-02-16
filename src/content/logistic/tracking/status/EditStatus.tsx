@@ -161,22 +161,13 @@ function Forms() {
                         label="Customer Name"
                         defaultValue="Jack Dawson"
                       />
-<<<<<<< HEAD
-=======
-            
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
                       <TextField
                         required
                         id="outlined-required"
                         label="Details"
                         defaultValue="ประแจ"
                       />
-<<<<<<< HEAD
                       <TextField
-=======
-
-<TextField
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
                         required
                         id="outlined-required"
                         label="Address"
@@ -189,7 +180,6 @@ function Forms() {
                         defaultValue="ประแจ"
                       />
                     </Grid>
-<<<<<<< HEAD
 
                     <Grid container justifyContent={"center"} paddingTop={2}>
                       {/* <NextLink href="/logistic/customerList/" passHref> */}
@@ -220,38 +210,6 @@ function Forms() {
                       >
                         Cancel{" "}
                       </Button>
-=======
- 
-                    <Grid container justifyContent={"center"} paddingTop={2}>
-                      {/* <NextLink href="/logistic/customerList/" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/order/')}
-                          disableRipple
-                          component="a"
-                        >
-                          Save{" "}
-                        </Button>
-                      {/* </NextLink> */}
-                      {/* <NextLink href="/logistic/customerList//" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          color="error"
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/order/')}
-                          disableRipple
-                          component="a"
-                        >
-                          Cancel{" "}
-                        </Button>
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
                       {/* </NextLink> */}
                     </Grid>
                   </div>
