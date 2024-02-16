@@ -162,9 +162,9 @@ const SubMenuWrapper = styled(Box)(
                 background: ${theme.colors.alpha.trueWhite[100]};
                 opacity: 0;
                 transition: ${theme.transitions.create([
-                  "transform",
-                  "opacity",
-                ])};
+    "transform",
+    "opacity",
+  ])};
                 width: 6px;
                 height: 6px;
                 transform: scale(0);
@@ -195,7 +195,7 @@ const SidebarMenu = () => {
   const [role, setRole] = useState([]);
   const [userRole, setUserRole] = useState('');
 
-  useEffect(() => { 
+  useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const token = localStorage.getItem('accessToken');
@@ -218,12 +218,16 @@ const SidebarMenu = () => {
                 Authorization: `Bearer ${token}`,
               },
             });
+<<<<<<< HEAD
             
             if (responseRole.ok){
+=======
+            if (responseRole.ok) {
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
               const roleData = await responseRole.json();
               console.log('role', roleData);
               setRole(roleData.data);
-              
+
               // Assuming roleData.data is an array and you want to get the first role's name
               if (roleData.data.length > 0) {
                 setUserRole(roleData.data[0].name);
@@ -236,7 +240,7 @@ const SidebarMenu = () => {
               console.error('Error fetching Role:', responseRole.statusText);
             }
             // console.log(user.avatar);
-          
+
           } else if (response.status === 401) {
             // Token หมดอายุหรือไม่ถูกต้อง
             console.log('Token expired or invalid');
@@ -253,7 +257,7 @@ const SidebarMenu = () => {
     };
     // console.log('user state:', user);
     fetchUserInfo();
-  },[]);
+  }, []);
 
   return (
     <>
@@ -294,6 +298,7 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
+<<<<<<< HEAD
               {(userRole === 'Stock' || userRole === 'Admin') && (
                 <>
                   <ListItem component="div">
@@ -363,6 +368,61 @@ const SidebarMenu = () => {
                 </>
               )}
   
+=======
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/management/material"
+                  startIcon={<BallotTwoToneIcon />}
+                >
+                  Material
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/management/materialAdd"
+                  startIcon={<TableChartTwoToneIcon />}
+                >
+                  Add Material
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/management/pickup"
+                  startIcon={<TableChartTwoToneIcon />}
+                >
+                  เบิกวัสดุ
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/management/report"
+                  startIcon={<DescriptionTwoToneIcon />}
+                >
+                  Report
+                </Button>
+              </ListItem>
+
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
             </List>
           </SubMenuWrapper>
         </List>
@@ -376,58 +436,46 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-            {(userRole === 'Manager' || userRole === 'Admin') && (
-              <>
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={Link}
-                    onClick={() => {
-                      dispatch(sidebarIsClose);
-                    }}
-                    href="/logistic/customerList"
-                    startIcon={<ListAltTwoToneIcon />}
-                  >
-                    รายการลูกค้า
-                  </Button>
-                </ListItem>
-              </>
-            )}
-            {(userRole === 'Manager' || userRole === 'Admin' || userRole === 'Delivery') && (
-              <>
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={Link}
-                    onClick={() => {
-                      dispatch(sidebarIsClose);
-                    }}
-                    href="/logistic/order"
-                    startIcon={<DescriptionTwoToneIcon />}
-                  >
-                    ใบสั่ง
-                  </Button>
-                </ListItem>
-              </>
-            )}
-            {(userRole === 'Manager' || userRole === 'Admin' || userRole === 'Delivery') && (
-              <>
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={Link}
-                    onClick={() => {
-                      dispatch(sidebarIsClose);
-                    }}
-                    href="/logistic/tracking"
-                    startIcon={<ShareLocationTwoToneIcon />}
-                  >
-                    ติดตามการขนส่ง
-                  </Button>
-                </ListItem>
-              </>
-            )}
-              
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/logistic/customerList"
+                  startIcon={<ListAltTwoToneIcon />}
+                >
+                  รายการลูกค้า
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/logistic/order"
+                  startIcon={<DescriptionTwoToneIcon />}
+                >
+                  ใบสั่ง
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/logistic/tracking"
+                  startIcon={<ShareLocationTwoToneIcon />}
+                >
+                  ติดตามการขนส่ง
+                </Button>
+              </ListItem>
+
             </List>
           </SubMenuWrapper>
         </List>
@@ -441,74 +489,58 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-              {(userRole === 'Manager' || userRole === 'Admin') && (
-                <>
-                  <ListItem component="div">
-                    <Button
-                      disableRipple
-                      component={Link}
-                      onClick={() => {
-                        dispatch(sidebarIsClose);
-                      }}
-                      href="/setup/shelf/"
-                      startIcon={<DoorSlidingIcon />}
-                    >
-                      Shelf
-                    </Button>
-                  </ListItem>
-                </>
-              )}
-              {(userRole === 'Manager' || userRole === 'Admin') && (
-                <>
-                  <ListItem component="div">
-                    <Button
-                      disableRipple
-                      component={Link}
-                      onClick={() => {
-                        dispatch(sidebarIsClose);
-                      }}
-                      href="/setup/unit/"
-                      startIcon={<InventoryIcon />}
-                    >
-                      Unit of products
-                    </Button>
-                  </ListItem>
-                </>
-              )}
-              {(userRole === 'Manager' || userRole === 'Admin') && (
-                <>
-                  <ListItem component="div">
-                    <Button
-                      disableRipple
-                      component={Link}
-                      onClick={() => {
-                        dispatch(sidebarIsClose);
-                      }}
-                      href="/setup/materialtype"
-                      startIcon={<LayersIcon />}
-                    >
-                      Material type
-                    </Button>
-                  </ListItem>
-                </>
-              )}
-              {(userRole === 'Manager' || userRole === 'Admin') && (
-                <>
-                  <ListItem component="div">
-                    <Button
-                      disableRipple
-                      component={Link}
-                      onClick={() => {
-                        dispatch(sidebarIsClose);
-                      }}
-                      href="/setup/permission"
-                      startIcon={<AdminPanelSettingsIcon />}
-                    >
-                      User Permission
-                    </Button>
-                  </ListItem>
-                </>
-              )}
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/setup/shelf/"
+                  startIcon={<DoorSlidingIcon />}
+                >
+                  Shelf
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/setup/unit/"
+                  startIcon={<InventoryIcon />}
+                >
+                  Unit of products
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/setup/materialtype"
+                  startIcon={<LayersIcon />}
+                >
+                  Material type
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={Link}
+                  onClick={() => {
+                    dispatch(sidebarIsClose);
+                  }}
+                  href="/setup/permission"
+                  startIcon={<AdminPanelSettingsIcon />}
+                >
+                  User Permission
+                </Button>
+              </ListItem>
             </List>
           </SubMenuWrapper>
         </List>

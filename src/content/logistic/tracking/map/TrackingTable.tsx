@@ -50,6 +50,8 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
 
+
+
 interface RecentOrdersTableProps {
   className?: string;
   cryptoOrders: Order[];
@@ -60,7 +62,11 @@ interface Filters {
 }
 
 const customIcon = new L.Icon({
+<<<<<<< HEAD
   iconUrl: "/location.png",
+=======
+  iconUrl: '/location.png',
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
@@ -217,6 +223,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
+<<<<<<< HEAD
           <Marker
             position={[13.7563, 100.5018]}
             draggable={true}
@@ -226,6 +233,18 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
               A pretty CSS3 popup. <br /> Easily customizable.
             </Popup>
           </Marker>
+=======
+                              <Marker
+                            position={[13.7563, 100.5018]}
+                            draggable={true}
+                            icon={customIcon} // Use the custom icon
+
+                          >
+                            <Popup>
+                              A pretty CSS3 popup. <br /> Easily customizable.
+                            </Popup>
+                          </Marker>
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
           <RoutingMachine />
         </MapContainer>
       </div>

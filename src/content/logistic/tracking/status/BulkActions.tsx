@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useRef } from "react";
+=======
+import { useState, useRef } from 'react';
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
 
 import {
   Box,
@@ -15,6 +19,7 @@ import {
   TableHead,
   TableBody,
   TableCell,
+<<<<<<< HEAD
   TableRow,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -24,6 +29,18 @@ import MoreVertTwoToneIcon from "@mui/icons-material/MoreVertTwoTone";
 import { format } from "date-fns";
 import { Order, OrderStatus } from "@/model/logistic/order";
 import { Tracking } from "@/model/logistic/tracking";
+=======
+  TableRow
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import MoreVertTwoToneIcon from '@mui/icons-material/MoreVertTwoTone';
+import { format } from 'date-fns';
+import { Order, OrderStatus } from '@/model/logistic/order';
+import { Tracking } from '@/model/logistic/tracking';
+
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
 
 const ButtonError = styled(Button)(
   ({ theme }) => `
@@ -36,11 +53,20 @@ const ButtonError = styled(Button)(
     `
 );
 
+<<<<<<< HEAD
 interface BulkActionsProps {
   Tracks: Tracking[];
 }
 
 function BulkActions({ Tracks }: BulkActionsProps) {
+=======
+
+interface BulkActionsProps {
+    Tracks: Tracking[]
+}
+
+function BulkActions({  Tracks}: BulkActionsProps) {
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
   const [onMenuOpen, menuOpen] = useState<boolean>(false);
   const [isBulkAddModalOpen, setBulkAddModalOpen] = useState<boolean>(false);
   const [selectedData, setSelectedData] = useState<string[]>([]);
@@ -102,6 +128,7 @@ function BulkActions({ Tracks }: BulkActionsProps) {
         open={onMenuOpen}
         onClose={closeMenu}
         anchorOrigin={{
+<<<<<<< HEAD
           vertical: "center",
           horizontal: "center",
         }}
@@ -118,6 +145,18 @@ function BulkActions({ Tracks }: BulkActionsProps) {
               openBulkAddModal();
             }}
           >
+=======
+          vertical: 'center',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'center'
+        }}
+      >
+        <List sx={{ p: 1 }} component="nav">
+          <ListItem button onClick={() => { handleDataSelection(); openBulkAddModal(); }}>
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
             <ListItemText primary="Bulk add selected" />
           </ListItem>
           <ListItem button>
@@ -138,22 +177,35 @@ function BulkActions({ Tracks }: BulkActionsProps) {
       >
         <Box
           sx={{
+<<<<<<< HEAD
             position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 600,
             bgcolor: "background.paper",
+=======
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 600,
+            bgcolor: 'background.paper',
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
             boxShadow: 24,
             p: 4,
           }}
         >
+<<<<<<< HEAD
           <Typography
             id="bulk-add-modal-title"
             variant="h6"
             component="h2"
             gutterBottom
           >
+=======
+          <Typography id="bulk-add-modal-title" variant="h6" component="h2" gutterBottom>
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
             สรุปรายการ
           </Typography>
           <TableContainer>
@@ -173,15 +225,20 @@ function BulkActions({ Tracks }: BulkActionsProps) {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{item.orderID}</TableCell>
                     <TableCell>{item.customerAddress}</TableCell>
+<<<<<<< HEAD
                     <TableCell>
                       {format(item.orderDate, "MMMM dd yyyy")}
                     </TableCell>
+=======
+                    <TableCell>{format(item.orderDate, "MMMM dd yyyy")}</TableCell>
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
                     {/* Add more cells as needed */}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
+<<<<<<< HEAD
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               variant="contained"
@@ -199,6 +256,13 @@ function BulkActions({ Tracks }: BulkActionsProps) {
               onClick={closeBulkAddModal}
               sx={{ mr: 2 }}
             >
+=======
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button variant="contained" component="a" disableRipple className='mr-5' >
+              Ok
+            </Button>
+            <Button variant="contained" component="a" disableRipple color="error" onClick={closeBulkAddModal} sx={{ mr: 2 }}>
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
               Cancel
             </Button>
           </Box>

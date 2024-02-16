@@ -1,17 +1,16 @@
 import Head from 'next/head';
 import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/logistic/order/OrderPageHeader';
+import PageHeader from '@/content/logistic/tracking/status/StatusPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 
-import RecentOrders from '@/content/logistic/order/OrderView';
-
+import RecentOrders from '@/content/logistic/tracking/map/TrackingView';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
 import Footer from '@/components/Footer';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/ใบสั่ง'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Tracking Status'; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -19,7 +18,8 @@ function ApplicationsTransactions() {
         <title></title>
       </Head>
       <PageTitleWrapper>
-      <Breadcrumb pageData={pageData} />
+        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
+        <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
       <Container maxWidth="lg">

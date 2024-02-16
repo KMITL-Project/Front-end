@@ -48,14 +48,24 @@ import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 // Change the import statement to the correct path
 
 import "leaflet/dist/leaflet.css";
+<<<<<<< HEAD
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css"; // Re-uses images from ~leaflet package
 import * as L from "leaflet";
 import "leaflet-defaulticon-compatibility";
+=======
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
+import * as L from 'leaflet';
+import 'leaflet-defaulticon-compatibility';
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
 const customIcon = new L.Icon({
+<<<<<<< HEAD
   iconUrl: "/location.png",
+=======
+  iconUrl: '/location.png',
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
@@ -300,6 +310,10 @@ function Forms() {
                             draggable={true}
                             eventHandlers={{ dragend: handleMarkerDrag }}
                             icon={customIcon} // Use the custom icon
+<<<<<<< HEAD
+=======
+
+>>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
                           >
                             <Popup>
                               A pretty CSS3 popup. <br /> Easily customizable.
