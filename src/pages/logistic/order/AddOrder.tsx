@@ -6,11 +6,7 @@ import { Grid, Container, Typography } from '@mui/material';
 
 import RecentOrders from '@/content/logistic/order/OrderView';
 import { ReactElement } from 'react';
-<<<<<<< HEAD:src/pages/logistic/order/AddMaterial.tsx
 import Forms from '@/content/setup/material/AddMaterialType/AddMaterial';
-=======
-import Forms from '@/content/logistic/order/AddOrder';
->>>>>>> 80806d7a3ffc7ee30df6756e41707b73ce0bfc73:src/pages/logistic/order/AddOrder.tsx
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {

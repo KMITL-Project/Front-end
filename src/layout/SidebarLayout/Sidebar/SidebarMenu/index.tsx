@@ -218,12 +218,8 @@ const SidebarMenu = () => {
                 Authorization: `Bearer ${token}`,
               },
             });
-<<<<<<< HEAD
             
             if (responseRole.ok){
-=======
-            if (responseRole.ok) {
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
               const roleData = await responseRole.json();
               console.log('role', roleData);
               setRole(roleData.data);
@@ -298,7 +294,6 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-<<<<<<< HEAD
               {(userRole === 'Stock' || userRole === 'Admin') && (
                 <>
                   <ListItem component="div">
@@ -368,61 +363,6 @@ const SidebarMenu = () => {
                 </>
               )}
   
-=======
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/material"
-                  startIcon={<BallotTwoToneIcon />}
-                >
-                  Material
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/materialAdd"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                  Add Material
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/pickup"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                  เบิกวัสดุ
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/report"
-                  startIcon={<DescriptionTwoToneIcon />}
-                >
-                  Report
-                </Button>
-              </ListItem>
-
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
             </List>
           </SubMenuWrapper>
         </List>

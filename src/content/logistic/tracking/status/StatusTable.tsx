@@ -214,11 +214,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const TransparentStepper = styled(Stepper)({
     background: "transparent", // Set the background to transparent
   });
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
   return (
     <Card>
       {selectedBulkActions && (
@@ -276,13 +271,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                 />
               </TableCell>
               <TableCell>ID</TableCell>
-<<<<<<< HEAD
               <TableCell align="center" sx={{ width: "480px" }}>
                 Details
               </TableCell>
-=======
-              <TableCell align="center"  sx={{ width: '480px' }}>Details</TableCell>
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
               <TableCell>Date</TableCell>
               <TableCell align="right">Status</TableCell>
               <TableCell align="right">Actions</TableCell>
@@ -321,14 +312,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-<<<<<<< HEAD
                     <TransparentStepper
                       activeStep={activeStep}
                       alternativeLabel
                     >
-=======
-                    <TransparentStepper activeStep={activeStep} alternativeLabel>
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
                       {steps.map((label, index) => (
                         <Step key={index}>
                           <StepLabel>{label}</StepLabel>
@@ -354,13 +341,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                           },
                           color: theme.palette.info.main,
                         }}
-<<<<<<< HEAD
                         onClick={() => router.push("/logistic/tracking/map/")}
-=======
-                        onClick={() =>
-                          router.push("/logistic/tracking/map/")
-                        }
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
                         color="inherit"
                         size="small"
                       >
@@ -414,11 +395,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           rowsPerPage={limit}
           rowsPerPageOptions={[5, 10, 25, 30]}
         />
-<<<<<<< HEAD
       </Box>
-=======
-      </Box>      
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
     </Card>
   );
 };

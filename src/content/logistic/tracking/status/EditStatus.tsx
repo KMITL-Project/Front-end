@@ -43,11 +43,7 @@ import UploadTwoToneIcon from "@mui/icons-material/UploadTwoTone";
 import { Upload } from "@mui/icons-material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Paper from "@mui/material/Paper";
-<<<<<<< HEAD
 import { useRouter } from "next/router";
-=======
-import { useRouter } from 'next/router';
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -134,10 +130,6 @@ function Forms() {
   const handleChange2 = (_event: any, newValue: any) => {
     setValue(newValue);
   };
-<<<<<<< HEAD
-=======
-  
->>>>>>> e6b68e7ef7641f6b2a412411314ee10fb8c87c8b
 
   return (
     <>
