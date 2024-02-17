@@ -41,6 +41,13 @@ const { publicRuntimeConfig } = getConfig();
 interface Filters {
   status?: any;
 }
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
 
 const applyFilters = (orders: any[], filters: Filters) => {
   return orders.filter((order) => {
@@ -68,7 +75,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
   const [lotOrders, setlotOrders] = useState([]);
   
   useEffect(() => {
