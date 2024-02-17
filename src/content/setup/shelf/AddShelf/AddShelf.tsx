@@ -17,19 +17,19 @@ const { publicRuntimeConfig } = getConfig();
 
 function Forms() {
   const router = useRouter();
-  const [file, setFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
+  const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // Updated type definition
   const [formData, setFormData] = useState({
     image: imageUrl,
     name: "ชั้นเครื่องมือ",
     detail: "ประแจ",
   });
 
-  const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
-    formDataToSend.append("image_url", file); // แนบรูปภาพ
+    formDataToSend.append("image_url", file!); // แนบรูปภาพ
     formDataToSend.append("name", formData.name);
     formDataToSend.append("detail", formData.detail);
     try {
@@ -80,7 +80,7 @@ function Forms() {
       // ทำการอ่านไฟล์รูปภาพ
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageUrl(reader.result);
+        setImageUrl(reader.result as string); // Cast result to string
       };
       reader.readAsDataURL(selectedFile);
 
@@ -141,7 +141,7 @@ function Forms() {
             </Grid>
           </Grid>
           {/* Button Row */}
-          <form onSubmit={handleCreateUnit} encType="multipart/form-data">
+          <form encType="multipart/form-data">
             <Grid container justifyContent="flex-end" className="mt-5">
               <Button
                 variant="contained"

@@ -36,6 +36,12 @@ const { publicRuntimeConfig } = getConfig();
 //   className?: string;
 //   cryptoOrders: CryptoOrder[];
 // }
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  // Add more properties as needed
+}
 
 interface Filters {
   status?: any;
@@ -69,7 +75,7 @@ const RecentOrdersTable: FC = () => {
   const [filters, setFilters] = useState<Filters>({
     status: null,
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {

@@ -24,12 +24,12 @@ interface EditUnitProps {}
 const ShelfEdit: FC<EditUnitProps> = () => {
   const router = useRouter();
   const { shelfId } = router.query;
-  const [file, setFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null); 
   const [ShelfData, setShelfData] = useState<any>({
     name: "",
     detail: "",
-    image_url: "",
+    image_url: imageUrl,
   });
   useEffect(() => {
     if (shelfId) {
@@ -76,11 +76,11 @@ const ShelfEdit: FC<EditUnitProps> = () => {
   if (!shelfId) {
     return <div>Loading...</div>;
   }
-  const handleUpdateShelf = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateShelf: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
-    formDataToSend.append("image_url", file); // แนบรูปภาพ
+    formDataToSend.append("image_url", file!); // แนบรูปภาพ
     formDataToSend.append("name", ShelfData.name);
     formDataToSend.append("detail", ShelfData.detail);
     try {

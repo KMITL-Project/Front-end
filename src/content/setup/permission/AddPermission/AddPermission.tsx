@@ -16,6 +16,14 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
+
 function AddPermission() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -23,8 +31,8 @@ function AddPermission() {
     role_id: "",
   });
 
-  const [userData, setUserData] = useState([]);
-  const [roleData, setRoleData] = useState([]);
+  const [userData, setUserData] = useState<{ value: string; label: string }[]>([]);
+  const [roleData, setRoleData] = useState<{ value: string; label: string }[]>([]);
   const [cryptoOrders, setCryptoOrders] = useState([]);
 
   useEffect(() => {
@@ -107,7 +115,7 @@ function AddPermission() {
     fetchFloorData();
   }, []);
 
-  const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
@@ -215,7 +223,7 @@ function AddPermission() {
             </Grid>
           </Grid>
           {/* Button Row */}
-          <form onSubmit={handleCreateUnit} encType="multipart/form-data">
+          <form encType="multipart/form-data">
             <Grid container justifyContent="flex-end" className="mt-5">
               <Button
                 variant="contained"

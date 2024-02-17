@@ -4,7 +4,6 @@ import PageHeader from '@/content/setup/shelf/Floor/AddFloorPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container, Typography } from '@mui/material';
 
-import RecentOrders from '@/content/setup/shelf/RecentOrders';
 import { ReactElement } from 'react';
 import Forms from '@/content/setup/shelf/Floor/AddFloor';
 import Breadcrumb from '@/components/Breadcrumbs';

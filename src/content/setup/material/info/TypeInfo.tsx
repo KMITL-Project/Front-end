@@ -20,6 +20,13 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 interface EditUnitProps {}
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
 
 const MaterialInfoPage: FC<EditUnitProps> = () => {
   const router = useRouter();
@@ -34,8 +41,8 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
     image_url: "",
     created_at: "",
   });
-  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState([]);
+  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState<{ value: string; label: string }[]>([]);
   const [image, setImage] = useState<Blob | undefined>(undefined);
 
   useEffect(() => {
@@ -79,13 +86,13 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
               console.log("ok", responseData);
               setmaterialData(responseData.data);
               setFloorOptions(
-                responseDataFloor.data.map((floor) => ({
+                responseDataFloor.data.map((floor: any) => ({
                   value: floor.id,
                   label: floor.name,
                 }))
               );
               setUnitOptions(
-                responseDataUnit.data.map((unit) => ({
+                responseDataUnit.data.map((unit: any) => ({
                   value: unit.id,
                   label: unit.name,
                 }))

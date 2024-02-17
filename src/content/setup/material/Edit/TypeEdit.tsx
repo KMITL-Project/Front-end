@@ -19,6 +19,14 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 interface EditMaterialProps {}
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
+
 
 const MaterialEdit: FC<EditMaterialProps> = () => {
   const router = useRouter();
@@ -39,8 +47,8 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
     image_url: imageUrl,
     created_at: "",
   });
-  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState([]);
+  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     if (materialId) {
@@ -119,12 +127,12 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
   if (!materialId) {
     return <div>Loading...</div>;
   }
-  const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdate: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
     formDataToSend.append("name", materialData.name);
-    formDataToSend.append("image_url", file); // แนบรูปภาพ
+    formDataToSend.append("image_url", file!); // แนบรูปภาพ
     formDataToSend.append("detail", materialData.detail);
     formDataToSend.append("floor_id", materialData.floor_id);
     formDataToSend.append("total", materialData.total);

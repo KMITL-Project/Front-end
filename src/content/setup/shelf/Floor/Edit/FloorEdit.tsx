@@ -25,8 +25,8 @@ interface EditUnitProps {}
 const FloorEdit: FC<EditUnitProps> = () => {
   const router = useRouter();
   const { floorId } = router.query;
-  const [file, setFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
+  const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
   // ตรวจสอบค่า id ที่ได้
   // console.log('router:', router);
   console.log("ID:", floorId);
@@ -99,14 +99,14 @@ const FloorEdit: FC<EditUnitProps> = () => {
   if (!floorId) {
     return <div>Loading...</div>;
   }
-  const handleUpdateShelf = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateShelf: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
     formDataToSend.append("shelve_id", ShelfData.shelve_id);
     formDataToSend.append("name", ShelfData.name);
     formDataToSend.append("detail", ShelfData.detail);
-    formDataToSend.append("image_url", file); // แนบรูปภาพ
+    formDataToSend.append("image_url", file!); // แนบรูปภาพ
     try {
       if (token) {
         const response = await fetch(
@@ -144,7 +144,7 @@ const FloorEdit: FC<EditUnitProps> = () => {
     }
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
 
     if (selectedFile) {
