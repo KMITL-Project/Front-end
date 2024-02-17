@@ -47,6 +47,14 @@ const { publicRuntimeConfig } = getConfig();
 interface Filters {
   status?: any;
 }
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+  material_id: string; // Add this property to CryptoOrder
+}
 
 const applyFilters = (orders: any[], filters: Filters) => {
   return orders.filter((order) => {
@@ -69,6 +77,13 @@ interface User {
   id: string; // หรือชนิดข้อมูลที่ 'id' เป็น
   full_name: string; // หรือชนิดข้อมูลที่ 'full_name' เป็น
 }
+interface Material {
+  label: string; // Add any other properties you need for Material
+}
+
+interface Materials {
+  [key: string]: Material;
+}
 
 const RecentOrdersTable: FC = () => {
   const router = useRouter();
@@ -81,10 +96,10 @@ const RecentOrdersTable: FC = () => {
   const [filters, setFilters] = useState<Filters>({
     status: null,
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
-  const [materials, setMaterials] = useState({});
-  const [unitData, setUnitData] = useState({});
-  const [floorData, setFloorData] = useState({});
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
+  const [materials, setMaterials] = useState<Materials>({});
+  const [unitData, setUnitData] = useState<CryptoOrder[]>([]);
+  const [floorData, setFloorData] = useState<CryptoOrder[]>([]);
   const [users, setUsers] = useState<{ [key: string]: User }>({});
 
   // Export
@@ -419,7 +434,7 @@ const RecentOrdersTable: FC = () => {
                       gutterBottom
                       noWrap
                     >
-                      {users.full_name}
+                      {String(users.full_name)}
                       {/* {users[cryptoOrder.update_by]?.full_name || 'N/A'} */}
                       {/* {users[cryptoOrder.update_by]?.name || 'N/A'} */}
                     </Typography>

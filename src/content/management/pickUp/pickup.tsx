@@ -30,7 +30,7 @@ const Pickup: React.FC = () => {
     // buy_date: ""
   });
 
-  const [cryptoOrders, setCryptoOrders] = useState([]);
+  const [cryptoOrders, setCryptoOrders] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     const fetchFloorData = async () => {
@@ -70,7 +70,7 @@ const Pickup: React.FC = () => {
     fetchFloorData();
   }, []);
 
-  const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreate: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
@@ -175,7 +175,7 @@ const Pickup: React.FC = () => {
               </Grid>
             </Grid> */}
           </Grid>
-          <form onSubmit={handleCreate} encType="multipart/form-data">
+          <form encType="multipart/form-data">
             <Grid container justifyContent="flex-end" className="mt-5">
               <Button
                 variant="contained"
