@@ -15,6 +15,8 @@ function RecentOrders() {
       customerName: "Rose",
       productName: "ประตู",
       customerAddress: "ลาดกระบัง",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "2",
@@ -24,6 +26,8 @@ function RecentOrders() {
       customerName: "Jack Dawson",
       productName: "รั้ว",
       customerAddress: "หนองจอก",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "3",
@@ -33,6 +37,8 @@ function RecentOrders() {
       customerName: "Billy",
       productName: "บานเลื่อน",
       customerAddress: "อ่อนนุช",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "4",
@@ -42,6 +48,8 @@ function RecentOrders() {
       customerName: "Max",
       productName: "ประตู",
       customerAddress: "บางนา",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "5",
@@ -51,6 +59,8 @@ function RecentOrders() {
       customerName: "Bob",
       productName: "รั้ว",
       customerAddress: "พญาไท",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "6",
@@ -60,6 +70,8 @@ function RecentOrders() {
       customerName: "John",
       productName: "บานเลื่อน",
       customerAddress: "ราชเทวี",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "7",
@@ -69,6 +81,8 @@ function RecentOrders() {
       customerName: "Paul",
       productName: "ประตู",
       customerAddress: "รามคำแหง",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "8",
@@ -78,6 +92,8 @@ function RecentOrders() {
       customerName: "Kim",
       productName: "รั้ว",
       customerAddress: "บางพลี",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "9",
@@ -87,6 +103,8 @@ function RecentOrders() {
       customerName: "Park",
       productName: "บานเลื่อน",
       customerAddress: "บึงกุ่ม",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
     {
       id: "10",
@@ -96,6 +114,8 @@ function RecentOrders() {
       customerName: "Ellen",
       productName: "ประตู",
       customerAddress: "บางแค",
+      detailStatus: "",
+      orderDate: new Date().getTime(),
     },
   ];
 

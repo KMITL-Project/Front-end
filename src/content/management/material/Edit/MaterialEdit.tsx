@@ -19,6 +19,10 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 interface EditMaterialProps {}
+interface Option {
+  value: string;
+  label: string;
+}
 
 const MaterialEdit: FC<EditMaterialProps> = () => {
   const router = useRouter();
@@ -26,7 +30,7 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialInfo | null>(null);
-
+  const [options, setOptions] = useState<Option[]>([]);
   const [materialData, setmaterialData] = useState<any>({
     id: '',
     name: '',
@@ -38,8 +42,8 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
     created_at: '',
   // และข้อมูลอื่น ๆ ที่คุณต้องการแสดงและแก้ไข
   });
-  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState([]);
+  const [floorOptions, setFloorOptions] = useState<Option[]>([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState<Option[]>([]);
 
   useEffect(() => {
     if (materialId) {
@@ -73,8 +77,8 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
               console.log('ok', responseData);
               if (responseData && responseData.data) {
                 setmaterialData(responseData.data);
-                setFloorOptions(responseDataFloor.data.map(floor => ({ value: floor.id, label: floor.name })));
-                setUnitOptions(responseDataUnit.data.map(unit => ({ value: unit.id, label: unit.name })));
+                setFloorOptions(responseDataFloor.data.map((floor: { id: string, name: string }) => ({ value: floor.id, label: floor.name })));
+                setUnitOptions(responseDataUnit.data.map((unit: { id: string, name: string }) => ({ value: unit.id, label: unit.name })));
               } else {
                 console.error('Invalid data format from API');
               }
@@ -104,7 +108,7 @@ const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
   const token = localStorage.getItem('accessToken');
   const formDataToSend = new FormData();
     formDataToSend.append('name', materialData.name);
-    formDataToSend.append('image_url', file);  // แนบรูปภาพ
+    formDataToSend.append('image_url', file!);  // แนบรูปภาพ
     formDataToSend.append('detail', materialData.detail);
     formDataToSend.append('floor_id', materialData.floor_id);
     formDataToSend.append('total', materialData.total);
@@ -143,7 +147,7 @@ const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
   }
 };
 
-const handleChange = (event, id) => {
+const handleChange = (event: any, id: any) => {
   const { value } = event.target;
 
   if (id === "floor_id") {
@@ -164,7 +168,7 @@ const handleChange = (event, id) => {
   }
 };
   
-const handleFileChange = (event) => {
+const handleFileChange = (event: any) => {
   const selectedFile = event.target.files[0];
 
   if (selectedFile) {
@@ -228,7 +232,7 @@ const handleFileChange = (event) => {
                       label="Unit"
                       variant="outlined"
                       value={materialData.unit_id}
-                      onChange={(e) => setmaterialData({ ...materialData, unit_id: e.target.value })}
+                      onChange={(e) => setmaterialData({ ...materialData, unit_id: e.target.value})}
                       select
                       >
                       {unitOptions.map((option) => (
@@ -273,16 +277,18 @@ const handleFileChange = (event) => {
                 </Grid>
                 {/* Button Row */}
                 <Grid container justifyContent="flex-end">
+                <form onSubmit={handleUpdate}>
                   <Button
-                    // type="submit"
+                    type="submit"
                     variant="contained" 
                     sx={{ margin:1}}
-                    onClick={handleUpdate}
+                    // onClick={handleUpdate}
                     disableRipple
                     component="a"
                     >Update
                     {" "}
                   </Button>
+                </form>
                   <Button
                     variant="contained" 
                     sx={{ margin:1}}

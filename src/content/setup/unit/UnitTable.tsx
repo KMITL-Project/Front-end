@@ -23,7 +23,6 @@ import {
   CardHeader,
 } from "@mui/material";
 
-// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
@@ -70,7 +69,7 @@ const RecentOrdersTable: FC = () => {
   const [filters, setFilters] = useState<Filters>({
     status: null,
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
+  const [cryptoOrders, setCryptoOrders] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,7 +77,7 @@ const RecentOrdersTable: FC = () => {
         const token = localStorage.getItem("accessToken");
         if (token) {
           const response = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
-            method: "GET", // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+            method: "GET",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -109,9 +108,8 @@ const RecentOrdersTable: FC = () => {
       }
     };
 
-    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
-  }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
-
+    fetchData();
+  }, []);
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
@@ -219,7 +217,7 @@ const RecentOrdersTable: FC = () => {
               </TableCell>
               <TableCell align="center">ID</TableCell>
               <TableCell align="center">Name</TableCell>
-              {/* <TableCell align="center">Description</TableCell> */}
+              {/* <TableCell align="center">Detail</TableCell> */}
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>

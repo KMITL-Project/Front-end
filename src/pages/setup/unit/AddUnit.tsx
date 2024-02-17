@@ -17,7 +17,6 @@ function ApplicationsTransactions() {
         <title></title>
       </Head>
       <PageTitleWrapper>
-        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
         <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>

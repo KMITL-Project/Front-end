@@ -33,25 +33,20 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-interface RecentOrdersTableProps {
-  className?: string;
-  cryptoOrders: CryptoOrder[];
-  lotData: any[];
-}
-
+// interface RecentOrdersTableProps {
+//   className?: string;
+//   cryptoOrders: CryptoOrder[];
+// }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: any;
 }
 
-const applyFilters = (
-  cryptoOrders: CryptoOrder[],
-  filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+const applyFilters = (orders: any[], filters: Filters) => {
+  return orders.filter((order) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && order.status !== filters.status) {
       matches = false;
     }
 
@@ -59,12 +54,9 @@ const applyFilters = (
   });
 };
 
-const applyPagination = (
-  cryptoOrders: CryptoOrder[],
-  page: number,
-  limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+const applyPagination = (orders: any[], page: number, limit: number) => {
+  const startIndex = page * limit;
+  return orders.slice(startIndex, startIndex + limit);
 };
 
 const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
@@ -86,7 +78,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
   }, [lotData]);
   
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
+    let value: any;
 
     if (e.target.value !== 'all') {
       value = e.target.value;

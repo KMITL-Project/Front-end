@@ -16,6 +16,8 @@ function RecentOrders() {
       customerName: "Rose",
       orderName: "ประตู",
       customerAddress: "ลาดกระบัง",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "2",
@@ -26,6 +28,8 @@ function RecentOrders() {
       customerName: "Jack Dawson",
       orderName: "รั้ว",
       customerAddress: "หนองจอก",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "3",
@@ -36,6 +40,8 @@ function RecentOrders() {
       customerName: "Billy",
       orderName: "บานเลื่อน",
       customerAddress: "อ่อนนุช",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "4",
@@ -46,6 +52,8 @@ function RecentOrders() {
       customerName: "Max",
       orderName: "ประตู",
       customerAddress: "บางนา",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "5",
@@ -56,6 +64,8 @@ function RecentOrders() {
       customerName: "Bob",
       orderName: "รั้ว",
       customerAddress: "พญาไท",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "6",
@@ -66,6 +76,8 @@ function RecentOrders() {
       customerName: "John",
       orderName: "บานเลื่อน",
       customerAddress: "ราชเทวี",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "7",
@@ -76,6 +88,8 @@ function RecentOrders() {
       customerName: "Paul",
       orderName: "ประตู",
       customerAddress: "รามคำแหง",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "8",
@@ -86,6 +100,8 @@ function RecentOrders() {
       customerName: "Kim",
       orderName: "รั้ว",
       customerAddress: "บางพลี",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "9",
@@ -96,6 +112,8 @@ function RecentOrders() {
       customerName: "Park",
       orderName: "บานเลื่อน",
       customerAddress: "บึงกุ่ม",
+      latitude: 42152,
+      longitude: 42533,
     },
     {
       id: "10",
@@ -106,6 +124,8 @@ function RecentOrders() {
       customerName: "Ellen",
       orderName: "ประตู",
       customerAddress: "บางแค",
+      latitude: 42152,
+      longitude: 42533,
     },
   ];
 

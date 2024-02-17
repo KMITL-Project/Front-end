@@ -40,6 +40,7 @@ import { Order } from "@/model/logistic/order";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -126,7 +127,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null,
+    status: undefined,
   });
 
   const statusOptions = [
@@ -148,11 +149,22 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     },
   ];
 
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
+  const handleStatusChange = (
+    e:
+      | ChangeEvent<HTMLInputElement>
+      | SelectChangeEvent<"completed" | "pending" | "failed" | "all">
+  ): void => {
+    let value: any;
 
-    if (e.target.value !== "all") {
-      value = e.target.value;
+    if ("target" in e) {
+      if (e.target.value !== "all") {
+        value = e.target.value;
+      }
+    } else {
+      // กรณี SelectChangeEvent
+      if (e !== "all") {
+        value = e;
+      }
     }
 
     setFilters((prevFilters) => ({

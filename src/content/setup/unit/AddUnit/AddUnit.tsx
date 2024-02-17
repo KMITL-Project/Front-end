@@ -22,7 +22,7 @@ function AddUnit() {
     name: "เมตร",
     description: "หน่วยความยาว",
   });
-  const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const requestData = {

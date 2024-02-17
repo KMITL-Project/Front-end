@@ -8,7 +8,7 @@ import { ReactElement } from "react";
 import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = "Home/Unit"; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Unit";
 
   return (
     <>

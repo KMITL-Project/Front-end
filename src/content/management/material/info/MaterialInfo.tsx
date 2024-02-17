@@ -20,6 +20,10 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 interface EditUnitProps {}
+interface Option {
+  value: string;
+  label: string;
+}
 
 const MaterialInfoPage: FC<EditUnitProps> = () => {
   const router = useRouter();
@@ -34,8 +38,8 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
     image_url: "",
     created_at: "",
   });
-  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState([]);
+  const [floorOptions, setFloorOptions] = useState<Option[]>([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState<Option[]>([]);
   const [lotData, setLotData] = useState<any[]>([]);
   const [image, setImage] = useState<Blob | undefined>(undefined);
 

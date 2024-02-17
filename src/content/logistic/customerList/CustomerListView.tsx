@@ -13,6 +13,8 @@ function RecentOrders() {
       customerName: 'Rose',
       productName: 'ประตู',
       customerAddress: 'ลาดกระบัง',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '2',
@@ -23,16 +25,19 @@ function RecentOrders() {
       customerName: 'Jack Dawson',
       productName: 'รั้ว',
       customerAddress: 'หนองจอก',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '3',
-
       shippingDate: subDays(new Date(), 5).getTime(),
       status: 'failed',
       orderID: 'F6JHK65MS818',
       customerName: 'Billy',
       productName: 'บานเลื่อน',
       customerAddress: 'อ่อนนุช',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '4',
@@ -43,6 +48,8 @@ function RecentOrders() {
       customerName: 'Max',
       productName: 'ประตู',
       customerAddress: 'บางนา',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '5',
@@ -53,6 +60,8 @@ function RecentOrders() {
       customerName: 'Bob',
       productName: 'รั้ว',
       customerAddress: 'พญาไท',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '6',
@@ -63,6 +72,8 @@ function RecentOrders() {
       customerName: 'John',
       productName: 'บานเลื่อน',
       customerAddress: 'ราชเทวี',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '7',
@@ -73,6 +84,8 @@ function RecentOrders() {
       customerName: 'Paul',
       productName: 'ประตู',
       customerAddress: 'รามคำแหง',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '8',
@@ -82,6 +95,8 @@ function RecentOrders() {
       customerName: 'Kim',
       productName: 'รั้ว',
       customerAddress: 'บางพลี',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '9',
@@ -91,6 +106,8 @@ function RecentOrders() {
       customerName: 'Park',
       productName: 'บานเลื่อน',
       customerAddress: 'บึงกุ่ม',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     },
     {
       id: '10',
@@ -100,6 +117,8 @@ function RecentOrders() {
       customerName: 'Ellen',
       productName: "ประตู",
       customerAddress: 'บางแค',
+      detailStatus: '',
+      orderDate: subDays(new Date(), 123).getTime(),
     }
   ];
 
