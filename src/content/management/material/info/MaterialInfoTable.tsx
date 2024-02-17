@@ -33,10 +33,10 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-// interface RecentOrdersTableProps {
-//   className?: string;
-//   cryptoOrders: CryptoOrder[];
-// }
+interface RecentOrdersTableProps {
+  materialId: string | string[];
+  lotData: any[];
+}
 
 interface Filters {
   status?: any;
@@ -66,7 +66,7 @@ const applyPagination = (orders: any[], page: number, limit: number) => {
   return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) => {
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
   const selectedBulkActions = selectedCryptoOrders.length > 0;
@@ -76,13 +76,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
     status: null
   });
   const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
-  const [lotOrders, setlotOrders] = useState([]);
+  const [lotOrders, setlotOrders] = useState<CryptoOrder[]>([]);
   
   useEffect(() => {
-    // console.log('Lot Data:', lotData);
-    setlotOrders(lotData);
-    // console.log('Lot Data:', lotOrders);
+    setCryptoOrders(lotData); // น่าจะต้องเป็น setCryptoOrders([...lotData]) ถ้า lotData เป็น array
   }, [lotData]);
+  
   
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
     let value: any;
@@ -170,7 +169,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {lotData.map((lot) => { // Use lotData instead of paginatedCryptoOrders
+            {lotData.map((lot: any) => { // Use lotData instead of paginatedCryptoOrders
               return (
                 <TableRow
                   hover
@@ -218,7 +217,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
                       gutterBottom
                       noWrap
                     >
-                      {lot.amount}
+                      {lot.available_amount}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -265,12 +264,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
 };
 
 RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired,
+  // cryptoOrders: PropTypes.array.isRequired,
   lotData: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  cryptoOrders: [],
+  // cryptoOrders: [],
   lotData: [],
 };
 

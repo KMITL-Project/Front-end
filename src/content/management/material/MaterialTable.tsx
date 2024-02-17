@@ -40,6 +40,14 @@ interface Filters {
   status?: any;
 }
 
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
+
 const applyFilters = (orders: any[], filters: Filters) => {
   return orders.filter((order) => {
     let matches = true;
@@ -68,9 +76,9 @@ const RecentOrdersTable: FC = () => {
   const [filters, setFilters] = useState<Filters>({
     status: null,
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
-  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState([]);
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
+  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]);
+  const [unitOptions, setUnitOptions] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,13 +124,13 @@ const RecentOrdersTable: FC = () => {
             ) {
               setCryptoOrders(responseData.data);
               setFloorOptions(
-                responseDataFloor.data.map((floor) => ({
+                responseDataFloor.data.map((floor: any) => ({
                   value: floor.id,
                   label: floor.name,
                 }))
               );
               setUnitOptions(
-                responseDataUnit.data.map((unit) => ({
+                responseDataUnit.data.map((unit: any) => ({
                   value: unit.id,
                   label: unit.name,
                 }))

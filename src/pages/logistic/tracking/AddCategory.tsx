@@ -4,9 +4,9 @@ import PageHeader from '@/content/logistic/tracking/map/PageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container, Typography } from '@mui/material';
 
-import RecentOrders from '@/content/setup/category/CategoryView';
+// import RecentOrders from '@/content/setup/category/CategoryView';
 import { ReactElement } from 'react';
-import Forms from '@/content/setup/category/AddCategory';
+// import Forms from '@/content/setup/category/AddCategory';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
@@ -32,7 +32,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <Forms />
+            {/* <Forms /> */}
           </Grid>
         </Grid>
       </Container>

@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, FC, useState } from "react";
 import { materialOrder } from "@/model/management/material";
-import SetupMaterialInfoTable from "@/content/management/material/info/MaterialInfoTable";
+import RecentOrdersTable from "@/content/management/material/info/MaterialInfoTable";
 import { MaterialInfo } from "@/model/management/materialInfo";
 import {
   Button,
@@ -25,7 +25,22 @@ interface Option {
   label: string;
 }
 
-const MaterialInfoPage: FC<EditUnitProps> = () => {
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
+
+interface SetupMaterialInfoTableProps {
+  materialId: string | string[];
+  lotData: any[];
+}
+
+
+
+const MaterialInfoPage: FC = () => {
   const router = useRouter();
   const { materialId } = router.query;
   const [materialData, setmaterialData] = useState<any>({
@@ -268,10 +283,7 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                   </Grid>
                   {/* Column 2 - Form */}
                   <Grid item xs={12} sm={7}>
-                    <SetupMaterialInfoTable
-                      materialId={materialId}
-                      lotData={lotData}
-                    />
+                  <RecentOrdersTable  materialId={materialId} lotData={lotData} />
                   </Grid>
                 </Grid>
                 {/* Button Row */}

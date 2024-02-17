@@ -3,8 +3,6 @@ import SidebarLayout from "@/layout/SidebarLayout";
 import PageHeader from "@/content/setup/shelf/ShelfPageHeader";
 import PageTitleWrapper from "@/components/PageTitleWrapper";
 import { Grid, Container, Typography } from "@mui/material";
-
-import RecentOrders from "@/content/setup/shelf/ShelfView";
 import { ReactElement } from "react";
 import Forms from "@/content/logistic/customerList/EditCustomerList";
 import Breadcrumb from "@/components/Breadcrumbs";

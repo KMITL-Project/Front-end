@@ -42,9 +42,7 @@ const HeaderWrapper = styled(Box)(
 
 function Header() {
   const theme = useTheme();
-  const sidebarStatus = useSelector(
-    (state: RootState) => state.systemStore.sidebarOpen
-  );
+  const sidebarStatus = useSelector((state: RootState) => state.systemStore.sidebarOpen);
   const dispatch = useDispatch();
 
   return (

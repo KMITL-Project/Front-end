@@ -1,16 +1,17 @@
+// systemStore.ts
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-export interface CounterState {
+export interface SystemCounterState {
   sidebarOpen: boolean;
   expandMenu: string[];
 }
 
-const initialState: CounterState = {
+const initialState: SystemCounterState = {
   sidebarOpen: false,
   expandMenu: [],
 };
 
-export const systemStore: any = createSlice({
+export const systemStore = createSlice({
   name: "counter",
   initialState,
   reducers: {
@@ -29,7 +30,6 @@ export const systemStore: any = createSlice({
   },
 });
 
-// Action creators are generated for each case reducer function
 export const {
   sidebarIsClose,
   sidebarIsOpen,
