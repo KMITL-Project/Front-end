@@ -12,8 +12,8 @@ import {
   Box,
   Container,
 } from '@mui/material';
-import { useRouter } from 'next/router';
-import getConfig from "next/config";
+import { useRouter } from "next/router";
+import getConfig  from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 

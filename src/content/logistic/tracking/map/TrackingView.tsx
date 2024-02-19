@@ -1,9 +1,13 @@
 import { Card } from "@mui/material";
 // import { Order,Ordertatus } from '@/model/logsitic/order.ts';
 
-import RecentOrdersTable from "./TrackingTable";
 import { subDays } from "date-fns";
 import { Order } from "@/model/logistic/order";
+import dynamic from "next/dynamic";
+
+const RecentOrdersTable = dynamic(() => import("./TrackingTable"),{
+  ssr: false  
+})
 
 function RecentOrders() {
   const listOrders: Order[] = [

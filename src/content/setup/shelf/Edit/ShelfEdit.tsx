@@ -24,13 +24,14 @@ interface EditUnitProps {}
 const ShelfEdit: FC<EditUnitProps> = () => {
   const router = useRouter();
   const { shelfId } = router.query;
-  const [file, setFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null); 
+  const [file, setFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
   const [ShelfData, setShelfData] = useState<any>({
     name: "",
     detail: "",
     image_url: imageUrl,
   });
+
   useEffect(() => {
     if (shelfId) {
       const fetchData = async () => {
@@ -103,7 +104,7 @@ const ShelfEdit: FC<EditUnitProps> = () => {
           const uploadedImageUrl = responseData.imageUrl;
           setImageUrl(uploadedImageUrl);
           // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
-          console.log("Unit created successfully!");
+          console.log("Shelf Updated successfully!");
           router.push("/setup/shelf/");
         } else if (response.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง

@@ -5,8 +5,12 @@ import PageTitleWrapper from "@/components/PageTitleWrapper";
 import { Grid, Container, Typography } from "@mui/material";
 
 import { ReactElement } from "react";
-import Forms from "@/content/logistic/customerList/AddCustomerList";
 import Breadcrumb from "@/components/Breadcrumbs";
+import dynamic from "next/dynamic";
+
+const Forms = dynamic(() => import("@/content/logistic/customerList/AddCustomerList"),{
+  ssr: false
+})
 
 function ApplicationsTransactions() {
   const pageData: string = "Home/Logistic/รายการลูกค้า/Add Order"; // ระบุเส้นทางของหน้าปัจจุบัน
