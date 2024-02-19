@@ -15,7 +15,7 @@ import {
 import SidebarMenu from "./SidebarMenu";
 import Logo from "@/components/LogoSign";
 import { useDispatch, useSelector } from "react-redux";
-import { sideBarIsToggle, sidebarIsClose } from "@/store/systemStore";
+import { sidebarIsToggle } from "@/store/systemStore";
 import { RootState } from "@/store/store";
 
 const SidebarWrapper = styled(Box)(
@@ -31,13 +31,11 @@ const SidebarWrapper = styled(Box)(
 );
 
 function Sidebar() {
+  const theme = useTheme();
   const sidebarStatus = useSelector(
     (state: RootState) => state.systemStore.sidebarOpen
   );
-
   const dispatch = useDispatch();
-
-  const theme = useTheme();
   return (
     <>
       <SidebarWrapper
@@ -82,19 +80,7 @@ function Sidebar() {
             background: theme.colors.alpha.trueWhite[10],
           }}
         />
-        <Box p={2}>
-          <Button
-            href="https://bloomui.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="contained"
-            color="warning"
-            size="small"
-            fullWidth
-          >
-            Upgrade to PRO
-          </Button>
-        </Box>
+        <Box p={2}>PowerBy KMITL</Box>
       </SidebarWrapper>
       <Drawer
         sx={{
@@ -103,7 +89,7 @@ function Sidebar() {
         anchor={theme.direction === "rtl" ? "right" : "left"}
         open={sidebarStatus}
         onClose={() => {
-          dispatch(sideBarIsToggle);
+          dispatch(sidebarIsToggle());
         }}
         variant="temporary"
         elevation={9}

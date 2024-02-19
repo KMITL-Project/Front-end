@@ -5,6 +5,7 @@ const nextConfig = {
     output: 'standalone',
     publicRuntimeConfig: {
         DebugMode: process.env.DebugMode === "true" ? true : false,
+        BackEnd: process.env.BackEnd
     },
     webpack(config) {
     config.module.rules.push({
