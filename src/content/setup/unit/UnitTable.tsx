@@ -217,7 +217,7 @@ const RecentOrdersTable: FC = () => {
               </TableCell>
               <TableCell align="center">ID</TableCell>
               <TableCell align="center">Name</TableCell>
-              {/* <TableCell align="center">Detail</TableCell> */}
+              <TableCell align="center">Detail</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -264,7 +264,7 @@ const RecentOrdersTable: FC = () => {
                       {cryptoOrder.name}
                     </Typography>
                   </TableCell>
-                  {/* <TableCell align="center">
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -272,9 +272,9 @@ const RecentOrdersTable: FC = () => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.sourceName}
+                      {cryptoOrder.detail}
                     </Typography>
-                  </TableCell> */}
+                  </TableCell>
                   <TableCell align="center">
                     <Tooltip title="View Unit" arrow>
                       <IconButton

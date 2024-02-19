@@ -19,8 +19,8 @@ const { publicRuntimeConfig } = getConfig();
 function AddUnit() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "เมตร",
-    description: "หน่วยความยาว",
+    name: "กิโลกรัม (kg)",
+    description: "หน่วยวัดน้ำหนัก",
   });
   const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
