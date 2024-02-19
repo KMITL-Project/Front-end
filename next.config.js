@@ -1,20 +1,19 @@
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    swcMinify: true,
-    output: 'standalone',
-    publicRuntimeConfig: {
-        DebugMode: process.env.DebugMode === "true" ? true : false,
-        BackEnd: process.env.BackEnd
-    },
-    webpack(config) {
+  swcMinify: true,
+  output: "standalone",
+  publicRuntimeConfig: {
+    DebugMode: process.env.DebugMode === "true" ? true : false,
+    BackEnd: process.env.BackEnd,
+  },
+  webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
-      use: ['@svgr/webpack'],
-    })
-    return config
+      use: ["@svgr/webpack"],
+    });
+    return config;
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
