@@ -77,7 +77,7 @@ const ShelfEdit: FC<EditUnitProps> = () => {
   if (!shelfId) {
     return <div>Loading...</div>;
   }
-  const handleUpdateShelf: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
+  const handleUpdateShelf = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
@@ -208,16 +208,18 @@ const ShelfEdit: FC<EditUnitProps> = () => {
                     </Button>
                   </Grid>
                   <Grid container justifyContent="flex-end">
-                    <Button
-                      // type="submit"
-                      variant="contained"
-                      sx={{ margin: 1 }}
-                      onClick={handleUpdateShelf}
-                      disableRipple
-                      component="a"
-                    >
-                      Update{" "}
-                    </Button>
+                    <form onSubmit={(e) => { e.preventDefault(); handleUpdateShelf(e); }}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{ margin: 1 }}
+                        disableRipple
+                        component="a"
+                      >
+                        Update
+                      </Button>
+                    </form>
+
                     <Button
                       variant="contained"
                       sx={{ margin: 1 }}
