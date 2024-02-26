@@ -1,14 +1,14 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/unit/Info/UnitInfoPageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
-import { ReactElement } from 'react';
-import InfoUnit from '@/content/setup/unit/Info/UnitInfo';
-import Breadcrumb from '@/components/Breadcrumbs';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/unit/Info/UnitInfoPageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container } from "@mui/material";
+import { ReactElement } from "react";
+import InfoUnit from "@/content/setup/unit/Info/UnitInfo";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Unit/Unit Info'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Unit/Unit Info";
 
   return (
     <>
@@ -16,7 +16,6 @@ function ApplicationsTransactions() {
         <title></title>
       </Head>
       <PageTitleWrapper>
-        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
         <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
@@ -29,7 +28,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <InfoUnit/>
+            <InfoUnit />
           </Grid>
         </Grid>
       </Container>
@@ -42,6 +41,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

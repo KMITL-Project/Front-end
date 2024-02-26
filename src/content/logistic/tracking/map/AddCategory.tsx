@@ -33,9 +33,8 @@ import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 
 import Switch from "@mui/material/Switch";
-import NextLink from 'next/link';
+import NextLink from "next/link";
 import router from "next/router";
-
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -78,7 +77,7 @@ function Forms() {
       <Head>
         <title></title>
       </Head>
-   
+
       <Container maxWidth="lg">
         <Grid
           container
@@ -87,12 +86,7 @@ function Forms() {
           alignItems="stretch"
           spacing={1}
         >
-          <Grid 
-          item xs={10}
-          direction="column"
-          justifyContent="center"
-          >
-            
+          <Grid item xs={10} direction="column" justifyContent="center">
             <Card>
               <CardHeader title="Category Details" />
               <Divider />
@@ -119,31 +113,36 @@ function Forms() {
                       label="Category Description"
                       defaultValue="อลูมิเนียมแผ่น"
                     />
-                 
-                    <Grid item>
-        <NextLink href="/setup/category/" passHref>
-        <Button
-            variant="contained" sx={{ margin:1}}
-            className={currentRoute === "/setup/category/" ? "active" : ""}
-            disableRipple
-            component="a"
 
-          >Save
-            {" "}
-          </Button>
-        </NextLink>
-        <NextLink href="/setup/category/" passHref>
-        <Button
-            variant="contained" sx={{ margin:1}}
-            color="error"
-            className={currentRoute === "/setup/category/" ? "active" : ""}
-            disableRipple
-            component="a"
-          >
-            Cancel{" "}
-          </Button>
-        </NextLink>
-      </Grid>
+                    <Grid item>
+                      <NextLink href="/setup/category/" passHref>
+                        <Button
+                          variant="contained"
+                          sx={{ margin: 1 }}
+                          className={
+                            currentRoute === "/setup/category/" ? "active" : ""
+                          }
+                          disableRipple
+                          component="a"
+                        >
+                          Save{" "}
+                        </Button>
+                      </NextLink>
+                      <NextLink href="/setup/category/" passHref>
+                        <Button
+                          variant="contained"
+                          sx={{ margin: 1 }}
+                          color="error"
+                          className={
+                            currentRoute === "/setup/category/" ? "active" : ""
+                          }
+                          disableRipple
+                          component="a"
+                        >
+                          Cancel{" "}
+                        </Button>
+                      </NextLink>
+                    </Grid>
                   </div>
                 </Box>
               </CardContent>
@@ -155,6 +154,6 @@ function Forms() {
   );
 }
 
-Forms.getLayout = (page : ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
+Forms.getLayout = (page: ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
 
 export default Forms;

@@ -9,4 +9,5 @@ export interface Tracking {
   customerAddress: string;
   shippingDate: number;
   detailStatus: string;
+  orderDate: number;
 }

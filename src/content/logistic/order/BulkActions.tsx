@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef } from "react";
 
 import {
   Box,
@@ -15,15 +15,14 @@ import {
   TableHead,
   TableBody,
   TableCell,
-  TableRow
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+  TableRow,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import MoreVertTwoToneIcon from '@mui/icons-material/MoreVertTwoTone';
-import { format } from 'date-fns';
-import { Order, OrderStatus } from '@/model/logistic/order';
-
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
+import MoreVertTwoToneIcon from "@mui/icons-material/MoreVertTwoTone";
+import { format } from "date-fns";
+import { Order, OrderStatus } from "@/model/logistic/order";
 
 const ButtonError = styled(Button)(
   ({ theme }) => `
@@ -36,12 +35,11 @@ const ButtonError = styled(Button)(
     `
 );
 
-
 interface BulkActionsProps {
-    Orders: Order[]
+  Orders: Order[];
 }
 
-function BulkActions({  Orders}: BulkActionsProps) {
+function BulkActions({ Orders }: BulkActionsProps) {
   const [onMenuOpen, menuOpen] = useState<boolean>(false);
   const [isBulkAddModalOpen, setBulkAddModalOpen] = useState<boolean>(false);
   const [selectedData, setSelectedData] = useState<string[]>([]);
@@ -103,16 +101,22 @@ function BulkActions({  Orders}: BulkActionsProps) {
         open={onMenuOpen}
         onClose={closeMenu}
         anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'center'
+          vertical: "center",
+          horizontal: "center",
         }}
         transformOrigin={{
-          vertical: 'center',
-          horizontal: 'center'
+          vertical: "center",
+          horizontal: "center",
         }}
       >
         <List sx={{ p: 1 }} component="nav">
-          <ListItem button onClick={() => { handleDataSelection(); openBulkAddModal(); }}>
+          <ListItem
+            button
+            onClick={() => {
+              handleDataSelection();
+              openBulkAddModal();
+            }}
+          >
             <ListItemText primary="Bulk add selected" />
           </ListItem>
           <ListItem button>
@@ -133,17 +137,22 @@ function BulkActions({  Orders}: BulkActionsProps) {
       >
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             width: 600,
-            bgcolor: 'background.paper',
+            bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
-          <Typography id="bulk-add-modal-title" variant="h6" component="h2" gutterBottom>
+          <Typography
+            id="bulk-add-modal-title"
+            variant="h6"
+            component="h2"
+            gutterBottom
+          >
             สรุปรายการ
           </Typography>
           <TableContainer>
@@ -163,18 +172,32 @@ function BulkActions({  Orders}: BulkActionsProps) {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{item.orderID}</TableCell>
                     <TableCell>{item.customerAddress}</TableCell>
-                    <TableCell>{format(item.orderDate, "MMMM dd yyyy")}</TableCell>
+                    <TableCell>
+                      {format(item.orderDate, "MMMM dd yyyy")}
+                    </TableCell>
                     {/* Add more cells as needed */}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="contained" component="a" disableRipple className='mr-5' >
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              className="mr-5"
+            >
               Ok
             </Button>
-            <Button variant="contained" component="a" disableRipple color="error" onClick={closeBulkAddModal} sx={{ mr: 2 }}>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              color="error"
+              onClick={closeBulkAddModal}
+              sx={{ mr: 2 }}
+            >
               Cancel
             </Button>
           </Box>

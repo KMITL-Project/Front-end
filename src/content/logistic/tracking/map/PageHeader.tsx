@@ -2,8 +2,7 @@ import { Typography, Button, Grid } from "@mui/material";
 
 import AddTwoToneIcon from "@mui/icons-material/AddTwoTone";
 import router from "next/router";
-import NextLink from 'next/link';
-
+import NextLink from "next/link";
 
 function PageHeader() {
   // const currentRoute = router.pathname;
@@ -21,7 +20,6 @@ function PageHeader() {
           {user.name}, these are your recent transactions
         </Typography> */}
       </Grid>
-
 
       {/* <Grid item>
         <NextLink href="/setup/category/AddCategory/" passHref>

@@ -19,21 +19,23 @@ function Forms() {
   const router = useRouter();
   const { shelfId } = router.query;
   console.log('Id:', shelfId);
-  const [file, setFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
+  const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
   const [formData, setFormData] = useState({
     image: imageUrl,
     name: "ชั้นเครื่องมือ",
     detail: "ประแจ",
   });
 
-  const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem('accessToken');
     const formDataToSend = new FormData();
-    formDataToSend.append('shelve_id', shelfId);
+    if (typeof shelfId === 'string') {
+      formDataToSend.append('shelve_id', shelfId);
+    }
     formDataToSend.append('name', formData.name);
-    formDataToSend.append('image_url', file);  // แนบรูปภาพ
+    formDataToSend.append('image_url', file!);  // แนบรูปภาพ
     formDataToSend.append('detail', formData.detail);
     
     try {
@@ -70,21 +72,21 @@ function Forms() {
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setFormData({
       ...formData,
       [event.target.id]: event.target.value,
     });
   };
   
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
   
     if (selectedFile) {
       // ทำการอ่านไฟล์รูปภาพ
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageUrl(reader.result);
+        setImageUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
   
@@ -102,11 +104,6 @@ function Forms() {
         <Divider />
           <CardContent>
               <Grid container spacing={3} justifyContent="center">
-                {/* Column 1 - Label */}
-                {/* <Grid item xs={12} sm={1.5}>
-            
-                </Grid> */}
-                {/* Column 2 - Form */}
                 <Grid item xs={12} sm={6} className="mt-5">
                   <TextField
                       required
@@ -141,7 +138,7 @@ function Forms() {
                 </Grid>
               </Grid>
               {/* Button Row */}
-              <form onSubmit={handleCreateUnit} encType="multipart/form-data">
+              <form encType="multipart/form-data">
               <Grid container justifyContent="flex-end" className="mt-5">
                 <Button variant="contained" 
                   sx={{ margin:1}}
@@ -170,5 +167,4 @@ function Forms() {
 }
 
 Forms.getLayout = (page: ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
-
 export default Forms;

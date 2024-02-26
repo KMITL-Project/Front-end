@@ -1,7 +1,6 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
-import numeral from 'numeral';
-import PropTypes from 'prop-types';
+import { FC, ChangeEvent, useState, useEffect } from "react";
+import { format } from "date-fns";
+import PropTypes from "prop-types";
 import {
   Tooltip,
   Divider,
@@ -22,56 +21,41 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader
-} from '@mui/material';
+  CardHeader,
+} from "@mui/material";
 
-import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/material';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
-import NextLink from "next/link";
-import { useRouter } from 'next/router';
+import Label from "@/components/Label";
+// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/material';
+import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
+import BulkActions from "./BulkActions";
+import { useRouter } from "next/router";
+import getConfig from "next/config";
 
-interface RecentOrdersTableProps {
-  className?: string;
-  cryptoOrders: CryptoOrder[];
-}
+const { publicRuntimeConfig } = getConfig();
+
+// interface RecentOrdersTableProps {
+//   className?: string;
+//   cryptoOrders: CryptoOrder[];
+// }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: any;
+}
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
 }
 
-// const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
-//   const map = {
-//     failed: {
-//       text: 'Failed',
-//       color: 'error'
-//     },
-//     completed: {
-//       text: 'Completed',
-//       color: 'success'
-//     },
-//     pending: {
-//       text: 'Pending',
-//       color: 'warning'
-//     }
-//   };
-
-//   const { text, color }: any = map[cryptoOrderStatus];
-
-//   return <Label color={color}>{text}</Label>;
-// };
-
-const applyFilters = (
-  cryptoOrders: CryptoOrder[],
-  filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+const applyFilters = (orders: any[], filters: Filters) => {
+  return orders.filter((order) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && order.status !== filters.status) {
       matches = false;
     }
 
@@ -79,15 +63,12 @@ const applyFilters = (
   });
 };
 
-const applyPagination = (
-  cryptoOrders: CryptoOrder[],
-  page: number,
-  limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+const applyPagination = (orders: any[], page: number, limit: number) => {
+  const startIndex = page * limit;
+  return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
+const PermissionTable: FC = () => {
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
@@ -96,40 +77,80 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null
+    status: null,
   });
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
+  const [user, setUser] = useState([]);
+  const [role, setRole] = useState([]);
+  const [userRoles, setUserRoles] = useState<Record<string, any>>({});
 
-  const statusOptions = [
-    {
-      id: 'all',
-      name: 'All'
-    },
-    {
-      id: 'completed',
-      name: 'Completed'
-    },
-    {
-      id: 'pending',
-      name: 'Pending'
-    },
-    {
-      id: 'failed',
-      name: 'Failed'
-    }
-  ];
+  useEffect(() => {
+    const fetchAllUsersInfo = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+          // Fetch all users
+          const usersResponse = await fetch(
+            `${publicRuntimeConfig.BackEnd}users/user`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
+          if (usersResponse.ok) {
+            const usersData = await usersResponse.json();
+            console.log("Users data:", usersData);
+            setCryptoOrders(usersData.data);
 
-    if (e.target.value !== 'all') {
-      value = e.target.value;
-    }
+            // Iterate through each user
+            for (const user of usersData.data) {
+              // Fetch roles for each user
+              const responseRole = await fetch(
+                `${publicRuntimeConfig.BackEnd}role/role-user/${user.id}`,
+                {
+                  method: "GET",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
 
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      status: value
-    }));
-  };
+              if (responseRole.ok) {
+                const roleData = await responseRole.json();
+                console.log(`Roles for user ${user.id}:`, roleData.data);
+                // อัปเดต state userRoles โดยใช้ ID ของผู้ใช้เป็นคีย์
+                setUserRoles((prevUserRoles) => ({
+                  ...prevUserRoles,
+                  [user.id]: roleData.data,
+                }));
+              } else {
+                // Handle error when fetching user roles
+                console.error(
+                  `Error fetching Roles for user ${user.id}:`,
+                  responseRole.statusText
+                );
+              }
+            }
+          } else if (usersResponse.status === 401) {
+            // Token หมดอายุหรือไม่ถูกต้อง
+            console.log("Token expired or invalid");
+            // ทำการลบ token ที่หมดอายุจาก localStorage
+            localStorage.removeItem("accessToken");
+          } else {
+            // Handle error when fetching user info
+            console.error("Error fetching users:", usersResponse.statusText);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchAllUsersInfo();
+  }, []);
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -148,7 +169,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     if (!selectedCryptoOrders.includes(cryptoOrderId)) {
       setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        cryptoOrderId
+        cryptoOrderId,
       ]);
     } else {
       setSelectedCryptoOrders((prevSelected) =>
@@ -185,36 +206,13 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && (
-        <CardHeader
-          // action={
-          //   // <Box width={150}>
-          //   //   <FormControl fullWidth variant="outlined">
-          //   //     <InputLabel>Status</InputLabel>
-          //   //     <Select
-          //   //       value={filters.status || 'all'}
-          //   //       onChange={handleStatusChange}
-          //   //       label="Status"
-          //   //       autoWidth
-          //   //     >
-          //   //       {statusOptions.map((statusOption) => (
-          //   //         <MenuItem key={statusOption.id} value={statusOption.id}>
-          //   //           {statusOption.name}
-          //   //         </MenuItem>
-          //   //       ))}
-          //   //     </Select>
-          //   //   </FormControl>
-          //   // </Box>
-          // }
-          title="User permission lists"
-        />
-      )}
+      {!selectedBulkActions && <CardHeader title="User lists" />}
       <Divider />
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              <TableCell padding="checkbox" align="center">
                 <Checkbox
                   color="primary"
                   checked={selectedAllCryptoOrders}
@@ -222,11 +220,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>User ID</TableCell>
-              <TableCell>User Name</TableCell>
-              <TableCell>Phone Number</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Role</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -240,7 +237,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   key={cryptoOrder.id}
                   selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
                       checked={isCryptoOrderSelected}
@@ -250,7 +247,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       value={isCryptoOrderSelected}
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -258,10 +255,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderID}
+                      {cryptoOrder.id}
                     </Typography>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -269,10 +266,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.sourceName}
+                      {cryptoOrder.full_name}
                     </Typography>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -280,66 +277,43 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.sourceDesc}
-                    </Typography>
-
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.status}
-                    </Typography>
-                  </TableCell>
-                  {/* <TableCell align="right">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.amountCrypto}
-                      {cryptoOrder.cryptoCurrency}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {numeral(cryptoOrder.amount).format(
-                        `${cryptoOrder.currency}0,0.00`
+                      {userRoles[cryptoOrder.id] &&
+                      userRoles[cryptoOrder.id].length > 0 ? (
+                        <ul>
+                          {userRoles[cryptoOrder.id].map((roleItem: any) => (
+                            <li key={roleItem.id}>{roleItem.name}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        "N/A"
                       )}
                     </Typography>
-                  </TableCell> */}
-                  {/* <TableCell align="right">
-                    {getStatusLabel(cryptoOrder.status)}
-                  </TableCell> */}
-                  <TableCell align="right">
-                  <Tooltip title="View User" arrow>
-                      {/* <NextLink href="/setup/permission/AddPermission" passHref> */}
-                        <IconButton
-                          sx={{
-                            "&:hover": {
-                              background: theme.colors.info.lighter,
-                            },
-                            color: theme.palette.info.main,
-                          }}
-                          onClick={() => router.push('/setup/permission/AddPermission')}
-                          color="inherit"
-                          size="small"
-                        >
-                          <VisibilityTwoToneIcon fontSize="small" />
-                        </IconButton>
-                      {/* </NextLink> */}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="View User" arrow>
+                      <IconButton
+                        sx={{
+                          "&:hover": {
+                            background: theme.colors.info.lighter,
+                          },
+                          color: theme.palette.info.main,
+                        }}
+                        onClick={() =>
+                          router.push("/setup/permission/AddPermission")
+                        }
+                        color="inherit"
+                        size="small"
+                      >
+                        <VisibilityTwoToneIcon fontSize="small" />
+                      </IconButton>
                     </Tooltip>
                     <Tooltip title="Edit Order" arrow>
                       <IconButton
                         sx={{
-                          '&:hover': {
-                            background: theme.colors.primary.lighter
+                          "&:hover": {
+                            background: theme.colors.primary.lighter,
                           },
-                          color: theme.palette.primary.main
+                          color: theme.palette.primary.main,
                         }}
                         color="inherit"
                         size="small"
@@ -350,8 +324,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     <Tooltip title="Delete Order" arrow>
                       <IconButton
                         sx={{
-                          '&:hover': { background: theme.colors.error.lighter },
-                          color: theme.palette.error.main
+                          "&:hover": { background: theme.colors.error.lighter },
+                          color: theme.palette.error.main,
                         }}
                         color="inherit"
                         size="small"
@@ -381,12 +355,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   );
 };
 
-RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired
+PermissionTable.propTypes = {
+  cryptoOrders: PropTypes.array.isRequired,
 };
 
-RecentOrdersTable.defaultProps = {
-  cryptoOrders: []
+PermissionTable.defaultProps = {
+  cryptoOrders: [],
 };
 
-export default RecentOrdersTable;
+export default PermissionTable;

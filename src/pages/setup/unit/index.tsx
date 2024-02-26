@@ -1,15 +1,14 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/unit/PageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
-import RecentOrdersTable from '@/content/setup/unit/UnitTable';
-import RecentOrders from '@/content/setup/unit/UnitView';
-import { ReactElement } from 'react';
-import Breadcrumb from '@/components/Breadcrumbs';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/unit/PageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container } from "@mui/material";
+import RecentOrdersTable from "@/content/setup/unit/UnitTable";
+import { ReactElement } from "react";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Unit'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Unit";
 
   return (
     <>
@@ -17,7 +16,7 @@ function ApplicationsTransactions() {
         <title></title>
       </Head>
       <PageTitleWrapper>
-      <Breadcrumb pageData={pageData} />
+        <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
       <Container maxWidth="lg">
@@ -42,6 +41,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

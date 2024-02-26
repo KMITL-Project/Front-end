@@ -1,6 +1,6 @@
 import Head from "next/head";
 import * as React from 'react';
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
   Button,
@@ -12,36 +12,31 @@ import {
   Box,
   Container,
 } from '@mui/material';
-import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
-import { useRouter } from 'next/router';
-import getConfig from "next/config";
+import { useRouter } from "next/router";
+import getConfig  from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
 function SignUp() {
   const router = useRouter();
   const [file, setFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     full_name: "",
     username: "",
     password: "",
-    // upload_image: imageUrl,
   });
 
-  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const formRegister = new FormData();
     formRegister.append('full_name', formData.full_name);
     formRegister.append('username', formData.username);
     formRegister.append('password', formData.password);
-    formRegister.append('upload_image', file);  // แนบรูปภาพ
+    formRegister.append('upload_image', file!);  // แนบรูปภาพ
     try {
       const response = await fetch(`${publicRuntimeConfig.BackEnd}auth/register`, {
         method: 'POST',
-        // headers: {
-        //   'Content-Type': 'application/json',
-        // },
         body: formRegister,
       });
       console.log('formData:', formRegister);
@@ -49,15 +44,13 @@ function SignUp() {
       console.log('username:', formRegister.get('username'));
       console.log('password:', formRegister.get('password'));
       if (response.ok) {
-        // ดำเนินการหลังจากการเรียก API ที่สำเร็จ
         const responseData = await response.json();
         const uploadedImageUrl = responseData.imageUrl;
         setImageUrl(uploadedImageUrl);
         console.log('Response Data:', responseData);
         console.log('Registed successfully!');
-        router.push('/auth/login'); // ไปยังหน้าที่ต้องการหลังจาก Sign Up สำเร็จ
+        router.push('/auth/login');
       } else {
-        // ถ้าการเรียก API ไม่สำเร็จ
         console.error('Register failed');
       }
     } catch (error) {
@@ -65,14 +58,14 @@ function SignUp() {
     }
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
   
     if (selectedFile) {
       // ทำการอ่านไฟล์รูปภาพ
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageUrl(reader.result);
+        setImageUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
   
@@ -96,7 +89,7 @@ function SignUp() {
               <Typography component="h1" variant="h5">
                 Register
               </Typography>
-              <form className="mt-1 w-full" noValidate onSubmit={handleRegister}>
+              <form className="mt-1 w-full" noValidate>
                 <TextField
                   margin="normal"
                   required

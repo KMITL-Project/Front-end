@@ -1,15 +1,14 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/user/profile/PageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
-import { ReactElement } from 'react';
-import Profile from '@/content/user/profile/Profile';
-import Breadcrumb from '@/components/Breadcrumbs';
-
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/user/profile/PageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container } from "@mui/material";
+import { ReactElement } from "react";
+import Profile from "@/content/user/profile/Profile";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Profile'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Profile"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -30,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <Profile/>
+            <Profile />
           </Grid>
         </Grid>
       </Container>

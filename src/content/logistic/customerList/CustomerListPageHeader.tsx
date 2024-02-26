@@ -2,8 +2,8 @@ import { Typography, Button, Grid } from "@mui/material";
 
 import AddTwoToneIcon from "@mui/icons-material/AddTwoTone";
 import router from "next/router";
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import NextLink from "next/link";
+import { useRouter } from "next/router";
 
 function PageHeader() {
   const router = useRouter();
@@ -23,20 +23,20 @@ function PageHeader() {
         </Typography> */}
       </Grid>
 
-
       <Grid item>
         {/* <NextLink href="/logistic/customerList/AddCustomerList/" passHref> */}
         <Button
-            variant="contained" sx={{ margin:1}}
-            // className={currentRoute === "/logistic/customerList/AddCustomerList/" ? "active" : ""}
-            disableRipple
-            component="a"
-            onClick={() => router.push('/logistic/customerList/AddCustomerList/')}
-            // onClick={closeSidebar}
-            // startIcon={<TableChartTwoToneIcon />}
-          >
-            + Order{" "}
-          </Button>
+          variant="contained"
+          sx={{ margin: 1 }}
+          // className={currentRoute === "/logistic/customerList/AddCustomerList/" ? "active" : ""}
+          disableRipple
+          component="a"
+          onClick={() => router.push("/logistic/customerList/AddCustomerList/")}
+          // onClick={closeSidebar}
+          // startIcon={<TableChartTwoToneIcon />}
+        >
+          + Order{" "}
+        </Button>
         {/* </NextLink> */}
       </Grid>
     </Grid>

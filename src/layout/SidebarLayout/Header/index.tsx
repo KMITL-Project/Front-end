@@ -42,9 +42,7 @@ const HeaderWrapper = styled(Box)(
 
 function Header() {
   const theme = useTheme();
-  const sidebarStatus = useSelector(
-    (state: RootState) => state.systemStore.sidebarOpen
-  );
+  const sidebarStatus = useSelector((state: RootState) => state.systemStore.sidebarOpen);
   const dispatch = useDispatch();
 
   return (
@@ -73,10 +71,10 @@ function Header() {
         alignItems="center"
         spacing={2}
       >
-        <HeaderMenu />
+        {/* <HeaderMenu /> */}
       </Stack>
       <Box display="flex" alignItems="center">
-        <HeaderButtons />
+        {/* <HeaderButtons /> */}
         <HeaderUserbox />
         <Box
           component="span"

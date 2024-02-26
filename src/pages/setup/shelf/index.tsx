@@ -5,11 +5,8 @@ import PageHeader from '@/content/setup/shelf/ShelfPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 import RecentOrdersTable from '@/content/setup/shelf/ShelfTable';
-import RecentOrders from '@/content/setup/shelf/ShelfView';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
-import RecentShelves from '@/content/setup/shelf/ShelfView';
-
 
 function ApplicationsTransactions() {
   const pageData: string = 'Home / Shelf'; // ระบุเส้นทางของหน้าปัจจุบัน
@@ -33,7 +30,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <RecentShelves />
+            <RecentOrdersTable />
           </Grid>
         </Grid>
       </Container>

@@ -1,5 +1,5 @@
-import { FC, ChangeEvent, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { FC, ChangeEvent, useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   Tooltip,
   Divider,
@@ -23,39 +23,44 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader
-} from '@mui/material';
+  CardHeader,
+} from "@mui/material";
 
 // import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
-import { useRouter } from 'next/router';
+import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
+import BulkActions from "./BulkActions";
+import { useRouter } from "next/router";
 import getConfig from "next/config";
-import * as ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
-import { format } from 'date-fns';
+import * as ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import { format } from "date-fns";
 
 const { publicRuntimeConfig } = getConfig();
 
-interface RecentOrdersTableProps {
-  className?: string;
-  cryptoOrders: CryptoOrder[];
-}
+// interface RecentOrdersTableProps {
+//   className?: string;
+//   cryptoOrders: CryptoOrder[];
+// }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: any;
+}
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+  material_id: string; // Add this property to CryptoOrder
 }
 
-const applyFilters = (
-  cryptoOrders: CryptoOrder[],
-  filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+const applyFilters = (orders: any[], filters: Filters) => {
+  return orders.filter((order) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && order.status !== filters.status) {
       matches = false;
     }
 
@@ -63,104 +68,126 @@ const applyFilters = (
   });
 };
 
-const applyPagination = (
-  cryptoOrders: CryptoOrder[],
-  page: number,
-  limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+const applyPagination = (orders: any[], page: number, limit: number) => {
+  const startIndex = page * limit;
+  return orders.slice(startIndex, startIndex + limit);
 };
 
 interface User {
   id: string; // หรือชนิดข้อมูลที่ 'id' เป็น
   full_name: string; // หรือชนิดข้อมูลที่ 'full_name' เป็น
-  // เพิ่มคุณสมบัติผู้ใช้อื่น ๆ ตามต้องการ
+}
+interface Material {
+  label: string; // Add any other properties you need for Material
 }
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
+interface Materials {
+  [key: string]: Material;
+}
+
+const RecentOrdersTable: FC = () => {
   const router = useRouter();
-  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
+    []
+  );
   const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null
+    status: null,
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
-  const [materials, setMaterials] = useState({});
-  const [unitData, setUnitData] = useState({});
-  const [floorData, setFloorData] = useState({});
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
+  const [materials, setMaterials] = useState<Materials>({});
+  const [unitData, setUnitData] = useState<CryptoOrder[]>([]);
+  const [floorData, setFloorData] = useState<CryptoOrder[]>([]);
   const [users, setUsers] = useState<{ [key: string]: User }>({});
-  
+
   // Export
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
-  const [fileName, setFileName] = useState<string>('');
-  const [fileType, setFileType] = useState<string>('pdf');
-
+  const [fileName, setFileName] = useState<string>("");
+  const [fileType, setFileType] = useState<string>("pdf");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem("accessToken");
         if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}material-history`, {
-          method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const responseMaterial = await fetch(`${publicRuntimeConfig.BackEnd}material`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const responseUser = await fetch(`${publicRuntimeConfig.BackEnd}users/user-info`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok && responseMaterial.ok && responseUser.ok) {
-          const responseData = await response.json();
-          const responseDataMaterial = await responseMaterial.json();
-          const responseDataUser = await responseUser.json();
-          console.log('User', responseDataUser)
-          
-          console.log('UserChack', users)
-          if (responseData && responseData.data && Array.isArray(responseData.data)) {
-            setCryptoOrders(responseData.data);
-            setUsers(responseDataUser.data)
-            setMaterials(responseDataMaterial.data.reduce((acc, material) => {
-              acc[material.id] = { value: material.id, label: material.name };
-              return acc;
-            }, {}));
-            // setUsers(
-            //   responseDataUser.data.reduce((acc, user) => {
-            //     acc[user.id] = { id: user.id, full_name: user.full_name };
-            //     return acc;
-            //   }, {})
-            // );              
-            // console.log('Update By:', cryptoOrder.update_by);
-            // console.log('User Data for Update By:', users[cryptoOrder.update_by]);
-                        
-            console.error('Invalid data format from API');
+          const response = await fetch(
+            `${publicRuntimeConfig.BackEnd}material-history`,
+            {
+              method: "GET", // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const responseMaterial = await fetch(
+            `${publicRuntimeConfig.BackEnd}material`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const responseUser = await fetch(
+            `${publicRuntimeConfig.BackEnd}users/user-info`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.ok && responseMaterial.ok && responseUser.ok) {
+            const responseData = await response.json();
+            const responseDataMaterial = await responseMaterial.json();
+            const responseDataUser = await responseUser.json();
+            console.log("User", responseDataUser);
+
+            console.log("UserChack", users);
+            if (
+              responseData &&
+              responseData.data &&
+              Array.isArray(responseData.data)
+            ) {
+              setCryptoOrders(responseData.data);
+              setUsers(responseDataUser.data);
+              setMaterials(
+                responseDataMaterial.data.reduce((acc: any, material: any) => {
+                  acc[material.id] = {
+                    value: material.id,
+                    label: material.name,
+                  };
+                  return acc;
+                }, {})
+              );
+              // setUsers(
+              //   responseDataUser.data.reduce((acc, user) => {
+              //     acc[user.id] = { id: user.id, full_name: user.full_name };
+              //     return acc;
+              //   }, {})
+              // );
+              // console.log('Update By:', cryptoOrder.update_by);
+              // console.log('User Data for Update By:', users[cryptoOrder.update_by]);
+
+              console.error("Invalid data format from API");
+            }
+          } else if (response.status === 401) {
+            // Token หมดอายุหรือไม่ถูกต้อง
+            console.log("Token expired or invalid");
+            // ทำการลบ token ที่หมดอายุจาก localStorage
+            localStorage.removeItem("accessToken");
+          } else {
+            console.error("Failed to fetch crypto orders");
           }
-        } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
-          console.log('Token expired or invalid');
-          // ทำการลบ token ที่หมดอายุจาก localStorage
-          localStorage.removeItem('accessToken');
-        } else {
-          console.error('Failed to fetch crypto orders');
-        }
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     };
-    console.log('Chack', users)
+    console.log("Chack", users);
     fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
   }, []);
 
@@ -181,7 +208,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
     if (!selectedCryptoOrders.includes(cryptoOrderId)) {
       setSelectedCryptoOrders((prevSelected) => [
         ...prevSelected,
-        cryptoOrderId
+        cryptoOrderId,
       ]);
     } else {
       setSelectedCryptoOrders((prevSelected) =>
@@ -215,7 +242,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
     // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
     if (selectedCryptoOrders.length === 0) {
       // แสดง popup แจ้งเตือนเมื่อไม่มีรายการที่ถูกเลือก
-      alert('Please select items to export.');
+      alert("Please select items to export.");
       return;
     }
     // เปิด popup สำหรับการ Export
@@ -228,53 +255,73 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
   };
 
   const handleExportConfirm = async () => {
-  
-    if (fileType === 'xlsx') {
+    if (fileType === "xlsx") {
       // สร้าง Workbook
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('MaterialList');
-  
+      const worksheet = workbook.addWorksheet("MaterialList");
+
       // เพิ่มหัวข้อ
-      worksheet.addRow(['No', 'ID', 'Material', 'Detail', 'Amount', 'Update by', 'Date',]);
-  
-      // เพิ่มข้อมูล
-      const dataForExcel: any[][] = paginatedCryptoOrders.map((cryptoOrder, index) => [
-        index + 1, // เลขลำดับอัตโนมัติ
-        cryptoOrder.id,
-        materials[cryptoOrder.material_id]?.label || 'N/A',
-        cryptoOrder.type,
-        cryptoOrder.amount,
-        users.full_name,
-        cryptoOrder.created_at ? format(new Date(cryptoOrder.created_at), 'yyyy-MM-dd') : '',
+      worksheet.addRow([
+        "No",
+        "ID",
+        "Material",
+        "Detail",
+        "Amount",
+        "Update by",
+        "Date",
       ]);
-  
+
+      // เพิ่มข้อมูล
+      const dataForExcel: any[][] = paginatedCryptoOrders.map(
+        (cryptoOrder, index) => [
+          index + 1, // เลขลำดับอัตโนมัติ
+          cryptoOrder.id,
+          materials[cryptoOrder.material_id]?.label || "N/A",
+          cryptoOrder.type,
+          cryptoOrder.amount,
+          users.full_name,
+          cryptoOrder.created_at
+            ? format(new Date(cryptoOrder.created_at), "yyyy-MM-dd")
+            : "",
+        ]
+      );
+
       worksheet.addRows(dataForExcel);
-  
+
       // บันทึกไฟล์ Excel
       workbook.xlsx.writeBuffer().then((buffer) => {
-        const excelBlob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const excelBlob = new Blob([buffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
         saveAs(excelBlob, `${fileName}.xlsx`);
         setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
       });
     }
     // ถ้าเลือก Export เป็น CSV
-    else if (fileType === 'csv') {
+    else if (fileType === "csv") {
       // สร้างข้อมูลสำหรับ CSV
       const csvContent = [
-        'ID,Name,Description,Unit,Total,Floor',
-        ...paginatedCryptoOrders.map(cryptoOrder =>
-          `${cryptoOrder.id},${cryptoOrder.name},${cryptoOrder.detail},${unitData[cryptoOrder.unit_id]?.name || 'N/A'},${cryptoOrder.total},${floorData[cryptoOrder.floor_id]?.name || 'N/A'}`
-        )
-      ].join('\n');
-  
+        "ID,Name,Description,Unit,Total,Floor",
+        ...paginatedCryptoOrders.map(
+          (cryptoOrder) =>
+            `${cryptoOrder.id},${cryptoOrder.name},${cryptoOrder.detail},${
+              unitData[cryptoOrder.unit_id]?.name || "N/A"
+            },${cryptoOrder.total},${
+              floorData[cryptoOrder.floor_id]?.name || "N/A"
+            }`
+        ),
+      ].join("\n");
+
       // บันทึกไฟล์ CSV
-      const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+      const csvBlob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8",
+      });
       saveAs(csvBlob, `${fileName}.csv`);
       setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
     }
-  
+
     return null;
-  };  
+  };
 
   return (
     <Card>
@@ -354,7 +401,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       noWrap
                     >
                       {/* ใช้ material_id ใน cryptoOrder เพื่อดึงข้อมูลวัสดุจาก materials */}
-                      {materials[cryptoOrder.material_id]?.label || 'N/A'}
+                      {materials[cryptoOrder.material_id]?.label || "N/A"}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -387,7 +434,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       gutterBottom
                       noWrap
                     >
-                      {users.full_name}
+                      {String(users.full_name)}
                       {/* {users[cryptoOrder.update_by]?.full_name || 'N/A'} */}
                       {/* {users[cryptoOrder.update_by]?.name || 'N/A'} */}
                     </Typography>
@@ -400,7 +447,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.created_at ? format(new Date(cryptoOrder.created_at), 'yyyy-MM-dd') : ''}
+                      {cryptoOrder.created_at
+                        ? format(new Date(cryptoOrder.created_at), "yyyy-MM-dd")
+                        : ""}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -429,18 +478,24 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
       >
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             width: 500, // เพิ่มความกว้างให้พอดีกับ PDFViewer
             height: 300, // เพิ่มความสูงให้พอดีกับ PDFViewer
-            bgcolor: 'background.paper',
+            bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
-          <Typography id="export-modal-title" variant="h6" component="h2" gutterBottom className='mb-5'>
+          <Typography
+            id="export-modal-title"
+            variant="h6"
+            component="h2"
+            gutterBottom
+            className="mb-5"
+          >
             Export Data
           </Typography>
           <TextField
@@ -464,11 +519,24 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
               <MenuItem value="csv">csv</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="contained" component="a" disableRipple className='mr-5' onClick={handleExportConfirm}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              className="mr-5"
+              onClick={handleExportConfirm}
+            >
               Export
             </Button>
-            <Button variant="contained" component="a" disableRipple color="error" onClick={handleCloseModal} sx={{ mr: 2 }}>
+            <Button
+              variant="contained"
+              component="a"
+              disableRipple
+              color="error"
+              onClick={handleCloseModal}
+              sx={{ mr: 2 }}
+            >
               Cancel
             </Button>
           </Box>
@@ -483,7 +551,7 @@ RecentOrdersTable.propTypes = {
 };
 
 RecentOrdersTable.defaultProps = {
-  cryptoOrders: []
+  cryptoOrders: [],
 };
 
 export default RecentOrdersTable;

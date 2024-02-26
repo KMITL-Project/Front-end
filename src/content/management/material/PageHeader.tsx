@@ -1,5 +1,5 @@
 import { Typography, Button, Grid } from "@mui/material";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 function PageHeader() {
   const router = useRouter();
@@ -14,15 +14,15 @@ function PageHeader() {
 
       <Grid item>
         <Button
-            variant="contained"
-            component="a"
-            sx={{ margin: 1 }}
-            onClick={() => {
-              router.push('/management/materialAdd/'); // ใส่ path ที่ต้องการทำการ redirect ไปที่นั้น
-            }}
-            disableRipple
-          >
-            + Create Material{" "}
+          variant="contained"
+          component="a"
+          sx={{ margin: 1 }}
+          onClick={() => {
+            router.push("/management/materialAdd/"); // ใส่ path ที่ต้องการทำการ redirect ไปที่นั้น
+          }}
+          disableRipple
+        >
+          + Create Material{" "}
         </Button>
       </Grid>
     </Grid>

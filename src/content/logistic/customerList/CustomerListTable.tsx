@@ -1,6 +1,6 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
-import PropTypes from 'prop-types';
+import { FC, ChangeEvent, useState } from "react";
+import { format } from "date-fns";
+import PropTypes from "prop-types";
 import {
   Tooltip,
   Divider,
@@ -21,17 +21,17 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader
-} from '@mui/material';
+  CardHeader,
+} from "@mui/material";
 
-import Label from '@/components/Label';
-import { Tracking, TrackingStatus } from '@/model/logistic/tracking';
+import Label from "@/components/Label";
+import { Tracking, TrackingStatus } from "@/model/logistic/tracking";
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from './BulkActions';
-import NextLink from "next/link";
-import { useRouter } from 'next/router';
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
+import BulkActions from "./BulkActions";
+import { SelectChangeEvent } from "@mui/material/Select";
+import { useRouter } from "next/router";
 
 interface RecentTrackingStatussTableProps {
   className?: string;
@@ -45,17 +45,17 @@ interface Filters {
 const getStatusLabel = (TrackingStatus: TrackingStatus): JSX.Element => {
   const map = {
     failed: {
-      text: 'Failed',
-      color: 'error'
+      text: "Failed",
+      color: "error",
     },
     completed: {
-      text: 'Completed',
-      color: 'success'
+      text: "Completed",
+      color: "success",
     },
     pending: {
-      text: 'Pending',
-      color: 'warning'
-    }
+      text: "Pending",
+      color: "warning",
+    },
   };
 
   const { text, color }: any = map[TrackingStatus];
@@ -63,10 +63,7 @@ const getStatusLabel = (TrackingStatus: TrackingStatus): JSX.Element => {
   return <Label color={color}>{text}</Label>;
 };
 
-const applyFilters = (
-  Trackings: Tracking[],
-  filters: Filters
-): Tracking[] => {
+const applyFilters = (Trackings: Tracking[], filters: Filters): Tracking[] => {
   return Trackings.filter((Tracking) => {
     let matches = true;
 
@@ -86,47 +83,58 @@ const applyPagination = (
   return Trackings.slice(page * limit, page * limit + limit);
 };
 
-const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Trackings }) => {
+const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
+  Trackings,
+}) => {
   const router = useRouter();
-  const [selectedTrackings, setSelectedTrackings] = useState<string[]>(
-    []
-  );
+  const [selectedTrackings, setSelectedTrackings] = useState<string[]>([]);
   const selectedBulkActions = selectedTrackings.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null
+    status: undefined,
   });
 
   const statusOptions = [
     {
-      id: 'all',
-      name: 'All'
+      id: "all",
+      name: "All",
     },
     {
-      id: 'completed',
-      name: 'Completed'
+      id: "completed",
+      name: "Completed",
     },
     {
-      id: 'pending',
-      name: 'Pending'
+      id: "pending",
+      name: "Pending",
     },
     {
-      id: 'failed',
-      name: 'Failed'
-    }
+      id: "failed",
+      name: "Failed",
+    },
   ];
 
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
+  const handleStatusChange = (
+    e:
+      | ChangeEvent<HTMLInputElement>
+      | SelectChangeEvent<"completed" | "pending" | "failed" | "all">
+  ): void => {
+    let value: any;
 
-    if (e.target.value !== 'all') {
-      value = e.target.value;
+    if ("target" in e) {
+      if (e.target.value !== "all") {
+        value = e.target.value;
+      }
+    } else {
+      // กรณี SelectChangeEvent
+      if (e !== "all") {
+        value = e;
+      }
     }
 
     setFilters((prevFilters) => ({
       ...prevFilters,
-      status: value
+      status: value,
     }));
   };
 
@@ -134,9 +142,7 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
     event: ChangeEvent<HTMLInputElement>
   ): void => {
     setSelectedTrackings(
-      event.target.checked
-        ? Trackings.map((Tracking) => Tracking.id)
-        : []
+      event.target.checked ? Trackings.map((Tracking) => Tracking.id) : []
     );
   };
 
@@ -145,10 +151,7 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
     TrackingId: string
   ): void => {
     if (!selectedTrackings.includes(TrackingId)) {
-      setSelectedTrackings((prevSelected) => [
-        ...prevSelected,
-        TrackingId
-      ]);
+      setSelectedTrackings((prevSelected) => [...prevSelected, TrackingId]);
     } else {
       setSelectedTrackings((prevSelected) =>
         prevSelected.filter((id) => id !== TrackingId)
@@ -165,16 +168,10 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
   };
 
   const filteredTrackings = applyFilters(Trackings, filters);
-  const paginatedTrackings = applyPagination(
-    filteredTrackings,
-    page,
-    limit
-  );
+  const paginatedTrackings = applyPagination(filteredTrackings, page, limit);
   const selectedSomeTrackings =
-    selectedTrackings.length > 0 &&
-    selectedTrackings.length < Trackings.length;
-  const selectedAllTrackings =
-    selectedTrackings.length === Trackings.length;
+    selectedTrackings.length > 0 && selectedTrackings.length < Trackings.length;
+  const selectedAllTrackings = selectedTrackings.length === Trackings.length;
   const theme = useTheme();
 
   return (
@@ -191,7 +188,7 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
               <FormControl fullWidth variant="outlined">
                 <InputLabel>Status</InputLabel>
                 <Select
-                  value={filters.status || 'all'}
+                  value={filters.status || "all"}
                   onChange={handleStatusChange}
                   label="Status"
                   autoWidth
@@ -236,11 +233,7 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
                 Tracking.id
               );
               return (
-                <TableRow
-                  hover
-                  key={Tracking.id}
-                  selected={isTrackingSelected}
-                >
+                <TableRow hover key={Tracking.id} selected={isTrackingSelected}>
                   <TableCell padding="checkbox">
                     <Checkbox
                       color="primary"
@@ -296,8 +289,8 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
                     </Typography>
                   </TableCell>
                   <TableCell>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(Tracking.shippingDate, 'MMMM dd yyyy')}
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {format(Tracking.shippingDate, "MMMM dd yyyy")}
                     </Typography>
                   </TableCell>
                   <TableCell align="right">
@@ -306,19 +299,21 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
                   <TableCell align="center">
                     <Tooltip title="View TrackingStatus" arrow>
                       {/* <NextLink href="/logistic/customerList/AddCustomerList" passHref> */}
-                        <IconButton
-                          sx={{
-                            "&:hover": {
-                              background: theme.colors.info.lighter,
-                            },
-                            color: theme.palette.info.main,
-                          }}
-                          onClick={() => router.push('/logistic/customerList/ViewCustomerList')}
-                          color="inherit"
-                          size="small"
-                        >
-                          <VisibilityTwoToneIcon fontSize="small" />
-                        </IconButton>
+                      <IconButton
+                        sx={{
+                          "&:hover": {
+                            background: theme.colors.info.lighter,
+                          },
+                          color: theme.palette.info.main,
+                        }}
+                        onClick={() =>
+                          router.push("/logistic/customerList/ViewCustomerList")
+                        }
+                        color="inherit"
+                        size="small"
+                      >
+                        <VisibilityTwoToneIcon fontSize="small" />
+                      </IconButton>
                       {/* </NextLink> */}
                     </Tooltip>
                     <Tooltip title="Edit TrackingStatus" arrow>
@@ -329,7 +324,9 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
                           },
                           color: theme.palette.primary.main,
                         }}
-                        onClick={() => router.push('/logistic/customerList/EditCustomerList')}
+                        onClick={() =>
+                          router.push("/logistic/customerList/EditCustomerList")
+                        }
                         color="inherit"
                         size="small"
                       >
@@ -371,11 +368,11 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({ Track
 };
 
 RecentTrackingStatussTable.propTypes = {
-  Trackings: PropTypes.array.isRequired
+  Trackings: PropTypes.array.isRequired,
 };
 
 RecentTrackingStatussTable.defaultProps = {
-  Trackings: []
+  Trackings: [],
 };
 
 export default RecentTrackingStatussTable;

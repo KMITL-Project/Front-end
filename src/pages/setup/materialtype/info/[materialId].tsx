@@ -1,15 +1,14 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/material/info/TypeInfoPageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
-import { ReactElement } from 'react';
-import MaterialInfoPage from '@/content/setup/material/info/TypeInfo';
-import Breadcrumb from '@/components/Breadcrumbs';
-
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/material/info/TypeInfoPageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container } from "@mui/material";
+import { ReactElement } from "react";
+import MaterialInfoPage from "@/content/setup/material/info/TypeInfo";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Material Type/Material Type Info'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Material Type/Material Type Info"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -30,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <MaterialInfoPage/>
+            <MaterialInfoPage />
           </Grid>
         </Grid>
       </Container>
@@ -43,6 +42,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

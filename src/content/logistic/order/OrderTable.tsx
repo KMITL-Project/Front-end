@@ -1,6 +1,5 @@
 import { FC, ChangeEvent, useState } from "react";
 import { format } from "date-fns";
-import numeral from "numeral";
 import PropTypes from "prop-types";
 import {
   Tooltip,
@@ -36,6 +35,10 @@ import { useRouter } from "next/router";
 import BulkActions from "./BulkActions";
 import Modal from "@mui/material/Modal";
 import { Order, OrderStatus } from "@/model/logistic/order";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -67,10 +70,7 @@ const getStatusLabel = (listOrderStatus: OrderStatus): JSX.Element => {
   return <Label color={color}>{text}</Label>;
 };
 
-const applyFilters = (
-  cryptoOrders: Order[],
-  filters: Filters
-): Order[] => {
+const applyFilters = (cryptoOrders: Order[], filters: Filters): Order[] => {
   return cryptoOrders.filter((cryptoOrder) => {
     let matches = true;
 
@@ -92,11 +92,12 @@ const applyPagination = (
 
 const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   // fuction for modal
-  
+
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>("");
   const [fileType, setFileType] = useState<string>("pdf");
+  const [paginatedReports, setPaginatedReports] = useState<any[]>([]);
 
   const handleExportClick = () => {
     // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
@@ -118,7 +119,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     // ถ้าเลือก Export เป็น Excel
     if (fileType === "excel") {
       // สร้างชุดข้อมูลสำหรับ Excel
-      const dataForExcel = paginatedReports.map((report) => {
+      const dataForExcel = paginatedReports.map((report: any) => {
         return {
           "Material ID": report.orderDetails,
           "Material Name": report.orderID,
@@ -217,7 +218,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null,
+    status: undefined,
   });
 
   const statusOptions = [
@@ -239,11 +240,22 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     },
   ];
 
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
+  const handleStatusChange = (
+    e:
+      | ChangeEvent<HTMLInputElement>
+      | SelectChangeEvent<"completed" | "pending" | "failed" | "all">
+  ): void => {
+    let value: any;
 
-    if (e.target.value !== "all") {
-      value = e.target.value;
+    if ("target" in e) {
+      if (e.target.value !== "all") {
+        value = e.target.value;
+      }
+    } else {
+      // กรณี SelectChangeEvent
+      if (e !== "all") {
+        value = e;
+      }
     }
 
     setFilters((prevFilters) => ({
@@ -299,17 +311,18 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
-
   return (
     <Card>
       {selectedBulkActions && (
         <Box flex={1} p={2}>
-          <BulkActions Orders={paginatedCryptoOrders.filter(value => {
-    const isCryptoOrderSelected = selectedCryptoOrders.includes(
-      value.id
-    )
-      return isCryptoOrderSelected
-    })}/>
+          <BulkActions
+            Orders={paginatedCryptoOrders.filter((value) => {
+              const isCryptoOrderSelected = selectedCryptoOrders.includes(
+                value.id
+              );
+              return isCryptoOrderSelected;
+            })}
+          />
         </Box>
       )}
       {!selectedBulkActions && (

@@ -43,7 +43,7 @@ import UploadTwoToneIcon from "@mui/icons-material/UploadTwoTone";
 import { Upload } from "@mui/icons-material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Paper from "@mui/material/Paper";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -130,7 +130,6 @@ function Forms() {
   const handleChange2 = (_event: any, newValue: any) => {
     setValue(newValue);
   };
-  
 
   return (
     <>
@@ -162,15 +161,13 @@ function Forms() {
                         label="Customer Name"
                         defaultValue="Jack Dawson"
                       />
-            
                       <TextField
                         required
                         id="outlined-required"
                         label="Details"
                         defaultValue="ประแจ"
                       />
-
-<TextField
+                      <TextField
                         required
                         id="outlined-required"
                         label="Address"
@@ -183,36 +180,36 @@ function Forms() {
                         defaultValue="ประแจ"
                       />
                     </Grid>
- 
+
                     <Grid container justifyContent={"center"} paddingTop={2}>
                       {/* <NextLink href="/logistic/customerList/" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/order/')}
-                          disableRipple
-                          component="a"
-                        >
-                          Save{" "}
-                        </Button>
+                      <Button
+                        variant="contained"
+                        sx={{ margin: 1 }}
+                        // className={
+                        //   currentRoute === "/logistic/customerList/" ? "active" : ""
+                        // }
+                        onClick={() => router.push("/logistic/order/")}
+                        disableRipple
+                        component="a"
+                      >
+                        Save{" "}
+                      </Button>
                       {/* </NextLink> */}
                       {/* <NextLink href="/logistic/customerList//" passHref> */}
-                        <Button
-                          variant="contained"
-                          sx={{ margin: 1 }}
-                          color="error"
-                          // className={
-                          //   currentRoute === "/logistic/customerList/" ? "active" : ""
-                          // }
-                          onClick={() => router.push('/logistic/order/')}
-                          disableRipple
-                          component="a"
-                        >
-                          Cancel{" "}
-                        </Button>
+                      <Button
+                        variant="contained"
+                        sx={{ margin: 1 }}
+                        color="error"
+                        // className={
+                        //   currentRoute === "/logistic/customerList/" ? "active" : ""
+                        // }
+                        onClick={() => router.push("/logistic/order/")}
+                        disableRipple
+                        component="a"
+                      >
+                        Cancel{" "}
+                      </Button>
                       {/* </NextLink> */}
                     </Grid>
                   </div>

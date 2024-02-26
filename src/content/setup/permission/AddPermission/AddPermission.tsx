@@ -16,6 +16,14 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
+
 function AddPermission() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -23,8 +31,8 @@ function AddPermission() {
     role_id: "",
   });
 
-  const [userData, setUserData] = useState([]);
-  const [roleData, setRoleData] = useState([]);
+  const [userData, setUserData] = useState<{ value: string; label: string }[]>([]);
+  const [roleData, setRoleData] = useState<{ value: string; label: string }[]>([]);
   const [cryptoOrders, setCryptoOrders] = useState([]);
 
   useEffect(() => {
@@ -66,19 +74,19 @@ function AddPermission() {
             const responseDataRole = await responseRole.json();
             // console.log('Floor Data:', responseDataFloor.data);
             setCryptoOrders(
-              responseData.data.map((material) => ({
+              responseData.data.map((material: any) => ({
                 value: material.id,
                 label: material.name,
               }))
             );
             setUserData(
-              responseDataUser.data.map((user) => ({
+              responseDataUser.data.map((user: any) => ({
                 value: user.id,
                 label: user.username,
               }))
             );
             setRoleData(
-              responseDataRole.data.map((role) => ({
+              responseDataRole.data.map((role: any) => ({
                 value: role.id,
                 label: role.name,
               }))
@@ -107,7 +115,7 @@ function AddPermission() {
     fetchFloorData();
   }, []);
 
-  const handleCreateUnit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
@@ -148,7 +156,7 @@ function AddPermission() {
     }
   };
 
-  const handleChange = (event, id) => {
+  const handleChange = (event: any, id: any) => {
     const { value } = event.target;
 
     if (id === "user_id") {
@@ -215,7 +223,7 @@ function AddPermission() {
             </Grid>
           </Grid>
           {/* Button Row */}
-          <form onSubmit={handleCreateUnit} encType="multipart/form-data">
+          <form encType="multipart/form-data">
             <Grid container justifyContent="flex-end" className="mt-5">
               <Button
                 variant="contained"

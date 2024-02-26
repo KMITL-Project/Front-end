@@ -34,24 +34,26 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 interface RecentOrdersTableProps {
-  className?: string;
-  cryptoOrders: CryptoOrder[];
+  materialId: string | string[];
   lotData: any[];
 }
 
-
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: any;
+}
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
 }
 
-const applyFilters = (
-  cryptoOrders: CryptoOrder[],
-  filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+const applyFilters = (orders: any[], filters: Filters) => {
+  return orders.filter((order) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && order.status !== filters.status) {
       matches = false;
     }
 
@@ -59,15 +61,12 @@ const applyFilters = (
   });
 };
 
-const applyPagination = (
-  cryptoOrders: CryptoOrder[],
-  page: number,
-  limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+const applyPagination = (orders: any[], page: number, limit: number) => {
+  const startIndex = page * limit;
+  return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) => {
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
   const selectedBulkActions = selectedCryptoOrders.length > 0;
@@ -76,17 +75,16 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
-  const [lotOrders, setlotOrders] = useState([]);
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
+  const [lotOrders, setlotOrders] = useState<CryptoOrder[]>([]);
   
   useEffect(() => {
-    // console.log('Lot Data:', lotData);
-    setlotOrders(lotData);
-    // console.log('Lot Data:', lotOrders);
+    setCryptoOrders(lotData); // น่าจะต้องเป็น setCryptoOrders([...lotData]) ถ้า lotData เป็น array
   }, [lotData]);
   
+  
   const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
+    let value: any;
 
     if (e.target.value !== 'all') {
       value = e.target.value;
@@ -171,7 +169,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {lotData.map((lot) => { // Use lotData instead of paginatedCryptoOrders
+            {lotData.map((lot: any) => { // Use lotData instead of paginatedCryptoOrders
               return (
                 <TableRow
                   hover
@@ -219,7 +217,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
                       gutterBottom
                       noWrap
                     >
-                      {lot.amount}
+                      {lot.available_amount}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -266,12 +264,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ lotData }) => {
 };
 
 RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired,
+  // cryptoOrders: PropTypes.array.isRequired,
   lotData: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  cryptoOrders: [],
+  // cryptoOrders: [],
   lotData: [],
 };
 

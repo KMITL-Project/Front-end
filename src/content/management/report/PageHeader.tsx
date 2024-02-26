@@ -11,20 +11,6 @@ function PageHeader() {
           Report
         </Typography>
       </Grid>
-
-      {/* <Grid item>
-        <Button
-          variant="contained"
-          component="a"
-          sx={{ margin: 1 }}
-          onClick={() => {
-            router.push('#'); // ใส่ path ที่ต้องการทำการ redirect ไปที่นั้น
-          }}
-          disableRipple
-        >
-          Export
-        </Button>
-      </Grid> */}
     </Grid>
   );
 }

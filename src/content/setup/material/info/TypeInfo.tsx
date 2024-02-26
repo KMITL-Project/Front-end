@@ -1,100 +1,146 @@
 import Head from "next/head";
-import { useRouter } from 'next/router';
-import { useEffect, FC, useState } from 'react';
-import { materialOrder } from '@/model/management/material';
-import SetupMaterialInfoTable from '@/content/management/material/info/MaterialInfoTable';
-import { MaterialInfo } from '@/model/management/materialInfo';
+import { useRouter } from "next/router";
+import { useEffect, FC, useState } from "react";
+import { materialOrder } from "@/model/management/material";
+import SetupMaterialInfoTable from "@/content/management/material/info/MaterialInfoTable";
+import { MaterialInfo } from "@/model/management/materialInfo";
 import {
-    Button,
-    Card,
-    CardContent,
-    Typography,
-    Grid,
-    Container,
-    CardHeader,
-    Divider,
-    TextField,
-  } from '@mui/material';
-import { format } from 'date-fns';
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Container,
+  CardHeader,
+  Divider,
+  TextField,
+} from "@mui/material";
+import { format } from "date-fns";
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 interface EditUnitProps {}
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
 
 const MaterialInfoPage: FC<EditUnitProps> = () => {
   const router = useRouter();
   const { materialId } = router.query;
   const [materialData, setmaterialData] = useState<any>({
-    id: '',
-    name: '',
-    detail: '',
-    unit_id: '',
-    total: '',
-    floor_id: '',
-    image_url: '',
-    created_at: '',
+    id: "",
+    name: "",
+    detail: "",
+    unit_id: "",
+    total: "",
+    floor_id: "",
+    image_url: "",
+    created_at: "",
   });
-  const [floorOptions, setFloorOptions] = useState([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState([]);
-  
+  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState<{ value: string; label: string }[]>([]);
+  const [image, setImage] = useState<Blob | undefined>(undefined);
+
   useEffect(() => {
     if (materialId) {
       const fetchData = async () => {
         try {
-          const token = localStorage.getItem('accessToken');
+          const token = localStorage.getItem("accessToken");
           if (token) {
-            const response = await fetch(`${publicRuntimeConfig.BackEnd}material/${materialId}`, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            const responseFloor = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            const responseUnit = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
+            const response = await fetch(
+              `${publicRuntimeConfig.BackEnd}material/${materialId}`,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            const responseFloor = await fetch(
+              `${publicRuntimeConfig.BackEnd}floor`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            const responseUnit = await fetch(
+              `${publicRuntimeConfig.BackEnd}unit`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
             if (response.ok && responseFloor.ok && responseUnit.ok) {
               const responseData = await response.json();
               const responseDataFloor = await responseFloor.json();
               const responseDataUnit = await responseUnit.json();
-              console.log('ok', responseData);
-              if (responseData && responseData.data) {
-                setmaterialData(responseData.data);
-                setFloorOptions(responseDataFloor.data.map(floor => ({ value: floor.id, label: floor.name })));
-                setUnitOptions(responseDataUnit.data.map(unit => ({ value: unit.id, label: unit.name })));
+              console.log("ok", responseData);
+              setmaterialData(responseData.data);
+              setFloorOptions(
+                responseDataFloor.data.map((floor: any) => ({
+                  value: floor.id,
+                  label: floor.name,
+                }))
+              );
+              setUnitOptions(
+                responseDataUnit.data.map((unit: any) => ({
+                  value: unit.id,
+                  label: unit.name,
+                }))
+              );
+
+              const responseImage = await fetch(
+                `${publicRuntimeConfig.BackEnd}upload/${responseData.data.image_url}`,
+                {
+                  method: "GET",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (responseImage.ok) {
+                const imageData = await responseImage.blob(); // หรือ responseImage.text() ตามที่เหมาะสม
+                console.log("image", imageData);
+                setImage(imageData);
               } else {
-                console.error('Invalid data format from API');
+                console.error(
+                  "Error fetching image:",
+                  responseImage.statusText
+                );
               }
             } else if (response.status === 401) {
               // Token หมดอายุหรือไม่ถูกต้อง
-              console.log('Token expired or invalid');
+              console.log("Token expired or invalid");
               // ทำการลบ token ที่หมดอายุจาก localStorage
-              localStorage.removeItem('accessToken');
+              localStorage.removeItem("accessToken");
             } else {
-              console.error('Failed to fetch unit data');
+              console.error("Failed to fetch unit data");
             }
           }
         } catch (error) {
-          console.error('Error:', error);
+          console.error("Error:", error);
         }
       };
-  
+
       fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
     }
   }, [materialId]);
 
-if (!materialId) {return <div>Loading...</div>;}
-  
-return (
+  if (!materialId) {
+    return <div>Loading...</div>;
+  }
+
+  return (
     <>
       <Head>
         <title></title>
@@ -106,27 +152,32 @@ return (
           justifyContent="center"
           alignItems="stretch"
           spacing={1}
-          >
-          <Grid 
-            item xs={10}
-            direction="column"
-            justifyContent="center"
-            >
+        >
+          <Grid item xs={10} direction="column" justifyContent="center">
             <Card>
-              <CardHeader title="Material Type Info"/>
+              <CardHeader title="Material Type Info" />
               <Divider />
               <CardContent>
                 <Grid container spacing={3} justifyContent="center">
                   {/* Column 1 - Label */}
                   <Grid item xs={12} sm={4}>
                     {/* Display uploaded image */}
-                    <Grid container justifyContent="center" alignItems="center" className="mb-5 flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 rounded-lg bg-gray-50">
-                        <img src="/path/to/your/image.jpg" alt="Uploaded Image" className="max-h-48 max-w-full" />
+                    <Grid
+                      container
+                      justifyContent="center"
+                      alignItems="center"
+                      className="mb-5 flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 rounded-lg bg-gray-50"
+                    >
+                      <img
+                        src={image ? URL.createObjectURL(image) : ""}
+                        alt="Uploaded Image"
+                        className="max-h-48 max-w-full"
+                      />
                     </Grid>
                   </Grid>
                   {/* Column 2 - Form */}
                   <Grid item xs={12} sm={7}>
-                  <TextField
+                    <TextField
                       required
                       fullWidth
                       className="mb-5"
@@ -159,7 +210,11 @@ return (
                       className="mb-5"
                       label="Unit"
                       variant="outlined"
-                      value={unitOptions.find(unit => unit.value === materialData.unit_id)?.label || ''}
+                      value={
+                        unitOptions.find(
+                          (unit) => unit.value === materialData.unit_id
+                        )?.label || ""
+                      }
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
@@ -168,7 +223,11 @@ return (
                       className="mb-5"
                       label="Floor"
                       variant="outlined"
-                      value={floorOptions.find(floor => floor.value === materialData.floor_id)?.label || ''}
+                      value={
+                        floorOptions.find(
+                          (floor) => floor.value === materialData.floor_id
+                        )?.label || ""
+                      }
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
@@ -177,7 +236,14 @@ return (
                       className="mb-5"
                       label="Date"
                       variant="outlined"
-                      value={materialData.created_at ? format(new Date(materialData.created_at), 'yyyy-MM-dd') : ''}
+                      value={
+                        materialData.created_at
+                          ? format(
+                              new Date(materialData.created_at),
+                              "yyyy-MM-dd"
+                            )
+                          : ""
+                      }
                       InputProps={{ readOnly: true }}
                     />
                   </Grid>
@@ -185,13 +251,14 @@ return (
                 {/* Button Row */}
                 <Grid container justifyContent="flex-end">
                   <Grid item>
-                    <Button 
-                        variant="contained" 
-                        sx={{ margin:1}}
-                        disableRipple
-                        component="a"
-                        onClick={() => router.push('/setup/materialtype')}
-                      >Back
+                    <Button
+                      variant="contained"
+                      sx={{ margin: 1 }}
+                      disableRipple
+                      component="a"
+                      onClick={() => router.push("/setup/materialtype")}
+                    >
+                      Back
                     </Button>
                   </Grid>
                 </Grid>

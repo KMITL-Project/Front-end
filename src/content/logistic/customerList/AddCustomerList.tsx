@@ -2,6 +2,7 @@ import Head from "next/head";
 import SidebarLayout from "@/layout/SidebarLayout";
 import PageTitle from "@/components/PageTitle";
 import { ReactElement, useEffect, useState } from "react";
+import { OpenStreetMapProvider } from "leaflet-geosearch";
 
 import PageTitleWrapper from "@/components/PageTitleWrapper";
 import {
@@ -44,18 +45,25 @@ import { Upload } from "@mui/icons-material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Paper from "@mui/material/Paper";
 import { useRouter } from "next/router";
-import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Tooltip,
+  useMap,
+} from "react-leaflet";
 // Change the import statement to the correct path
 
 import "leaflet/dist/leaflet.css";
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
-import * as L from 'leaflet';
-import 'leaflet-defaulticon-compatibility';
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css"; // Re-uses images from ~leaflet package
+import * as L from "leaflet";
+import "leaflet-defaulticon-compatibility";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
 const customIcon = new L.Icon({
-  iconUrl: '/location.png',
+  iconUrl: "/location.png",
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
@@ -134,6 +142,50 @@ const handleSearch = () => {
 };
 
 type LatLngTuple = [number, number];
+
+const Search = ({ setMarkerPosition, setCurrentPosition }: any) => {
+  const map = useMap();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = async () => {
+    const provider = new OpenStreetMapProvider();
+    const results = await provider.search({ query: searchTerm });
+    if (results.length > 0) {
+      const { x, y } = results[0];
+      map.setView([y, x], 13);
+      setMarkerPosition([y, x]);
+      setCurrentPosition([y, x]);
+    }
+  };
+
+  return (
+    <div
+      style={{ position: "absolute", top: "10px", right: "0px", zIndex: 1000}}
+
+    >
+      <input
+        style={{
+        border: "1px solid #ccc", // Border color
+        borderColor: "#ccc", // Border color
+        borderWidth: "2px", // Border width
+        borderRadius:"4px",
+        padding:"5px",alignContent:"center", position: "absolute", top: "0px", right: "70px", zIndex: 1000, width:"146px", height:"30px"}}
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search for a location"
+      />
+      <button 
+      style={{
+        border: "1px solid #ccc", // Border color
+        borderColor: "#ccc", // Border color
+        borderWidth: "2px", // Border width
+        borderRadius:"4px",
+      alignContent:"center", position: "absolute", top: "0px", right: "12px", zIndex: 1000, width:"50px", height:"30px", backgroundColor:"white"}}
+      onClick={handleSearch}>Search</button>
+    </div>
+  );
+};
 
 function Forms() {
   const initialPosition: LatLngTuple = [51.505, -0.09];
@@ -291,6 +343,10 @@ function Forms() {
                           style={{ height: "400px", width: "100%" }}
                           scrollWheelZoom={false}
                         >
+                          <Search
+                            setMarkerPosition={setMarkerPosition}
+                            setCurrentPosition={setCurrentPosition}
+                          />
                           <TileLayer
                             attribution="&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -300,7 +356,6 @@ function Forms() {
                             draggable={true}
                             eventHandlers={{ dragend: handleMarkerDrag }}
                             icon={customIcon} // Use the custom icon
-
                           >
                             <Popup>
                               A pretty CSS3 popup. <br /> Easily customizable.

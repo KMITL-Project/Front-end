@@ -29,21 +29,20 @@ import ChromeReaderModeTwoToneIcon from "@mui/icons-material/ChromeReaderModeTwo
 import WorkspacePremiumTwoToneIcon from "@mui/icons-material/WorkspacePremiumTwoTone";
 import CameraFrontTwoToneIcon from "@mui/icons-material/CameraFrontTwoTone";
 import DisplaySettingsTwoToneIcon from "@mui/icons-material/DisplaySettingsTwoTone";
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import LayersIcon from '@mui/icons-material/Layers';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import CategoryIcon from '@mui/icons-material/Category';
-import DoorSlidingIcon from '@mui/icons-material/DoorSliding';
-import ShareLocationTwoToneIcon from '@mui/icons-material/ShareLocationTwoTone';
-import DescriptionTwoToneIcon from '@mui/icons-material/DescriptionTwoTone';
-import ListAltTwoToneIcon from '@mui/icons-material/ListAltTwoTone';
-
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import LayersIcon from "@mui/icons-material/Layers";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import CategoryIcon from "@mui/icons-material/Category";
+import DoorSlidingIcon from "@mui/icons-material/DoorSliding";
+import ShareLocationTwoToneIcon from "@mui/icons-material/ShareLocationTwoTone";
+import DescriptionTwoToneIcon from "@mui/icons-material/DescriptionTwoTone";
+import ListAltTwoToneIcon from "@mui/icons-material/ListAltTwoTone";
 
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { sidebarIsClose } from "@/store/systemStore";
 import getConfig from "next/config";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -162,9 +161,9 @@ const SubMenuWrapper = styled(Box)(
                 background: ${theme.colors.alpha.trueWhite[100]};
                 opacity: 0;
                 transition: ${theme.transitions.create([
-    "transform",
-    "opacity",
-  ])};
+                  "transform",
+                  "opacity",
+                ])};
                 width: 6px;
                 height: 6px;
                 transform: scale(0);
@@ -193,61 +192,67 @@ const SidebarMenu = () => {
   const dispatch = useDispatch();
   const [user, setUser] = useState([]);
   const [role, setRole] = useState([]);
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState<any>([]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem("accessToken");
         if (token) {
-          const response = await fetch(`${publicRuntimeConfig.BackEnd}users/user-info`, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.ok) {
-            const userData = await response.json();
-            console.log('ok', userData);
-            setUser(userData.data);
-
-            const responseRole = await fetch(`${publicRuntimeConfig.BackEnd}role/role-user/${userData.data.id}`, {
-              method: 'GET',
+          const response = await fetch(
+            `${publicRuntimeConfig.BackEnd}users/user-info`,
+            {
+              method: "GET",
               headers: {
                 Authorization: `Bearer ${token}`,
               },
-            });
+            }
+          );
+
+          if (response.ok) {
+            const userData = await response.json();
+            console.log("ok", userData);
+            setUser(userData.data);
+
+            const responseRole = await fetch(
+              `${publicRuntimeConfig.BackEnd}role/role-user/${userData.data.id}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
             if (responseRole.ok) {
               const roleData = await responseRole.json();
-              console.log('role', roleData);
+              console.log("role", roleData);
               setRole(roleData.data);
 
               // Assuming roleData.data is an array and you want to get the first role's name
               if (roleData.data.length > 0) {
-                setUserRole(roleData.data[0].name);
-                console.log('User Role:', roleData.data[0].name);
+                setUserRole(roleData.data);
+                console.log("User Role:", roleData.data[0].name);
               } else {
-                console.error('No roles found for the user.');
+                console.error("No roles found for the user.");
               }
             } else {
               // Handle error when fetching user roles
-              console.error('Error fetching Role:', responseRole.statusText);
+              console.error("Error fetching Role:", responseRole.statusText);
             }
             // console.log(user.avatar);
-
           } else if (response.status === 401) {
             // Token หมดอายุหรือไม่ถูกต้อง
-            console.log('Token expired or invalid');
+            console.log("Token expired or invalid");
             // ทำการลบ token ที่หมดอายุจาก localStorage
-            localStorage.removeItem('accessToken');
+            localStorage.removeItem("accessToken");
           } else {
             // Handle error when fetching user info
-            console.error('Error fetching user info:', response.statusText);
+            console.error("Error fetching user info:", response.statusText);
           }
         }
       } catch (error) {
-        console.error('Error fetching user info:', error);
+        console.error("Error fetching user info:", error);
       }
     };
     // console.log('user state:', user);
@@ -293,59 +298,79 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/material"
-                  startIcon={<BallotTwoToneIcon />}
-                >
-                  Material
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/materialAdd"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                  Add Material
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/pickup"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                  เบิกวัสดุ
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/management/report"
-                  startIcon={<DescriptionTwoToneIcon />}
-                >
-                  Report
-                </Button>
-              </ListItem>
-
+              {(userRole.some((value: any) => value.name === "Stock") ||
+                userRole.some((value: any) => value.name === "Admin")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/material"
+                      startIcon={<BallotTwoToneIcon />}
+                    >
+                      Material
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole.some((value: any) => value.name === "Stock") ||
+                userRole.some((value: any) => value.name === "Admin")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/materialAdd"
+                      startIcon={<TableChartTwoToneIcon />}
+                    >
+                      Add Material
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole.some((value: any) => value.name === "Stock") ||
+                userRole.some((value: any) => value.name === "Admin")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/pickup"
+                      startIcon={<TableChartTwoToneIcon />}
+                    >
+                      เบิกวัสดุ
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole.some((value: any) => value.name === "Stock") ||
+                userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/management/report"
+                      startIcon={<DescriptionTwoToneIcon />}
+                    >
+                      Report
+                    </Button>
+                  </ListItem>
+                </>
+              )}
             </List>
           </SubMenuWrapper>
         </List>
@@ -359,19 +384,25 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/logistic/customerList"
-                  startIcon={<ListAltTwoToneIcon />}
-                >
-                  รายการลูกค้า
-                </Button>
-              </ListItem>
+              {(userRole.some((value: any) => value.name === "Delivery") ||
+                userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/logistic/customerList"
+                      startIcon={<ListAltTwoToneIcon />}
+                    >
+                      รายการลูกค้า
+                    </Button>
+                  </ListItem>
+                </>
+              )}
               <ListItem component="div">
                 <Button
                   disableRipple
@@ -398,7 +429,6 @@ const SidebarMenu = () => {
                   ติดตามการขนส่ง
                 </Button>
               </ListItem>
-
             </List>
           </SubMenuWrapper>
         </List>
@@ -412,58 +442,78 @@ const SidebarMenu = () => {
         >
           <SubMenuWrapper>
             <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/shelf/"
-                  startIcon={<DoorSlidingIcon />}
-                >
-                  Shelf
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/unit/"
-                  startIcon={<InventoryIcon />}
-                >
-                  Unit of products
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/materialtype"
-                  startIcon={<LayersIcon />}
-                >
-                  Material type
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/setup/permission"
-                  startIcon={<AdminPanelSettingsIcon />}
-                >
-                  User Permission
-                </Button>
-              </ListItem>
+              {(userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/shelf/"
+                      startIcon={<DoorSlidingIcon />}
+                    >
+                      Shelf
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/unit/"
+                      startIcon={<InventoryIcon />}
+                    >
+                      Unit of products
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/materialtype"
+                      startIcon={<LayersIcon />}
+                    >
+                      Material type
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/setup/permission"
+                      startIcon={<AdminPanelSettingsIcon />}
+                    >
+                      User Permission
+                    </Button>
+                  </ListItem>
+                </>
+              )}
             </List>
           </SubMenuWrapper>
         </List>

@@ -12,4 +12,3 @@ export interface Order {
   latitude: number;
   longitude: number;
 }
-

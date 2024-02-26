@@ -1,16 +1,14 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layout/SidebarLayout';
-import PageHeader from '@/content/setup/shelf/ShelfPageHeader';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container, Typography } from '@mui/material';
-
-import RecentOrders from '@/content/setup/shelf/ShelfView';
-import { ReactElement } from 'react';
-import Forms from '@/content/logistic/customerList/ViewCustomerList';
-import Breadcrumb from '@/components/Breadcrumbs';
+import Head from "next/head";
+import SidebarLayout from "@/layout/SidebarLayout";
+import PageHeader from "@/content/setup/shelf/ShelfPageHeader";
+import PageTitleWrapper from "@/components/PageTitleWrapper";
+import { Grid, Container, Typography } from "@mui/material";
+import { ReactElement } from "react";
+import Forms from "@/content/logistic/customerList/ViewCustomerList";
+import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/Logistic/รายการลูกค้า/Add Order'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Logistic/รายการลูกค้า/Add Order"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
@@ -19,11 +17,11 @@ function ApplicationsTransactions() {
       </Head>
 
       <Container maxWidth="lg">
-      <Grid item padding={3}>   
-      <Breadcrumb pageData={pageData} />
-   
-      <Typography variant="h3">View Order #1342</Typography>
-      </Grid>
+        <Grid item padding={3}>
+          <Breadcrumb pageData={pageData} />
+
+          <Typography variant="h3">View Order #1342</Typography>
+        </Grid>
         <Grid
           container
           direction="row"
@@ -45,6 +43,3 @@ ApplicationsTransactions.getLayout = (page: ReactElement) => (
 );
 
 export default ApplicationsTransactions;
-
-
-

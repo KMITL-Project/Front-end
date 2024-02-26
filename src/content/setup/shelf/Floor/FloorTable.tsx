@@ -34,23 +34,27 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-interface RecentOrdersTableProps {
-  className?: string;
-  cryptoOrders: CryptoOrder[];
-}
+// interface RecentOrdersTableProps {
+//   className?: string;
+//   cryptoOrders: CryptoOrder[];
+// }
 
 interface Filters {
-  status?: CryptoOrderStatus;
+  status?: any;
 }
 
-const applyFilters = (
-  cryptoOrders: CryptoOrder[],
-  filters: Filters
-): CryptoOrder[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  // Add more properties as needed
+}
+
+const applyFilters = (orders: any[], filters: Filters) => {
+  return orders.filter((order) => {
     let matches = true;
 
-    if (filters.status && cryptoOrder.status !== filters.status) {
+    if (filters.status && order.status !== filters.status) {
       matches = false;
     }
 
@@ -58,15 +62,12 @@ const applyFilters = (
   });
 };
 
-const applyPagination = (
-  cryptoOrders: CryptoOrder[],
-  page: number,
-  limit: number
-): CryptoOrder[] => {
-  return cryptoOrders.slice(page * limit, page * limit + limit);
+const applyPagination = (orders: any[], page: number, limit: number) => {
+  const startIndex = page * limit;
+  return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
+const RecentOrdersTable: FC = () => {
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
   const selectedBulkActions = selectedCryptoOrders.length > 0;
@@ -75,7 +76,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-  const [cryptoOrders, setCryptoOrders] = useState([]);
+  const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
   
   useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +86,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
         const response = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
           method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         });
@@ -112,19 +112,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
 
     fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
   }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
-  
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value = null;
-
-    if (e.target.value !== 'all') {
-      value = e.target.value;
-    }
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      status: value
-    }));
-  };
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -177,10 +164,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
     try {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}shelf/${cryptoOrderId}`, {
+        const response = await fetch(`${publicRuntimeConfig.BackEnd}floor/${cryptoOrderId}`, {
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         });
@@ -232,9 +218,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = () => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell align="center">Floor ID</TableCell>
-              <TableCell align="center">Floor Name</TableCell>
-              <TableCell align="center">Description</TableCell>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Detail</TableCell>
               <TableCell align="center">Date</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
