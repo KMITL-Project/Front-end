@@ -46,11 +46,9 @@ import {
 import { LatLngTuple } from "leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
-import 'leaflet-routing-machine';
-
-
+import "leaflet/dist/leaflet.css";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import "leaflet-routing-machine";
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -62,7 +60,7 @@ interface Filters {
 }
 
 const customIcon = new L.Icon({
-  iconUrl: '/location.png',
+  iconUrl: "/location.png",
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
@@ -117,8 +115,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
-  const [filters, setFilters] = useState<Filters>({
-  });
+  const [filters, setFilters] = useState<Filters>({});
 
   const statusOptions = [
     {
@@ -138,8 +135,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
       name: "Failed",
     },
   ];
-
-  
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -222,16 +217,15 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-                              <Marker
-                            position={[13.7563, 100.5018]}
-                            draggable={true}
-                            icon={customIcon} // Use the custom icon
-
-                          >
-                            <Popup>
-                              A pretty CSS3 popup. <br /> Easily customizable.
-                            </Popup>
-                          </Marker>
+          <Marker
+            position={[13.7563, 100.5018]}
+            draggable={true}
+            icon={customIcon} // Use the custom icon
+          >
+            <Popup>
+              A pretty CSS3 popup. <br /> Easily customizable.
+            </Popup>
+          </Marker>
           <RoutingMachine />
         </MapContainer>
       </div>
