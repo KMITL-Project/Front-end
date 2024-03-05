@@ -34,6 +34,13 @@ const { publicRuntimeConfig } = getConfig();
 
 interface EditCustomerListProps {}
 
+const customIcon = new L.Icon({
+  iconUrl: "/management/marker.svg",
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
 const EditCustomerList: FC<EditCustomerListProps> = () => {
   const router = useRouter();
   const { customerId } = router.query;
@@ -106,16 +113,8 @@ const EditCustomerList: FC<EditCustomerListProps> = () => {
 
   useEffect(() => {
     // Fetch current location using the browser's geolocation API
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setCurrentPosition([latitude, longitude]);
-        setMarkerPosition([latitude, longitude]);
-      },
-      (error) => {
-        console.error("Error getting current location:", error);
-      }
-    );
+    setCurrentPosition([13.7957701, 100.7068413]);
+    setMarkerPosition([13.7957701, 100.7068413]);
   }, []);
 
   useEffect(() => {
@@ -175,12 +174,12 @@ const EditCustomerList: FC<EditCustomerListProps> = () => {
     return <div>Loading...</div>;
   }
 
-  const customIcon = new L.Icon({
-    iconUrl: "/marker.svg",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-  });
+  // const customIcon = new L.Icon({
+  //   iconUrl: "/marker.svg",
+  //   iconSize: [32, 32],
+  //   iconAnchor: [16, 32],
+  //   popupAnchor: [0, -32],
+  // });
 
   type LatLngTuple = [number, number];
 

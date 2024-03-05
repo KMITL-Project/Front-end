@@ -61,7 +61,7 @@ interface TrackingOrder {
 }
 
 const customIcon = new L.Icon({
-  iconUrl: "/location.png",
+  iconUrl: "/management/location.png",
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
@@ -197,14 +197,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
 
   const colors = ["blue", "red", "green", "orange", "purple"];
   const markerIcon = icon({
-    iconUrl: "/marker-icon.svg",
+    iconUrl: "/management/marker-icon.svg",
     iconSize: [41, 41],
     iconAnchor: [20, 41],
     popupAnchor: [1, -34],
   });
 
   const markerStart = icon({
-    iconUrl: "/location_icon.svg",
+    iconUrl: "/management/location_icon.svg",
     iconSize: [32, 32],
     iconAnchor: [20, 41],
     popupAnchor: [1, -34],

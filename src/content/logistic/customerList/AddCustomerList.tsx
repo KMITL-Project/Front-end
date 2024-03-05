@@ -46,7 +46,7 @@ const label = { inputProps: { "aria-label": "Switch demo" } };
 const { publicRuntimeConfig } = getConfig();
 
 const customIcon = new L.Icon({
-  iconUrl: "/marker.svg",
+  iconUrl: "/management/marker.svg",
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],

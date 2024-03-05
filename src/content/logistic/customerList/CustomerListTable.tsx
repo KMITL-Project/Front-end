@@ -115,16 +115,26 @@ const RecentCustomerTable: FC<RecentCustomerTableProps> = ({
           return trackingOrder.longitude;
         });
 
-        const concatenatedLatitude = latitudeValues.join(",");
-        const concatenatedLongitude = longitudeValues.join(",");
-        console.log("Latitude", concatenatedLatitude);
-        console.log("Longitude", concatenatedLongitude);
+        const newLatitude = 13.7957701;
+        const newLongitude = 100.7068413;
+        const updatedLatitudeValues = [newLatitude,...latitudeValues];
+        const updatedLongitudeValues = [newLongitude,...longitudeValues];
+        const concatenatedUpdatedLatitude = updatedLatitudeValues.join(",");
+        const concatenatedUpdatedLongitude = updatedLongitudeValues.join(",");
+
+        console.log("Updated Latitude", concatenatedUpdatedLatitude);
+        console.log("Updated Longitude", concatenatedUpdatedLongitude);
+
+        // const concatenatedLatitude = latitudeValues.join(",");
+        // const concatenatedLongitude = longitudeValues.join(",");
+        // console.log("Latitude", concatenatedLatitude);
+        // console.log("Longitude", concatenatedLongitude);
 
         const orderGroupIds = selectedCustomers.join(",");
         console.log("groupId", orderGroupIds);
         const formDataToSend = new FormData();
-        formDataToSend.append("latitude", concatenatedLatitude);
-        formDataToSend.append("longitude", concatenatedLongitude);
+        formDataToSend.append("latitude", concatenatedUpdatedLatitude);
+        formDataToSend.append("longitude", concatenatedUpdatedLongitude);
 
         const responseNode = await fetch(
           `${publicRuntimeConfig.Routing}/get_route`,
@@ -270,7 +280,6 @@ const RecentCustomerTable: FC<RecentCustomerTableProps> = ({
           console.log(`Unit with ID ${customerId} deleted successfully!`);
 
           // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
-          // router.replace(router.asPath);
           router.reload();
         } else if (response.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง

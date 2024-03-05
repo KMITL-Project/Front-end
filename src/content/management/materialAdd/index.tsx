@@ -25,7 +25,7 @@ function Forms() {
     name: "Material",
     price: "",
     amount: "",
-    detail: "ประแจ",
+    detail: "",
     buy_date: new Date().toISOString().split("T")[0],
   });
   const [cryptoOrders, setCryptoOrders] = useState<
