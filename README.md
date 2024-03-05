@@ -22,3 +22,17 @@ Open [http://localhost:3001](http://localhost:3001) with your browser to see the
 ```bash
 npm run build & nmp run start
 ```
+
+## Build
+
+#### build image
+
+```bash
+docker build --no-cache --progress=plain -t management-front-end .
+```
+
+#### run image
+
+```bash
+docker run -d -p 3001:3000 management-front-end
+```

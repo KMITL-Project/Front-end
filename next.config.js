@@ -7,6 +7,7 @@ const nextConfig = {
     BackEnd: process.env.BackEnd,
     Routing: process.env.Routing,
   },
+  basePath: "/management",
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
@@ -15,6 +16,7 @@ const nextConfig = {
     });
     return config;
   },
+
 };
 
 module.exports = nextConfig;
