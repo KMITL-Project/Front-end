@@ -1,4 +1,4 @@
-export type TrackingStatus = 'completed' | 'pending' | 'failed';
+export type TrackingStatus = 'completed' | 'pending' | 'failed' | 'in_progress' | 'success' ;
 
 export interface Tracking {
   id: string;
@@ -10,4 +10,8 @@ export interface Tracking {
   shippingDate: number;
   detailStatus: string;
   orderDate: number;
+  name: string;
+  customer_name: string;
+  address: string;
+  detail: string;
 }

@@ -1,10 +1,10 @@
 import { Card } from '@mui/material';
-import { Tracking } from '@/model/logistic/tracking';
+import { Customer } from '@/model/logistic/customer';
 import RecentOrdersTable from './CustomerListTable';
 import { subDays } from 'date-fns';
 
 function RecentOrders() {
-  const trackingOrders: Tracking[] = [
+  const trackingOrders: Customer[] = [
     {
       id: '1',
       shippingDate: new Date().getTime(),
@@ -15,116 +15,16 @@ function RecentOrders() {
       customerAddress: 'ลาดกระบัง',
       detailStatus: '',
       orderDate: subDays(new Date(), 123).getTime(),
+      name: "string",
+      customer_name: "string",
+      address: "string",
+      detail: "string",
     },
-    {
-      id: '2',
-
-      shippingDate: subDays(new Date(), 1).getTime(),
-      status: 'completed',
-      orderID: '23M3UOG65G8K',
-      customerName: 'Jack Dawson',
-      productName: 'รั้ว',
-      customerAddress: 'หนองจอก',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '3',
-      shippingDate: subDays(new Date(), 5).getTime(),
-      status: 'failed',
-      orderID: 'F6JHK65MS818',
-      customerName: 'Billy',
-      productName: 'บานเลื่อน',
-      customerAddress: 'อ่อนนุช',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '4',
-
-      shippingDate: subDays(new Date(), 55).getTime(),
-      status: 'completed',
-      orderID: 'QJFAI7N84LGM',
-      customerName: 'Max',
-      productName: 'ประตู',
-      customerAddress: 'บางนา',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '5',
-
-      shippingDate: subDays(new Date(), 56).getTime(),
-      status: 'pending',
-      orderID: 'BO5KFSYGC0YW',
-      customerName: 'Bob',
-      productName: 'รั้ว',
-      customerAddress: 'พญาไท',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '6',
-
-      shippingDate: subDays(new Date(), 33).getTime(),
-      status: 'completed',
-      orderID: '6RS606CBMKVQ',
-      customerName: 'John',
-      productName: 'บานเลื่อน',
-      customerAddress: 'ราชเทวี',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '7',
-
-      shippingDate: new Date().getTime(),
-      status: 'pending',
-      orderID: '479KUYHOBMJS',
-      customerName: 'Paul',
-      productName: 'ประตู',
-      customerAddress: 'รามคำแหง',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '8',
-      shippingDate: subDays(new Date(), 22).getTime(),
-      status: 'completed',
-      orderID: 'W67CFZNT71KR',
-      customerName: 'Kim',
-      productName: 'รั้ว',
-      customerAddress: 'บางพลี',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '9',
-      shippingDate: subDays(new Date(), 11).getTime(),
-      status: 'completed',
-      orderID: '63GJ5DJFKS4H',
-      customerName: 'Park',
-      productName: 'บานเลื่อน',
-      customerAddress: 'บึงกุ่ม',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    },
-    {
-      id: '10',
-      shippingDate: subDays(new Date(), 123).getTime(),
-      status: 'failed',
-      orderID: '17KRZHY8T05M',
-      customerName: 'Ellen',
-      productName: "ประตู",
-      customerAddress: 'บางแค',
-      detailStatus: '',
-      orderDate: subDays(new Date(), 123).getTime(),
-    }
   ];
 
   return (
     <Card>
-      <RecentOrdersTable Trackings={trackingOrders} />
+      <RecentOrdersTable Customers={trackingOrders} />
     </Card>
   );
 }

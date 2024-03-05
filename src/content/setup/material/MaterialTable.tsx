@@ -23,7 +23,6 @@ import {
   CardHeader,
 } from "@mui/material";
 
-// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
@@ -32,11 +31,6 @@ import { useRouter } from "next/router";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
-
-// interface RecentOrdersTableProps {
-//   className?: string;
-//   cryptoOrders: CryptoOrder[];
-// }
 
 interface Filters {
   status?: any;
@@ -78,10 +72,8 @@ const RecentOrdersTable: FC = () => {
     status: null,
   });
   const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
-  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]); // State to store floor options
+  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]);
   const [unitOptions, setUnitOptions] = useState<{ value: string; label: string }[]>([]);
-  const [unitData, setUnitData] = useState({});
-  const [floorData, setFloorData] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +83,7 @@ const RecentOrdersTable: FC = () => {
           const response = await fetch(
             `${publicRuntimeConfig.BackEnd}material`,
             {
-              method: "GET", // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+              method: "GET",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -142,9 +134,7 @@ const RecentOrdersTable: FC = () => {
               console.error("Invalid data format from API");
             }
           } else if (response.status === 401) {
-            // Token หมดอายุหรือไม่ถูกต้อง
             console.log("Token expired or invalid");
-            // ทำการลบ token ที่หมดอายุจาก localStorage
             localStorage.removeItem("accessToken");
           } else {
             console.error("Failed to fetch crypto orders");
@@ -155,8 +145,8 @@ const RecentOrdersTable: FC = () => {
       }
     };
 
-    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
-  }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
+    fetchData();
+  }, []);
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -221,19 +211,12 @@ const RecentOrdersTable: FC = () => {
         );
 
         if (response.ok) {
-          // ดำเนินการหลังจากการลบ Unit สำเร็จ
           console.log(`Unit with ID ${cryptoOrderId} deleted successfully!`);
-
-          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
-          // router.replace(router.asPath);
           router.reload();
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log("Token expired or invalid");
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการลบ Unit ไม่สำเร็จ
           console.error(`Failed to delete Unit with ID ${cryptoOrderId}`);
         }
       }
@@ -249,7 +232,7 @@ const RecentOrdersTable: FC = () => {
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && <CardHeader title="Material Type lists" />}
+      {!selectedBulkActions && <CardHeader title="Material Type Lists" />}
       <Divider />
       <TableContainer>
         <Table>
@@ -267,7 +250,6 @@ const RecentOrdersTable: FC = () => {
               <TableCell align="center">Name</TableCell>
               <TableCell align="center">Detail</TableCell>
               <TableCell align="center">Unit</TableCell>
-              {/* <TableCell align="center">Total</TableCell> */}
               <TableCell align="center">Floor</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
@@ -353,7 +335,7 @@ const RecentOrdersTable: FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View Material" arrow>
+                    <Tooltip title="View" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -372,7 +354,7 @@ const RecentOrdersTable: FC = () => {
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Material" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -391,7 +373,7 @@ const RecentOrdersTable: FC = () => {
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Material" arrow>
+                    <Tooltip title="Delete" arrow>
                       <IconButton
                         sx={{
                           "&:hover": { background: theme.colors.error.lighter },

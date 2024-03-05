@@ -13,7 +13,7 @@ import {
   Box,
   TextField,
 } from "@mui/material";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import { useRouter } from "next/router";
 import getConfig from "next/config";
 
@@ -74,6 +74,10 @@ const InfoUnit: FC<EditUnitProps> = () => {
     return <div>Loading...</div>;
   }
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
     <>
       <Head>
@@ -95,42 +99,39 @@ const InfoUnit: FC<EditUnitProps> = () => {
                 <Grid container spacing={3} justifyContent="center">
                   <Grid item xs={12} sm={6} className="mt-5">
                     <TextField
-                      required
+                      fullWidth
+                      label="Id"
+                      className="mb-4"
+                      variant="outlined"
+                      value={unitData.id || ""}
+                      InputProps={{ readOnly: true }}
+                    />
+                    <TextField
                       fullWidth
                       label="Name"
                       className="mb-4"
                       variant="outlined"
-                      value={unitData.name}
+                      value={unitData.name || ""}
                       InputProps={{ readOnly: true }}
-                      // onChange={(e) => setUnitData({ ...unitData, name: e.target.value })}
                     />
-                    {/* <TextField
-                      required
-                      fullWidth
-                      label="Detail"
-                      className="mb-4"
-                      variant="outlined"
-                      value={unitData.detail}
-                      InputProps={{ readOnly: true }}
-                      // onChange={(e) => setUnitData({ ...unitData, detail: e.target.value })}
-                    /> */}
                     <TextField
-                      required
                       fullWidth
                       label="Date"
                       className="mb-4"
                       variant="outlined"
-                      value={unitData.created_at ? format(new Date(unitData.created_at), 'yyyy-MM-dd') : ''}
+                      value={
+                        unitData.created_at
+                          ? format(new Date(unitData.created_at), "yyyy-MM-dd")
+                          : ""
+                      }
                       InputProps={{ readOnly: true }}
-                      // onChange={(e) => setUnitData({ ...unitData, detail: e.target.value })}
                     />
                   </Grid>
                   <Grid container justifyContent="flex-end">
                     <Button
-                      // type="submit"
                       variant="contained"
                       sx={{ margin: 1 }}
-                      onClick={() => router.push("/setup/unit/")}
+                      onClick={handleGoBack}
                       disableRipple
                       component="a"
                     >
@@ -147,5 +148,4 @@ const InfoUnit: FC<EditUnitProps> = () => {
   );
 };
 
-// EditUnit.getLayout = (page : ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
 export default InfoUnit;

@@ -4,8 +4,6 @@ import {
   Tooltip,
   Divider,
   Box,
-  FormControl,
-  InputLabel,
   Card,
   Checkbox,
   IconButton,
@@ -16,8 +14,6 @@ import {
   TablePagination,
   TableRow,
   TableContainer,
-  Select,
-  MenuItem,
   Typography,
   useTheme,
   CardHeader,
@@ -32,15 +28,10 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-// interface RecentOrdersTableProps {
-//   className?: string;
-//   cryptoOrders: CryptoOrder[];
-// }
 interface CryptoOrder {
   id: string;
   name: string;
   detail: string;
-  // Add more properties as needed
 }
 
 interface Filters {
@@ -64,7 +55,7 @@ const applyPagination = (orders: any[], page: number, limit: number) => {
   return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC = () => {
+const ShelfTable: FC = () => {
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
@@ -83,7 +74,7 @@ const RecentOrdersTable: FC = () => {
         const token = localStorage.getItem("accessToken");
         if (token) {
           const response = await fetch(`${publicRuntimeConfig.BackEnd}shelf`, {
-            method: "GET", // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
+            method: "GET",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -101,9 +92,7 @@ const RecentOrdersTable: FC = () => {
               console.error("Invalid data format from API");
             }
           } else if (response.status === 401) {
-            // Token หมดอายุหรือไม่ถูกต้อง
             console.log("Token expired or invalid");
-            // ทำการลบ token ที่หมดอายุจาก localStorage
             localStorage.removeItem("accessToken");
           } else {
             console.error("Failed to fetch crypto orders");
@@ -114,8 +103,8 @@ const RecentOrdersTable: FC = () => {
       }
     };
 
-    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
-  }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
+    fetchData();
+  }, []);
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -180,19 +169,12 @@ const RecentOrdersTable: FC = () => {
         );
 
         if (response.ok) {
-          // ดำเนินการหลังจากการลบ Unit สำเร็จ
           console.log(`Unit with ID ${cryptoOrderId} deleted successfully!`);
-
-          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
-          // router.replace(router.asPath);
           router.reload();
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log("Token expired or invalid");
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการลบ Unit ไม่สำเร็จ
           console.error(`Failed to delete Unit with ID ${cryptoOrderId}`);
         }
       }
@@ -208,7 +190,7 @@ const RecentOrdersTable: FC = () => {
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && <CardHeader title="Shelf lists" />}
+      {!selectedBulkActions && <CardHeader title="Shelf Lists" />}
       <Divider />
       <TableContainer>
         <Table>
@@ -283,7 +265,7 @@ const RecentOrdersTable: FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View Unit" arrow>
+                    <Tooltip title="View" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -300,7 +282,7 @@ const RecentOrdersTable: FC = () => {
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -317,7 +299,7 @@ const RecentOrdersTable: FC = () => {
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
+                    <Tooltip title="Delete" arrow>
                       <IconButton
                         sx={{
                           "&:hover": { background: theme.colors.error.lighter },
@@ -352,12 +334,12 @@ const RecentOrdersTable: FC = () => {
   );
 };
 
-RecentOrdersTable.propTypes = {
+ShelfTable.propTypes = {
   mockShelves: PropTypes.array.isRequired,
 };
 
-RecentOrdersTable.defaultProps = {
+ShelfTable.defaultProps = {
   mockShelves: [],
 };
 
-export default RecentOrdersTable;
+export default ShelfTable;

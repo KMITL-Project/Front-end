@@ -28,8 +28,9 @@ function AddPermission() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     user_id: "",
-    role_id: "",
+    role_ids: [],
   });
+  ;
 
   const [userData, setUserData] = useState<{ value: string; label: string }[]>([]);
   const [roleData, setRoleData] = useState<{ value: string; label: string }[]>([]);
@@ -82,7 +83,7 @@ function AddPermission() {
             setUserData(
               responseDataUser.data.map((user: any) => ({
                 value: user.id,
-                label: user.username,
+                label: user.full_name,
               }))
             );
             setRoleData(
@@ -120,7 +121,7 @@ function AddPermission() {
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
     formDataToSend.append("user_id", formData.user_id);
-    formDataToSend.append("role_id", formData.role_id);
+    formDataToSend.append("role_ids", formData.role_ids.join(','));
 
     try {
       if (token) {
@@ -158,7 +159,7 @@ function AddPermission() {
 
   const handleChange = (event: any, id: any) => {
     const { value } = event.target;
-
+  
     if (id === "user_id") {
       setFormData({
         ...formData,
@@ -167,7 +168,7 @@ function AddPermission() {
     } else if (id === "role_id") {
       setFormData({
         ...formData,
-        role_id: value,
+        role_ids: value,
       });
     } else {
       setFormData({
@@ -176,6 +177,8 @@ function AddPermission() {
       });
     }
   };
+  
+  
 
   return (
     <>
@@ -209,10 +212,15 @@ function AddPermission() {
                 fullWidth
                 className="mb-4"
                 id="role_id"
-                label="Role"
-                value={formData.role_id}
+                label="Roles"
+                value={formData.role_ids}
                 onChange={(e) => handleChange(e, "role_id")}
                 select
+                SelectProps={{
+                  multiple: true, // Enable multiple selections
+                  value: formData.role_ids,
+                  onChange: (e) => handleChange(e, "role_id"),
+                }}
               >
                 {roleData.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -220,6 +228,7 @@ function AddPermission() {
                   </MenuItem>
                 ))}
               </TextField>
+
             </Grid>
           </Grid>
           {/* Button Row */}

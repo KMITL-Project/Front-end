@@ -1,15 +1,10 @@
-import { FC, ChangeEvent, useState, useEffect } from 'react';
-import { format } from 'date-fns';
-import PropTypes from 'prop-types';
+import { FC, ChangeEvent, useState, useEffect } from "react";
+import { format } from "date-fns";
+import PropTypes from "prop-types";
 import {
-  Tooltip,
   Divider,
   Box,
-  FormControl,
-  InputLabel,
   Card,
-  Checkbox,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -17,21 +12,12 @@ import {
   TablePagination,
   TableRow,
   TableContainer,
-  Select,
-  MenuItem,
   Typography,
   useTheme,
-  CardHeader
-} from '@mui/material';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import BulkActions from '../BulkActions';
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
-import getConfig from "next/config";
-
-const { publicRuntimeConfig } = getConfig();
+  CardHeader,
+} from "@mui/material";
+import BulkActions from "../BulkActions";
+import { useRouter } from "next/router";
 
 interface RecentOrdersTableProps {
   materialId: string | string[];
@@ -66,61 +52,25 @@ const applyPagination = (orders: any[], page: number, limit: number) => {
   return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({
+  materialId,
+  lotData,
+}) => {
   const router = useRouter();
-  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
+  const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
+    []
+  );
   const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
-    status: null
+    status: null,
   });
   const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
-  const [lotOrders, setlotOrders] = useState<CryptoOrder[]>([]);
-  
+
   useEffect(() => {
-    setCryptoOrders(lotData); // น่าจะต้องเป็น setCryptoOrders([...lotData]) ถ้า lotData เป็น array
+    setCryptoOrders(lotData);
   }, [lotData]);
-  
-  
-  const handleStatusChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    let value: any;
-
-    if (e.target.value !== 'all') {
-      value = e.target.value;
-    }
-
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      status: value
-    }));
-  };
-
-  const handleSelectAllCryptoOrders = (
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
-    setSelectedCryptoOrders(
-      event.target.checked
-        ? cryptoOrders.map((cryptoOrder) => cryptoOrder.id)
-        : []
-    );
-  };
-
-  const handleSelectOneCryptoOrder = (
-    _event: ChangeEvent<HTMLInputElement>,
-    cryptoOrderId: string
-  ): void => {
-    if (!selectedCryptoOrders.includes(cryptoOrderId)) {
-      setSelectedCryptoOrders((prevSelected) => [
-        ...prevSelected,
-        cryptoOrderId
-      ]);
-    } else {
-      setSelectedCryptoOrders((prevSelected) =>
-        prevSelected.filter((id) => id !== cryptoOrderId)
-      );
-    }
-  };
 
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
@@ -131,17 +81,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) 
   };
 
   const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
-  const paginatedCryptoOrders = applyPagination(
-    filteredCryptoOrders,
-    page,
-    limit
-  );
-  const selectedSomeCryptoOrders =
-    selectedCryptoOrders.length > 0 &&
-    selectedCryptoOrders.length < cryptoOrders.length;
-  const selectedAllCryptoOrders =
-    selectedCryptoOrders.length === cryptoOrders.length;
-  const theme = useTheme();
 
   return (
     <Card>
@@ -150,18 +89,13 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) 
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && (
-        <CardHeader
-          title="lot lists"
-        />
-      )}
+      {!selectedBulkActions && <CardHeader title="lot lists" />}
       <Divider />
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell align="center">ID</TableCell>
-              {/* <TableCell align="center">Name</TableCell> */}
               <TableCell align="center">price</TableCell>
               <TableCell align="center">amount</TableCell>
               <TableCell align="center">detail</TableCell>
@@ -169,7 +103,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) 
             </TableRow>
           </TableHead>
           <TableBody>
-            {lotData.map((lot: any) => { // Use lotData instead of paginatedCryptoOrders
+            {lotData.map((lot: any) => {
+              // Use lotData instead of paginatedCryptoOrders
               return (
                 <TableRow
                   hover
@@ -187,17 +122,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) 
                       {lot.id}
                     </Typography>
                   </TableCell>
-                  {/* <TableCell align="center">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {lot.name}
-                    </Typography>
-                  </TableCell> */}
                   <TableCell align="center">
                     <Typography
                       variant="body1"
@@ -239,7 +163,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) 
                       gutterBottom
                       noWrap
                     >
-                      {lot.buy_date ? format(new Date(lot.created_at), 'yyyy-MM-dd') : ''}
+                      {lot.buy_date
+                        ? format(new Date(lot.created_at), "yyyy-MM-dd")
+                        : ""}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -264,14 +190,11 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ materialId, lotData }) 
 };
 
 RecentOrdersTable.propTypes = {
-  // cryptoOrders: PropTypes.array.isRequired,
   lotData: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  // cryptoOrders: [],
   lotData: [],
 };
-
 
 export default RecentOrdersTable;

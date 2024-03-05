@@ -3,15 +3,13 @@ import SidebarLayout from '@/layout/SidebarLayout';
 import PageHeader from '@/content/logistic/order/OrderPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
-
 import RecentOrders from '@/content/logistic/order/OrderView';
 
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
-import Footer from '@/components/Footer';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home/ใบสั่ง'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home/Order';
 
   return (
     <>
@@ -35,8 +33,6 @@ function ApplicationsTransactions() {
           </Grid>
         </Grid>
       </Container>
-      <Footer />
-
     </>
   );
 }

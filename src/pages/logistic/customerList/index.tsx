@@ -4,18 +4,17 @@ import PageHeader from "@/content/logistic/customerList/CustomerListPageHeader";
 import PageTitleWrapper from "@/components/PageTitleWrapper";
 import { Grid, Container } from "@mui/material";
 import Footer from "@/components/Footer";
-
 import RecentOrders from "@/content/logistic/customerList/CustomerListView";
 import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
-  const pageData: string = "Home / รายการลูกค้า"; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home / Customer List"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>
-      {/* <Head>
-        <title>Transactions - Applications</title>
-      </Head> */}
+      <Head>
+        <title></title>
+      </Head>
       <PageTitleWrapper>
         <Breadcrumb pageData={pageData} />
         <PageHeader />
@@ -33,7 +32,7 @@ function ApplicationsTransactions() {
           </Grid>
         </Grid>
       </Container>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

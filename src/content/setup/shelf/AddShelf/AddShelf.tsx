@@ -18,18 +18,20 @@ const { publicRuntimeConfig } = getConfig();
 function Forms() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null); // Updated type definition
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     image: imageUrl,
-    name: "ชั้นเครื่องมือ",
-    detail: "ประแจ",
+    name: "",
+    detail: "",
   });
 
-  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (
+    event
+  ) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
-    formDataToSend.append("image_url", file!); // แนบรูปภาพ
+    formDataToSend.append("image_url", file!);
     formDataToSend.append("name", formData.name);
     formDataToSend.append("detail", formData.detail);
     try {
@@ -48,16 +50,12 @@ function Forms() {
           const responseData = await response.json();
           const uploadedImageUrl = responseData.imageUrl;
           setImageUrl(uploadedImageUrl);
-          // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
           console.log("Unit created successfully!");
           router.push("/setup/shelf/");
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log("Token expired or invalid");
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการสร้าง Unit ไม่สำเร็จ
           console.error("Unit creation failed");
         }
       }
@@ -77,15 +75,18 @@ function Forms() {
     const selectedFile = event.target.files[0];
 
     if (selectedFile) {
-      // ทำการอ่านไฟล์รูปภาพ
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageUrl(reader.result as string); // Cast result to string
+        setImageUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
 
-      setFile(selectedFile); // เซ็ตค่า file ใน state
+      setFile(selectedFile);
     }
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
@@ -148,7 +149,6 @@ function Forms() {
                 sx={{ margin: 1 }}
                 disableRipple
                 component="a"
-                // type="submit"
                 onClick={handleCreateUnit}
               >
                 Create
@@ -159,7 +159,7 @@ function Forms() {
                 disableRipple
                 color="error"
                 component="a"
-                onClick={() => router.push("/setup/shelf/")}
+                onClick={handleGoBack}
               >
                 Cancel
               </Button>

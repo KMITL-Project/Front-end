@@ -22,7 +22,7 @@ function PageHeader() {
           }}
           disableRipple
         >
-          + Create Material{" "}
+          + Add Material{" "}
         </Button>
       </Grid>
     </Grid>

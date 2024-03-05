@@ -39,10 +39,14 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
     total: "",
     floor_id: "",
     image_url: "",
-    created_at: "",
+    update_at: "",
   });
-  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState<{ value: string; label: string }[]>([]);
+  const [floorOptions, setFloorOptions] = useState<
+    { value: string; label: string }[]
+  >([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [image, setImage] = useState<Blob | undefined>(undefined);
 
   useEffect(() => {
@@ -140,6 +144,10 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
     return <div>Loading...</div>;
   }
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
     <>
       <Head>
@@ -178,7 +186,6 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                   {/* Column 2 - Form */}
                   <Grid item xs={12} sm={7}>
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="ID"
@@ -187,7 +194,6 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Name"
@@ -196,7 +202,6 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Detial"
@@ -205,7 +210,6 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Unit"
@@ -218,7 +222,6 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Floor"
@@ -231,15 +234,14 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Date"
                       variant="outlined"
                       value={
-                        materialData.created_at
+                        materialData.update_at
                           ? format(
-                              new Date(materialData.created_at),
+                              new Date(materialData.update_at),
                               "yyyy-MM-dd"
                             )
                           : ""
@@ -256,9 +258,9 @@ const MaterialInfoPage: FC<EditUnitProps> = () => {
                       sx={{ margin: 1 }}
                       disableRipple
                       component="a"
-                      onClick={() => router.push("/setup/materialtype")}
+                      onClick={handleGoBack}
                     >
-                      Back
+                      Back{''}
                     </Button>
                   </Grid>
                 </Grid>

@@ -206,7 +206,7 @@ const PermissionTable: FC = () => {
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && <CardHeader title="User lists" />}
+      {!selectedBulkActions && <CardHeader title="User Lists" />}
       <Divider />
       <TableContainer>
         <Table>
@@ -290,7 +290,7 @@ const PermissionTable: FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View User" arrow>
+                    <Tooltip title="View" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -299,7 +299,7 @@ const PermissionTable: FC = () => {
                           color: theme.palette.info.main,
                         }}
                         onClick={() =>
-                          router.push("/setup/permission/AddPermission")
+                          router.push(`/setup/permission/info/${cryptoOrder.id}`)
                         }
                         color="inherit"
                         size="small"
@@ -307,7 +307,7 @@ const PermissionTable: FC = () => {
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -317,20 +317,11 @@ const PermissionTable: FC = () => {
                         }}
                         color="inherit"
                         size="small"
+                        onClick={() =>
+                          router.push(`/setup/permission/edit/${cryptoOrder.id}`)
+                        }
                       >
                         <EditTwoToneIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
-                      <IconButton
-                        sx={{
-                          "&:hover": { background: theme.colors.error.lighter },
-                          color: theme.palette.error.main,
-                        }}
-                        color="inherit"
-                        size="small"
-                      >
-                        <DeleteTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   </TableCell>

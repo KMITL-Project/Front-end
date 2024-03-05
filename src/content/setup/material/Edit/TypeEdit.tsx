@@ -14,7 +14,6 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
-import { format } from "date-fns";
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
@@ -27,16 +26,11 @@ interface CryptoOrder {
   floor_id: string;
 }
 
-
 const MaterialEdit: FC<EditMaterialProps> = () => {
   const router = useRouter();
   const { materialId } = router.query;
-  const [file, setFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
-  const [selectedMaterial, setSelectedMaterial] = useState<MaterialInfo | null>(
-    null
-  );
-
+  const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [materialData, setmaterialData] = useState<any>({
     id: "",
     name: "",
@@ -47,8 +41,12 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
     image_url: imageUrl,
     created_at: "",
   });
-  const [floorOptions, setFloorOptions] = useState<{ value: string; label: string }[]>([]); // State to store floor options
-  const [unitOptions, setUnitOptions] = useState<{ value: string; label: string }[]>([]);
+  const [floorOptions, setFloorOptions] = useState<
+    { value: string; label: string }[]
+  >([]); // State to store floor options
+  const [unitOptions, setUnitOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   useEffect(() => {
     if (materialId) {
@@ -107,9 +105,7 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
                 console.error("Invalid data format from API");
               }
             } else if (response.status === 401) {
-              // Token หมดอายุหรือไม่ถูกต้อง
               console.log("Token expired or invalid");
-              // ทำการลบ token ที่หมดอายุจาก localStorage
               localStorage.removeItem("accessToken");
             } else {
               console.error("Failed to fetch unit data");
@@ -120,14 +116,16 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
         }
       };
 
-      fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
+      fetchData();
     }
   }, [materialId]);
 
   if (!materialId) {
     return <div>Loading...</div>;
   }
-  const handleUpdate: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
+  const handleUpdate: React.MouseEventHandler<HTMLAnchorElement> = async (
+    event
+  ) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
@@ -156,16 +154,12 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
           const responseData = await response.json();
           const uploadedImageUrl = responseData.imageUrl;
           setImageUrl(uploadedImageUrl);
-          // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
           console.log("Material Updated successfully!");
-          router.push("/setup/materialtype/");
+          router.back();
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log("Token expired or invalid");
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการสร้าง Unit ไม่สำเร็จ
           console.error("Material creation failed");
         }
       }
@@ -197,16 +191,19 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
 
   const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
-
     if (selectedFile) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setmaterialData({ ...materialData, image_url: reader.result });
+        setImageUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
 
       setFile(selectedFile);
     }
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
@@ -300,41 +297,31 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
                         </MenuItem>
                       ))}
                     </TextField>
-                  </Grid>
-                  {/* Display uploaded image */}
-                  <Grid item xs={12} sm={4} className="mt-5">
-                    {/* Display uploaded image */}
                     <input
                       id="dropzone-file"
                       type="file"
                       className="hidden"
                       onChange={handleFileChange}
                     />
-                    <Grid
-                      container
-                      justifyContent="center"
-                      alignItems="center"
-                      className="mt-5 mb-5 flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 rounded-lg bg-gray-50"
-                    >
+                    {imageUrl && (
                       <img
-                        src={materialData.image_url}
+                        src={imageUrl}
                         alt="Uploaded Image"
-                        className="max-h-48 max-w-full"
+                        className="w-300 h-300 justify-center"
                       />
-                    </Grid>
+                    )}
                     <Button
                       variant="contained"
                       component="label"
                       htmlFor="dropzone-file"
+                      className="mt-2"
                     >
                       Upload Image
                     </Button>
                   </Grid>
                 </Grid>
-                {/* Button Row */}
                 <Grid container justifyContent="flex-end">
                   <Button
-                    // type="submit"
                     variant="contained"
                     sx={{ margin: 1 }}
                     onClick={handleUpdate}
@@ -347,7 +334,7 @@ const MaterialEdit: FC<EditMaterialProps> = () => {
                     variant="contained"
                     sx={{ margin: 1 }}
                     color="error"
-                    onClick={() => router.push("/setup/materialtype/")}
+                    onClick={handleGoBack}
                     disableRipple
                     component="a"
                   >

@@ -1,4 +1,4 @@
-import { FC, ChangeEvent, useState } from "react";
+import { FC, ChangeEvent, useState, useEffect } from "react";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
 import {
@@ -25,49 +25,52 @@ import {
 } from "@mui/material";
 
 import Label from "@/components/Label";
-import { Tracking, TrackingStatus } from "@/model/logistic/tracking";
+import { Customer, CustomerStatus } from "@/model/logistic/customer";
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
 import BulkActions from "./BulkActions";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { useRouter } from "next/router";
+import getConfig from "next/config";
 
-interface RecentTrackingStatussTableProps {
+const { publicRuntimeConfig } = getConfig();
+const currentDate = new Date();
+
+interface RecentCustomerTableProps {
   className?: string;
-  Trackings: Tracking[];
+  Customers: Customer[];
 }
 
 interface Filters {
-  status?: TrackingStatus;
+  status?: CustomerStatus;
 }
 
-const getStatusLabel = (TrackingStatus: TrackingStatus): JSX.Element => {
-  const map = {
-    failed: {
-      text: "Failed",
+const getStatusLabel = (orderStatus: string): JSX.Element => {
+  const map: Record<string, { text: string; color: "error" | "success" | "warning" | "black" | "primary" | "secondary" | "info" }> = {
+    pending: {
+      text: "pending",
       color: "error",
     },
-    completed: {
-      text: "Completed",
+    success: {
+      text: "success",
       color: "success",
     },
-    pending: {
-      text: "Pending",
+    in_progress: {
+      text: "in_progress",
       color: "warning",
     },
   };
 
-  const { text, color }: any = map[TrackingStatus];
-
+  const { text, color }: { text: string; color: "error" | "success" | "warning" | "black" | "primary" | "secondary" | "info" } = map[orderStatus] || { text: '', color: '' };
   return <Label color={color}>{text}</Label>;
 };
 
-const applyFilters = (Trackings: Tracking[], filters: Filters): Tracking[] => {
-  return Trackings.filter((Tracking) => {
+const applyFilters = (Customers: Customer[], filters: Filters): Customer[] => {
+  return Customers.filter((Customer) => {
     let matches = true;
 
-    if (filters.status && Tracking.status !== filters.status) {
+    if (filters.status && Customer.status !== filters.status) {
       matches = false;
     }
 
@@ -76,24 +79,213 @@ const applyFilters = (Trackings: Tracking[], filters: Filters): Tracking[] => {
 };
 
 const applyPagination = (
-  Trackings: Tracking[],
+  Customers: Customer[],
   page: number,
   limit: number
-): Tracking[] => {
-  return Trackings.slice(page * limit, page * limit + limit);
+): Customer[] => {
+  return Customers.slice(page * limit, page * limit + limit);
 };
 
-const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
-  Trackings,
+const RecentCustomerTable: FC<RecentCustomerTableProps> = ({
 }) => {
   const router = useRouter();
-  const [selectedTrackings, setSelectedTrackings] = useState<string[]>([]);
-  const selectedBulkActions = selectedTrackings.length > 0;
+  const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
+  const selectedBulkActions = selectedCustomers.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filters, setFilters] = useState<Filters>({
     status: undefined,
   });
+  const [trackOrders, setCustomerList] = useState<any[]>([]);
+  const [routeNode, setRouteNode] = useState<any[]>([]);
+
+  const functionGroupOrderbyId = async (): Promise<void> => {
+    try {
+      if (selectedCustomers.length > 0) {
+        const latitudeValues = selectedCustomers.map((trackingId) => {
+          const trackingOrder = trackOrders.find(
+            (order) => order.id === trackingId
+          );
+          return trackingOrder.latitude;
+        });
+        const longitudeValues = selectedCustomers.map((trackingId) => {
+          const trackingOrder = trackOrders.find(
+            (order) => order.id === trackingId
+          );
+          return trackingOrder.longitude;
+        });
+
+        const concatenatedLatitude = latitudeValues.join(",");
+        const concatenatedLongitude = longitudeValues.join(",");
+        console.log("Latitude", concatenatedLatitude);
+        console.log("Longitude", concatenatedLongitude);
+
+        const orderGroupIds = selectedCustomers.join(",");
+        console.log("groupId", orderGroupIds);
+        const formDataToSend = new FormData();
+        formDataToSend.append("latitude", concatenatedLatitude);
+        formDataToSend.append("longitude", concatenatedLongitude);
+
+        const responseNode = await fetch(
+          `${publicRuntimeConfig.Routing}/get_route`,
+          {
+            method: "POST",
+            headers: {
+              // Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+            body: formDataToSend,
+          }
+        );
+
+        console.log("Response from server:", responseNode);
+        if (responseNode.ok) {
+          const responseNodeData = await responseNode.json();
+          console.log("Node created successfully:", responseNodeData);
+          router.reload();
+          const response = await fetch(
+            `${publicRuntimeConfig.BackEnd}order-group`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+              body: JSON.stringify({
+                orders_ids: orderGroupIds,
+                node: responseNodeData,
+                // coordinates: coordinates,
+              }),
+            }
+          );
+
+          if (response.ok) {
+            const responseData = await response.json();
+            console.log("Order group created successfully:", responseData);
+            setCustomerList((prevCustomerList) => {
+              const updatedList = prevCustomerList.map((order) => {
+                if (selectedCustomers.includes(order.id)) {
+                  return {
+                    ...order,
+                    orderGroup_id: responseData.orderGroup_id,
+                  };
+                }
+                return order;
+              });
+              return updatedList;
+            });
+            setSelectedCustomers([]);
+            console.log("Selected orders grouped successfully!");
+          } else {
+            console.error("Failed to group orders:", response.statusText);
+          }
+          console.log("Selected orders grouped successfully!");
+        } else {
+          console.error("Failed to Node:", responseNode.statusText);
+        }
+      } else {
+        console.log("No orders selected for grouping.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const closeMenu = (): void => {
+    // Define the closeMenu function
+    // You can implement the logic to close the menu here
+    // For example, set a state variable to control the menu's open state
+  };
+
+  const handleDeleteAllSelected = (): void => {
+    // Implement the logic to delete selected items
+    selectedCustomers.forEach((trackingId) => {
+      handleDeleteCustomerList(trackingId);
+    });
+
+    // Clear the selection after deletion
+    setSelectedCustomers([]);
+  };
+
+  //API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+          const response = await fetch(`${publicRuntimeConfig.BackEnd}order`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            const responseData = await response.json();
+            if (
+              responseData &&
+              responseData.data &&
+              Array.isArray(responseData.data)
+            ) {
+              const filteredData = responseData.data.filter(
+                (item: any) => item.orders_group_id == null
+              );
+              setCustomerList(filteredData);
+            } else {
+              console.error("Invalid data format from API");
+            }
+          } else if (response.status === 401) {
+            // Token หมดอายุหรือไม่ถูกต้อง
+            console.log("Token expired or invalid");
+            // ทำการลบ token ที่หมดอายุจาก localStorage
+            localStorage.removeItem("accessToken");
+          } else {
+            console.error("Failed to fetch orders");
+          }
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleDeleteCustomerList = async (customerId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        const response = await fetch(
+          `${publicRuntimeConfig.BackEnd}order/${customerId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          // ดำเนินการหลังจากการลบ Unit สำเร็จ
+          console.log(`Unit with ID ${customerId} deleted successfully!`);
+
+          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
+          // router.replace(router.asPath);
+          router.reload();
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log("Token expired or invalid");
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem("accessToken");
+        } else {
+          // ถ้าการลบ Unit ไม่สำเร็จ
+          console.error(`Failed to delete Unit with ID ${customerId}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const statusOptions = [
     {
@@ -101,16 +293,16 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
       name: "All",
     },
     {
-      id: "completed",
-      name: "Completed",
-    },
-    {
       id: "pending",
-      name: "Pending",
+      name: "pending",
     },
     {
-      id: "failed",
-      name: "Failed",
+      id: "in_progress",
+      name: "in_progress",
+    },
+    {
+      id: "success",
+      name: "success",
     },
   ];
 
@@ -126,7 +318,6 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
         value = e.target.value;
       }
     } else {
-      // กรณี SelectChangeEvent
       if (e !== "all") {
         value = e;
       }
@@ -138,23 +329,25 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
     }));
   };
 
-  const handleSelectAllTrackings = (
+  const handleSelectAllCustomers = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedTrackings(
-      event.target.checked ? Trackings.map((Tracking) => Tracking.id) : []
+    setSelectedCustomers(
+      event.target.checked
+        ? trackOrders.map((CustomerOrder) => CustomerOrder.id)
+        : []
     );
   };
 
-  const handleSelectOneTracking = (
+  const handleSelectOneCustomer = (
     _event: ChangeEvent<HTMLInputElement>,
-    TrackingId: string
+    CustomerId: string
   ): void => {
-    if (!selectedTrackings.includes(TrackingId)) {
-      setSelectedTrackings((prevSelected) => [...prevSelected, TrackingId]);
+    if (!selectedCustomers.includes(CustomerId)) {
+      setSelectedCustomers((prevSelected) => [...prevSelected, CustomerId]);
     } else {
-      setSelectedTrackings((prevSelected) =>
-        prevSelected.filter((id) => id !== TrackingId)
+      setSelectedCustomers((prevSelected) =>
+        prevSelected.filter((id) => id !== CustomerId)
       );
     }
   };
@@ -167,18 +360,27 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredTrackings = applyFilters(Trackings, filters);
-  const paginatedTrackings = applyPagination(filteredTrackings, page, limit);
-  const selectedSomeTrackings =
-    selectedTrackings.length > 0 && selectedTrackings.length < Trackings.length;
-  const selectedAllTrackings = selectedTrackings.length === Trackings.length;
+  const filteredCustomers = applyFilters(trackOrders, filters);
+  const paginatedCustomers = applyPagination(filteredCustomers, page, limit);
+  const selectedSomeCustomers =
+    selectedCustomers.length > 0 &&
+    selectedCustomers.length < trackOrders.length;
+  const selectedAllCustomers = selectedCustomers.length === trackOrders.length;
   const theme = useTheme();
+
+  const trackingStatusToString = (status: CustomerStatus | undefined): string => {
+    return status || ""; // Convert undefined to an empty string
+  };
 
   return (
     <Card>
       {selectedBulkActions && (
         <Box flex={1} p={2}>
-          <BulkActions />
+          <BulkActions
+            onDeleteSelected={handleDeleteAllSelected}
+            onCloseMenu={closeMenu}
+            onGroupOrder={functionGroupOrderbyId}
+          />
         </Box>
       )}
       {!selectedBulkActions && (
@@ -199,6 +401,8 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
                     </MenuItem>
                   ))}
                 </Select>
+
+                
               </FormControl>
             </Box>
           }
@@ -210,41 +414,45 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              <TableCell padding="checkbox" align="center">
                 <Checkbox
                   color="primary"
-                  checked={selectedAllTrackings}
-                  indeterminate={selectedSomeTrackings}
-                  onChange={handleSelectAllTrackings}
+                  checked={selectedAllCustomers}
+                  indeterminate={selectedSomeCustomers}
+                  onChange={handleSelectAllCustomers}
                 />
               </TableCell>
-              <TableCell>ID</TableCell>
-              <TableCell>Product</TableCell>
-              <TableCell>Customer</TableCell>
-              <TableCell>Adress</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Customer</TableCell>
+              <TableCell align="center">Detail</TableCell>
+              {/* <TableCell align="center">Date</TableCell> */}
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedTrackings.map((Tracking) => {
-              const isTrackingSelected = selectedTrackings.includes(
-                Tracking.id
+            {paginatedCustomers.map((CustomerOrder) => {
+              const isCustomerSelected = selectedCustomers.includes(
+                CustomerOrder.id
               );
               return (
-                <TableRow hover key={Tracking.id} selected={isTrackingSelected}>
-                  <TableCell padding="checkbox">
+                <TableRow
+                  hover
+                  key={CustomerOrder.id}
+                  selected={isCustomerSelected}
+                >
+                  <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
-                      checked={isTrackingSelected}
+                      checked={isCustomerSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneTracking(event, Tracking.id)
+                        handleSelectOneCustomer(event, CustomerOrder.id)
                       }
-                      value={isTrackingSelected}
+                      value={isCustomerSelected}
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -252,10 +460,10 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
                       gutterBottom
                       noWrap
                     >
-                      {Tracking.orderID}
+                      {CustomerOrder.id}
                     </Typography>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center"> 
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -263,42 +471,42 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
                       gutterBottom
                       noWrap
                     >
-                      {Tracking.productName}
+                      {CustomerOrder.name}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {Tracking.customerName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="left">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {Tracking.customerAddress}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(Tracking.shippingDate, "MMMM dd yyyy")}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    {getStatusLabel(Tracking.status)}
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View TrackingStatus" arrow>
-                      {/* <NextLink href="/logistic/customerList/AddCustomerList" passHref> */}
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {CustomerOrder.customer_name}
+                    </Typography>
+                  </TableCell>
+
+                  <TableCell align="center">
+                    <Typography
+                      variant="body1"
+                      fontWeight="bold"
+                      color="text.primary"
+                      gutterBottom
+                      noWrap
+                    >
+                      {CustomerOrder.detail}
+                    </Typography>
+                  </TableCell>
+                  {/* <TableCell align="center">
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {format(currentDate, "yyyy-MM-dd")}
+                    </Typography>
+                  </TableCell> */}
+                  <TableCell align="center">
+                    {getStatusLabel(CustomerOrder.status)}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="View" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -306,17 +514,18 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
                           },
                           color: theme.palette.info.main,
                         }}
-                        onClick={() =>
-                          router.push("/logistic/customerList/ViewCustomerList")
-                        }
+                        onClick={() => {
+                          router.push(
+                            `/logistic/customerList/info/${CustomerOrder.id}`
+                          );
+                        }}
                         color="inherit"
                         size="small"
                       >
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
-                      {/* </NextLink> */}
                     </Tooltip>
-                    <Tooltip title="Edit TrackingStatus" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -325,7 +534,9 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
                           color: theme.palette.primary.main,
                         }}
                         onClick={() =>
-                          router.push("/logistic/customerList/EditCustomerList")
+                          router.push(
+                            `/logistic/customerList/edit/${CustomerOrder.id}`
+                          )
                         }
                         color="inherit"
                         size="small"
@@ -333,7 +544,7 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete TrackingStatus" arrow>
+                    <Tooltip title="Delete" arrow>
                       <IconButton
                         sx={{
                           "&:hover": { background: theme.colors.error.lighter },
@@ -341,6 +552,9 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
                         }}
                         color="inherit"
                         size="small"
+                        onClick={() =>
+                          handleDeleteCustomerList(CustomerOrder.id)
+                        }
                       >
                         <DeleteTwoToneIcon fontSize="small" />
                       </IconButton>
@@ -355,7 +569,7 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
       <Box p={2}>
         <TablePagination
           component="div"
-          count={filteredTrackings.length}
+          count={filteredCustomers.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -367,12 +581,4 @@ const RecentTrackingStatussTable: FC<RecentTrackingStatussTableProps> = ({
   );
 };
 
-RecentTrackingStatussTable.propTypes = {
-  Trackings: PropTypes.array.isRequired,
-};
-
-RecentTrackingStatussTable.defaultProps = {
-  Trackings: [],
-};
-
-export default RecentTrackingStatussTable;
+export default RecentCustomerTable;

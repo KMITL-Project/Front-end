@@ -1,22 +1,18 @@
 import Head from "next/head";
-import SidebarLayout from "@/layout/SidebarLayout";
-import { ReactElement, useState, FC, useEffect } from "react";
+import { useState, FC, useEffect } from "react";
 import {
   Container,
   Grid,
   Card,
   CardHeader,
   CardContent,
-  Typography,
   Divider,
   Button,
   Box,
   TextField,
 } from "@mui/material";
-import { format } from "date-fns";
 import { useRouter } from "next/router";
 import getConfig from "next/config";
-import FloorTable from "@/content/setup/shelf/Floor/FloorTable";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -26,18 +22,16 @@ const FloorEdit: FC<EditUnitProps> = () => {
   const router = useRouter();
   const { floorId } = router.query;
   const [file, setFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null); // เพิ่ม state สำหรับเก็บ URL ของรูป
-  // ตรวจสอบค่า id ที่ได้
-  // console.log('router:', router);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   console.log("ID:", floorId);
   const [ShelfData, setShelfData] = useState<any>({
     name: "",
     detail: "",
     image_url: "",
     shelve_id: "",
-    // และข้อมูลอื่น ๆ ที่คุณต้องการแสดงและแก้ไข
   });
   const [image, setImage] = useState<Blob | undefined>(undefined);
+
   useEffect(() => {
     if (floorId) {
       const fetchData = async () => {
@@ -79,9 +73,7 @@ const FloorEdit: FC<EditUnitProps> = () => {
                 );
               }
             } else if (response.status === 401) {
-              // Token หมดอายุหรือไม่ถูกต้อง
               console.log("Token expired or invalid");
-              // ทำการลบ token ที่หมดอายุจาก localStorage
               localStorage.removeItem("accessToken");
             } else {
               console.error("Failed to fetch unit data");
@@ -92,21 +84,23 @@ const FloorEdit: FC<EditUnitProps> = () => {
         }
       };
 
-      fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
+      fetchData();
     }
   }, [floorId]);
 
   if (!floorId) {
     return <div>Loading...</div>;
   }
-  const handleUpdateShelf: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
+  const handleUpdateShelf: React.MouseEventHandler<HTMLAnchorElement> = async (
+    event
+  ) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
     formDataToSend.append("shelve_id", ShelfData.shelve_id);
     formDataToSend.append("name", ShelfData.name);
     formDataToSend.append("detail", ShelfData.detail);
-    formDataToSend.append("image_url", file!); // แนบรูปภาพ
+    formDataToSend.append("image_url", file!);
     try {
       if (token) {
         const response = await fetch(
@@ -126,16 +120,12 @@ const FloorEdit: FC<EditUnitProps> = () => {
           const responseData = await response.json();
           const uploadedImageUrl = responseData.imageUrl;
           setImageUrl(uploadedImageUrl);
-          // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
           console.log("Unit created successfully!");
-          router.push("/setup/shelf/");
+          router.back();
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log("Token expired or invalid");
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการสร้าง Unit ไม่สำเร็จ
           console.error("Unit creation failed");
         }
       }
@@ -146,16 +136,19 @@ const FloorEdit: FC<EditUnitProps> = () => {
 
   const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
-
     if (selectedFile) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setShelfData({ ...ShelfData, image_url: reader.result });
+        setImageUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
 
       setFile(selectedFile);
     }
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
@@ -182,7 +175,7 @@ const FloorEdit: FC<EditUnitProps> = () => {
                       required
                       fullWidth
                       className="mb-5"
-                      label="Floor Name"
+                      label="Name"
                       variant="outlined"
                       value={ShelfData.name}
                       onChange={(e) =>
@@ -193,46 +186,37 @@ const FloorEdit: FC<EditUnitProps> = () => {
                       required
                       fullWidth
                       className="mb-5"
-                      label="Floor Detail"
+                      label="Detail"
                       variant="outlined"
                       value={ShelfData.detail}
                       onChange={(e) =>
                         setShelfData({ ...ShelfData, detail: e.target.value })
                       }
                     />
-                  </Grid>
-                  {/* Column 2 - Form */}
-                  <Grid item xs={12} sm={4} className="mt-5">
-                    {/* Display uploaded image */}
                     <input
                       id="dropzone-file"
                       type="file"
                       className="hidden"
                       onChange={handleFileChange}
                     />
-                    <Grid
-                      container
-                      justifyContent="center"
-                      alignItems="center"
-                      className="mt-5 mb-5 flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 rounded-lg bg-gray-50"
-                    >
+                    {imageUrl && (
                       <img
-                        src={ShelfData.image_url}
-                        alt="Upload Image"
-                        className="max-h-48 max-w-full"
+                        src={imageUrl}
+                        alt="Uploaded Image"
+                        className="w-300 h-300 justify-center"
                       />
-                    </Grid>
+                    )}
                     <Button
                       variant="contained"
                       component="label"
                       htmlFor="dropzone-file"
+                      className="mt-2"
                     >
                       Upload Image
                     </Button>
                   </Grid>
                   <Grid container justifyContent="flex-end">
                     <Button
-                      // type="submit"
                       variant="contained"
                       sx={{ margin: 1 }}
                       onClick={handleUpdateShelf}
@@ -245,7 +229,7 @@ const FloorEdit: FC<EditUnitProps> = () => {
                       variant="contained"
                       sx={{ margin: 1 }}
                       color="error"
-                      onClick={() => router.push("/setup/shelf/")}
+                      onClick={handleGoBack}
                       disableRipple
                       component="a"
                     >
@@ -262,5 +246,4 @@ const FloorEdit: FC<EditUnitProps> = () => {
   );
 };
 
-// EditUnit.getLayout = (page : ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
 export default FloorEdit;

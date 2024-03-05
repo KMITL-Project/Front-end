@@ -1,5 +1,4 @@
 import Head from "next/head";
-import SidebarLayout from "@/layout/SidebarLayout";
 import { ReactElement, useState, FC, useEffect } from "react";
 import {
   Container,
@@ -29,7 +28,7 @@ const FloorInfo: FC<EditUnitProps> = () => {
     name: "",
     detail: "",
     image_url: "",
-    created_at: "",
+    update_at: "",
   });
   const [image, setImage] = useState<Blob | undefined>(undefined);
 
@@ -63,13 +62,16 @@ const FloorInfo: FC<EditUnitProps> = () => {
                   },
                 }
               );
-  
+
               if (responseImage.ok) {
                 const imageData = await responseImage.blob(); // หรือ responseImage.text() ตามที่เหมาะสม
                 console.log("image", imageData);
                 setImage(imageData);
               } else {
-                console.error("Error fetching image:", responseImage.statusText);
+                console.error(
+                  "Error fetching image:",
+                  responseImage.statusText
+                );
               }
             } else if (response.status === 401) {
               // Token หมดอายุหรือไม่ถูกต้อง
@@ -93,6 +95,10 @@ const FloorInfo: FC<EditUnitProps> = () => {
     return <div>Loading...</div>;
   }
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
     <>
       <Head>
@@ -113,7 +119,6 @@ const FloorInfo: FC<EditUnitProps> = () => {
               <CardContent>
                 <Grid container spacing={3} justifyContent="center">
                   <Grid item xs={12} sm={4}>
-                    {/* Display uploaded image */}
                     <Grid
                       container
                       justifyContent="center"
@@ -129,41 +134,37 @@ const FloorInfo: FC<EditUnitProps> = () => {
                   </Grid>
                   <Grid item xs={12} sm={6} className="mt-5">
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
-                      label="Shelf Id"
+                      label="Id"
                       variant="outlined"
                       value={unitData.id}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
-                      label="Shelf Name"
+                      label="Name"
                       variant="outlined"
                       value={unitData.name}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
-                      label="Shelf Detail"
+                      label="Detail"
                       variant="outlined"
                       value={unitData.detail}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
-                      label="Shelf created"
+                      label="Date"
                       variant="outlined"
                       value={
-                        unitData.created_at
-                          ? format(new Date(unitData.created_at), "yyyy-MM-dd")
+                        unitData.update_at
+                          ? format(new Date(unitData.update_at), "yyyy-MM-dd")
                           : ""
                       }
                       InputProps={{ readOnly: true }}
@@ -171,10 +172,9 @@ const FloorInfo: FC<EditUnitProps> = () => {
                   </Grid>
                   <Grid container justifyContent="flex-end">
                     <Button
-                      // type="submit"
                       variant="contained"
                       sx={{ margin: 1 }}
-                      onClick={() => router.push("/setup/shelf/")}
+                      onClick={handleGoBack}
                       disableRipple
                       component="a"
                     >
@@ -191,5 +191,4 @@ const FloorInfo: FC<EditUnitProps> = () => {
   );
 };
 
-// EditUnit.getLayout = (page : ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
 export default FloorInfo;

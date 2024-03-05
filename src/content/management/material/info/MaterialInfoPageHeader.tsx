@@ -20,7 +20,7 @@ function PageHeader() {
             onClick={() => {router.push('/management/materialAdd/');}}
             disableRipple
           >
-            + Create Material{" "}
+            + Add Material{" "}
           </Button>
       </Grid>
     </Grid>

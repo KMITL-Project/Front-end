@@ -5,8 +5,6 @@ import {
   Tooltip,
   Divider,
   Box,
-  FormControl,
-  InputLabel,
   Card,
   Checkbox,
   IconButton,
@@ -17,14 +15,11 @@ import {
   TablePagination,
   TableRow,
   TableContainer,
-  Select,
-  MenuItem,
   Typography,
   useTheme,
   CardHeader
 } from '@mui/material';
 
-// import { CryptoOrder, CryptoOrderStatus } from '@/model/setup/shelf';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
@@ -34,10 +29,9 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-// interface RecentOrdersTableProps {
-//   className?: string;
-//   cryptoOrders: CryptoOrder[];
-// }
+interface RecentOrdersTableProps {
+  floorData: any[];
+}
 
 interface Filters {
   status?: any;
@@ -47,7 +41,6 @@ interface CryptoOrder {
   id: string;
   name: string;
   detail: string;
-  // Add more properties as needed
 }
 
 const applyFilters = (orders: any[], filters: Filters) => {
@@ -67,7 +60,7 @@ const applyPagination = (orders: any[], page: number, limit: number) => {
   return orders.slice(startIndex, startIndex + limit);
 };
 
-const RecentOrdersTable: FC = () => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({floorData}) => {
   const router = useRouter();
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>([]);
   const selectedBulkActions = selectedCryptoOrders.length > 0;
@@ -79,39 +72,8 @@ const RecentOrdersTable: FC = () => {
   const [cryptoOrders, setCryptoOrders] = useState<CryptoOrder[]>([]);
   
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-        const response = await fetch(`${publicRuntimeConfig.BackEnd}floor`, {
-          method: 'GET', // หรือ 'GET', 'PUT', 'DELETE' ตามที่ต้องการ
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const responseData = await response.json();
-          if (responseData && responseData.data && Array.isArray(responseData.data)) {
-            setCryptoOrders(responseData.data);
-          } else {
-            console.error('Invalid data format from API');
-          }
-        } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
-          console.log('Token expired or invalid');
-          // ทำการลบ token ที่หมดอายุจาก localStorage
-          localStorage.removeItem('accessToken');
-        } else {
-          console.error('Failed to fetch crypto orders');
-        }
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    };
-
-    fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
-  }, []); // ใส่ [] เพื่อให้ useEffect ทำงานเฉพาะครั้งแรกเท่านั้น
+    setCryptoOrders(floorData);
+  }, [floorData]);
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>
@@ -172,19 +134,12 @@ const RecentOrdersTable: FC = () => {
         });
 
         if (response.ok) {
-          // ดำเนินการหลังจากการลบ Unit สำเร็จ
           console.log(`Unit with ID ${cryptoOrderId} deleted successfully!`);
-
-          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
-          // router.replace(router.asPath);
           router.reload();
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log('Token expired or invalid');
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem('accessToken');
         } else {
-          // ถ้าการลบ Unit ไม่สำเร็จ
           console.error(`Failed to delete Unit with ID ${cryptoOrderId}`);
         }
       }
@@ -291,7 +246,7 @@ const RecentOrdersTable: FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                  <Tooltip title="View Floor" arrow>
+                  <Tooltip title="View" arrow>
                         <IconButton
                           sx={{
                             "&:hover": {
@@ -306,7 +261,7 @@ const RecentOrdersTable: FC = () => {
                           <VisibilityTwoToneIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Floor" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           '&:hover': {
@@ -321,7 +276,7 @@ const RecentOrdersTable: FC = () => {
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Floor" arrow>
+                    <Tooltip title="Delete" arrow>
                       <IconButton
                         sx={{
                           '&:hover': { background: theme.colors.error.lighter },
@@ -357,11 +312,11 @@ const RecentOrdersTable: FC = () => {
 };
 
 RecentOrdersTable.propTypes = {
-  cryptoOrders: PropTypes.array.isRequired,
+  floorData: PropTypes.array.isRequired,
 };
 
 RecentOrdersTable.defaultProps = {
-  cryptoOrders: []
+  floorData: []
 };
 
 export default RecentOrdersTable;

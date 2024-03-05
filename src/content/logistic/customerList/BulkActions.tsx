@@ -1,91 +1,60 @@
 import { useState, useRef } from "react";
+import { ListItemText, ListItem, List, Alert, AlertColor } from "@mui/material";
+import React from "react";
 
-import {
-  Box,
-  Menu,
-  IconButton,
-  Button,
-  ListItemText,
-  ListItem,
-  List,
-  Typography,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
+interface BulkActionsProps {
+  onDeleteSelected: () => void;
+  onCloseMenu: () => void;
+  onGroupOrder: () => void; // Add onGroupOrder to the prop interface
+}
 
-import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
-import MoreVertTwoToneIcon from "@mui/icons-material/MoreVertTwoTone";
+function BulkActions({
+  onDeleteSelected,
+  onCloseMenu,
+  onGroupOrder,
+}: BulkActionsProps) {
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState("");
+  const [alertSeverity, setAlertSeverity] = React.useState<
+    AlertColor | undefined
+  >(undefined);
 
-const ButtonError = styled(Button)(
-  ({ theme }) => `
-     background: ${theme.colors.error.main};
-     color: ${theme.palette.error.contrastText};
-
-     &:hover {
-        background: ${theme.colors.error.dark};
-     }
-    `
-);
-
-function BulkActions() {
-  const [onMenuOpen, menuOpen] = useState<boolean>(false);
-  const moreRef = useRef<HTMLButtonElement | null>(null);
-
-  const openMenu = (): void => {
-    menuOpen(true);
+  const handleDeleteSelected = (): void => {
+    // Call the onDeleteSelected callback
+    onDeleteSelected();
+    // Close the menu
+    onCloseMenu();
   };
 
-  const closeMenu = (): void => {
-    menuOpen(false);
+  const handleGroupOrder = (): void => {
+    // Call the onGroupOrder callback
+    onGroupOrder();
+    // Close the menu
+    onCloseMenu();
+
+    // Set the alert message and severity
+    setAlertMessage("Bulk group orders clicked!");
+    setAlertSeverity("success");
+    setAlertOpen(true);
   };
 
   return (
     <>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Box display="flex" alignItems="center">
-          <Typography variant="h5" color="text.secondary">
-            Bulk actions:
-          </Typography>
-          <ButtonError
-            sx={{ ml: 1 }}
-            startIcon={<DeleteTwoToneIcon />}
-            variant="contained"
-          >
-            Delete
-          </ButtonError>
-        </Box>
-        <IconButton
-          color="primary"
-          onClick={openMenu}
-          ref={moreRef}
-          sx={{ ml: 2, p: 1 }}
-        >
-          <MoreVertTwoToneIcon />
-        </IconButton>
-      </Box>
-
-      <Menu
-        keepMounted
-        anchorEl={moreRef.current}
-        open={onMenuOpen}
-        onClose={closeMenu}
-        anchorOrigin={{
-          vertical: "center",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "center",
-          horizontal: "center",
-        }}
+      <List sx={{ p: 1 }} component="nav">
+        <ListItem button onClick={handleDeleteSelected}>
+          <ListItemText primary="Bulk delete selected" />
+        </ListItem>
+        <ListItem button onClick={handleGroupOrder}>
+          <ListItemText primary="Bulk group orders" />
+        </ListItem>
+      </List>
+      <Alert
+        severity={alertSeverity}
+        onClose={() => setAlertOpen(false)}
+        sx={{ display: alertOpen ? "flex" : "none" }}
       >
-        <List sx={{ p: 1 }} component="nav">
-          <ListItem button>
-            <ListItemText primary="Bulk delete selected" />
-          </ListItem>
-          <ListItem button>
-            <ListItemText primary="Bulk edit selected" />
-          </ListItem>
-        </List>
-      </Menu>
+        {alertMessage}
+      </Alert>
     </>
   );
 }

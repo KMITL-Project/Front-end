@@ -26,9 +26,11 @@ function Forms() {
     price: "",
     amount: "",
     detail: "ประแจ",
-    buy_date: new Date().toISOString().split('T')[0],
+    buy_date: new Date().toISOString().split("T")[0],
   });
-  const [cryptoOrders, setCryptoOrders] = useState<{ value: string; label: string }[]>([]);
+  const [cryptoOrders, setCryptoOrders] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   useEffect(() => {
     const fetchFloorData = async () => {
@@ -53,9 +55,7 @@ function Forms() {
                 label: material.name,
               }))
             );
-          } else if (
-            response.status === 401
-          ) {
+          } else if (response.status === 401) {
             console.log("Token expired or invalid");
             localStorage.removeItem("accessToken");
           } else {
@@ -73,7 +73,9 @@ function Forms() {
     fetchFloorData();
   }, []);
 
-  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (
+    event
+  ) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const formDataToSend = new FormData();
@@ -82,7 +84,7 @@ function Forms() {
     formDataToSend.append("price", formData.price);
     formDataToSend.append("amount", formData.amount);
     formDataToSend.append("detail", formData.detail);
-    formDataToSend.append('buy_date', formData.buy_date);
+    formDataToSend.append("buy_date", formData.buy_date);
 
     try {
       if (token) {
@@ -159,13 +161,17 @@ function Forms() {
     }
   };
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
     <>
       <Head>
         <title></title>
       </Head>
       <Card>
-        <CardHeader title="Create Material" />
+        <CardHeader title="Add Material" />
         <Divider />
         <CardContent>
           <Grid container spacing={3} justifyContent="center">
@@ -213,27 +219,6 @@ function Forms() {
                 value={formData.detail}
                 onChange={(e) => handleChange(e, "detail")}
               />
-              {/* <TextField
-                    required
-                    fullWidth
-                    className="mb-4" 
-                    id="buy_date"
-                    label="buy_date"
-                    value={formData.buy_date}
-                    onChange={(e) => handleChange(e, "buy_date")}
-                  /> */}
-              {/* <input
-                    id="dropzone-file"
-                    type="file"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  {imageUrl && (
-                    <img src={imageUrl} alt="Uploaded Image" className="w-300 h-300 justify-center" />
-                  )}
-                  <Button variant="contained" component="label" htmlFor="dropzone-file" className="mt-2">
-                    Upload Image
-                  </Button> */}
             </Grid>
           </Grid>
           {/* Button Row */}
@@ -247,7 +232,7 @@ function Forms() {
                 // type="submit"
                 onClick={handleCreateUnit}
               >
-                Create
+                Create{""}
               </Button>
               <Button
                 variant="contained"
@@ -255,9 +240,9 @@ function Forms() {
                 disableRipple
                 color="error"
                 component="a"
-                onClick={() => router.push("/management/material")}
+                onClick={handleGoBack}
               >
-                Cancel
+                Cancel{""}
               </Button>
             </Grid>
           </form>

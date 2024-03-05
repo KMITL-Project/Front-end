@@ -78,13 +78,6 @@ function BulkActions({ Tracks }: BulkActionsProps) {
           <Typography variant="h5" color="text.secondary">
             Bulk actions:
           </Typography>
-          <ButtonError
-            sx={{ ml: 1 }}
-            startIcon={<DeleteTwoToneIcon />}
-            variant="contained"
-          >
-            Delete
-          </ButtonError>
         </Box>
         <IconButton
           color="primary"

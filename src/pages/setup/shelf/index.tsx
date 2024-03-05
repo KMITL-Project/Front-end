@@ -4,12 +4,12 @@ import SidebarLayout from '@/layout/SidebarLayout';
 import PageHeader from '@/content/setup/shelf/ShelfPageHeader';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
-import RecentOrdersTable from '@/content/setup/shelf/ShelfTable';
+import ShelfTable from '@/content/setup/shelf/ShelfTable';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
 
 function ApplicationsTransactions() {
-  const pageData: string = 'Home / Shelf'; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = 'Home / Shelf';
 
   return (
     <>
@@ -17,7 +17,6 @@ function ApplicationsTransactions() {
         <title></title>
       </Head>
       <PageTitleWrapper>
-        {/* เรียกใช้ Breadcrumb component และส่งค่า pageData */}
         <Breadcrumb pageData={pageData} />
         <PageHeader />
       </PageTitleWrapper>
@@ -30,7 +29,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <RecentOrdersTable />
+            <ShelfTable />
           </Grid>
         </Grid>
       </Container>

@@ -19,10 +19,12 @@ const { publicRuntimeConfig } = getConfig();
 function AddUnit() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "กิโลกรัม (kg)",
-    description: "หน่วยวัดน้ำหนัก",
+    name: "",
+    detail: "",
   });
-  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
+  const handleCreateUnit: React.MouseEventHandler<HTMLAnchorElement> = async (
+    event
+  ) => {
     event.preventDefault();
     const token = localStorage.getItem("accessToken");
     const requestData = {
@@ -33,7 +35,7 @@ function AddUnit() {
       },
       body: JSON.stringify({
         name: formData.name,
-        detail: formData.description,
+        detail: formData.detail,
       }),
     };
     try {
@@ -44,7 +46,7 @@ function AddUnit() {
         );
         if (response.ok) {
           console.log("Unit created successfully!");
-          router.push("/setup/unit/");
+          router.back();
         } else if (response.status === 401) {
           console.log("Token expired or invalid");
           localStorage.removeItem("accessToken");
@@ -61,6 +63,10 @@ function AddUnit() {
       ...formData,
       [event.target.id]: event.target.value,
     });
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
@@ -87,15 +93,14 @@ function AddUnit() {
                 required
                 fullWidth
                 className="mb-4"
-                id="description"
+                id="detail"
                 label="Detail"
-                defaultValue={formData.description}
+                defaultValue={formData.detail}
                 onChange={handleChange}
               />
             </Grid>
             <Grid container justifyContent="flex-end" className="mt-5">
               <Button
-                // type="submit"
                 variant="contained"
                 sx={{ margin: 1 }}
                 onClick={handleCreateUnit}
@@ -108,7 +113,7 @@ function AddUnit() {
                 variant="contained"
                 sx={{ margin: 1 }}
                 color="error"
-                onClick={() => router.push("/setup/unit/")}
+                onClick={handleGoBack}
                 disableRipple
                 component="a"
               >

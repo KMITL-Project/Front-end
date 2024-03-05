@@ -1,29 +1,10 @@
-import { useState, useRef } from 'react';
-
 import {
   Box,
-  Menu,
-  IconButton,
   Button,
-  ListItemText,
-  ListItem,
-  List,
   Typography
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
 
 function BulkActions() {
-  const [onMenuOpen, menuOpen] = useState<boolean>(false);
-  const moreRef = useRef<HTMLButtonElement | null>(null);
-
-  const openMenu = (): void => {
-    menuOpen(true);
-  };
-
-  const closeMenu = (): void => {
-    menuOpen(false);
-  };
-
 
   return (
     <>
@@ -33,14 +14,6 @@ function BulkActions() {
             Bulk actions:
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          component="a"
-          sx={{ margin: 1 }}
-          disableRipple
-        >
-          Delete
-        </Button>
       </Box>
     </>
   );

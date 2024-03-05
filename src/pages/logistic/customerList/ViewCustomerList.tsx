@@ -4,7 +4,7 @@ import PageHeader from "@/content/setup/shelf/ShelfPageHeader";
 import PageTitleWrapper from "@/components/PageTitleWrapper";
 import { Grid, Container, Typography } from "@mui/material";
 import { ReactElement } from "react";
-import Forms from "@/content/logistic/customerList/ViewCustomerList";
+// import Forms from "@/content/logistic/customerList/ViewCustomerList";
 import Breadcrumb from "@/components/Breadcrumbs";
 
 function ApplicationsTransactions() {
@@ -30,7 +30,7 @@ function ApplicationsTransactions() {
           spacing={3}
         >
           <Grid item xs={12}>
-            <Forms />
+            {/* <Forms /> */}
           </Grid>
         </Grid>
       </Container>

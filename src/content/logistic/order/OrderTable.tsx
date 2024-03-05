@@ -1,4 +1,4 @@
-import { FC, ChangeEvent, useState } from "react";
+import { FC, ChangeEvent, useState, useEffect } from "react";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
 import {
@@ -30,7 +30,6 @@ import Label from "@/components/Label";
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteTwoToneIcon from "@mui/icons-material/DeleteTwoTone";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
 import BulkActions from "./BulkActions";
 import Modal from "@mui/material/Modal";
@@ -39,6 +38,9 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import { SelectChangeEvent } from "@mui/material/Select";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -49,24 +51,61 @@ interface Filters {
   status?: OrderStatus;
 }
 
-const getStatusLabel = (listOrderStatus: OrderStatus): JSX.Element => {
-  const map = {
-    failed: {
-      text: "Failed",
+interface CryptoOrder {
+  id: string;
+  name: string;
+  detail: string;
+  unit_id: string;
+  floor_id: string;
+}
+
+interface GroupOrder {
+  orders: Order[];
+}
+
+const getStatusLabel = (orderStatus: string): JSX.Element => {
+  const map: Record<
+    string,
+    {
+      text: string;
+      color:
+        | "error"
+        | "success"
+        | "warning"
+        | "black"
+        | "primary"
+        | "secondary"
+        | "info";
+    }
+  > = {
+    pending: {
+      text: "pending",
       color: "error",
     },
-    completed: {
-      text: "Completed",
+    success: {
+      text: "success",
       color: "success",
     },
-    pending: {
-      text: "Pending",
+    in_progress: {
+      text: "in_progress",
       color: "warning",
     },
   };
 
-  const { text, color }: any = map[listOrderStatus];
-
+  const {
+    text,
+    color,
+  }: {
+    text: string;
+    color:
+      | "error"
+      | "success"
+      | "warning"
+      | "black"
+      | "primary"
+      | "secondary"
+      | "info";
+  } = map[orderStatus] || { text: "", color: "" };
   return <Label color={color}>{text}</Label>;
 };
 
@@ -98,6 +137,50 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const [fileName, setFileName] = useState<string>("");
   const [fileType, setFileType] = useState<string>("pdf");
   const [paginatedReports, setPaginatedReports] = useState<any[]>([]);
+  const [groupOrders, setGroupOrders] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+          const response = await fetch(
+            `${publicRuntimeConfig.BackEnd}order-group`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.ok) {
+            const responseData = await response.json();
+            if (
+              responseData &&
+              responseData.data &&
+              Array.isArray(responseData.data)
+            ) {
+              console.log("data", responseData.data);
+              setGroupOrders(responseData.data);
+            } else {
+              console.error("Invalid data format from API");
+            }
+          } else if (response.status === 401) {
+            // Token หมดอายุหรือไม่ถูกต้อง
+            console.log("Token expired or invalid");
+            // ทำการลบ token ที่หมดอายุจาก localStorage
+            localStorage.removeItem("accessToken");
+          } else {
+            console.error("Failed to fetch orders");
+          }
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleExportClick = () => {
     // ตรวจสอบว่ามีรายการที่ถูกเลือกหรือไม่
@@ -221,25 +304,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     status: undefined,
   });
 
-  const statusOptions = [
-    {
-      id: "all",
-      name: "All",
-    },
-    {
-      id: "completed",
-      name: "Completed",
-    },
-    {
-      id: "pending",
-      name: "Pending",
-    },
-    {
-      id: "failed",
-      name: "Failed",
-    },
-  ];
-
   const handleStatusChange = (
     e:
       | ChangeEvent<HTMLInputElement>
@@ -311,6 +375,43 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
 
+  const handleDeleteCustomerList = async (groupId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        const response = await fetch(
+          `${publicRuntimeConfig.BackEnd}order-group/${groupId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          // ดำเนินการหลังจากการลบ Unit สำเร็จ
+          console.log(`Unit with ID ${groupId} deleted successfully!`);
+
+          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
+          // router.replace(router.asPath);
+          router.reload();
+        } else if (response.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง
+          console.log("Token expired or invalid");
+          // ทำการลบ token ที่หมดอายุจาก localStorage
+          localStorage.removeItem("accessToken");
+        } else {
+          // ถ้าการลบ Unit ไม่สำเร็จ
+          console.error(`Failed to delete Unit with ID ${groupId}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <Card>
       {selectedBulkActions && (
@@ -329,7 +430,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
         <CardHeader
           action={
             <Box width={150}>
-              <FormControl fullWidth variant="outlined">
+              {/* <FormControl fullWidth variant="outlined">
                 <InputLabel>Status</InputLabel>
                 <Select
                   value={filters.status || "all"}
@@ -348,10 +449,10 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </FormControl> */}
             </Box>
           }
-          title="Customer Lists"
+          title="Order Lists"
         />
       )}
       <Divider />
@@ -367,37 +468,37 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Customer</TableCell>
-              <TableCell>Adress</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Distance</TableCell>
+              <TableCell align="center">Time</TableCell>
+              {/* <TableCell align="center">Date</TableCell> */}
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedCryptoOrders.map((cryptoOrder) => {
+            {groupOrders.map((orderGroup: any) => {
               const isCryptoOrderSelected = selectedCryptoOrders.includes(
-                cryptoOrder.id
+                orderGroup.id
               );
               return (
                 <TableRow
                   hover
-                  key={cryptoOrder.id}
+                  key={orderGroup.id}
                   selected={isCryptoOrderSelected}
                 >
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" align="center">
                     <Checkbox
                       color="primary"
                       checked={isCryptoOrderSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                        handleSelectOneCryptoOrder(event, cryptoOrder.id)
+                        handleSelectOneCryptoOrder(event, orderGroup.id)
                       }
                       value={isCryptoOrderSelected}
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -405,53 +506,41 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                       gutterBottom
                       noWrap
                     >
-                      {cryptoOrder.orderID}
+                      {orderGroup.id}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.orderName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.customerName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography
-                      variant="body1"
-                      fontWeight="bold"
-                      color="text.primary"
-                      gutterBottom
-                      noWrap
-                    >
-                      {cryptoOrder.customerAddress}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {format(cryptoOrder.orderDate, "MMMM dd yyyy")}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    {getStatusLabel(cryptoOrder.status)}
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View Order" arrow>
-                      {/* <NextLink href="/logistic/customerList/AddCustomerList" passHref> */}
+                    <Typography variant="body1" color="text.primary" noWrap>
+                      {orderGroup.orders
+                        .map((order: any) => order.name)
+                        .join(", ")}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="body1" color="text.primary" noWrap>
+                      {orderGroup.node.route_length > 0
+                        ? orderGroup.node.route_length > 1000
+                          ? (orderGroup.node.route_length / 1000).toFixed(2) +
+                            " km"
+                          : orderGroup.node.route_length + " m"
+                        : "0 km"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="body1" color="text.primary" noWrap>
+                      {orderGroup.node.route_time > 0
+                        ? orderGroup.node.route_time > 1000
+                          ? (orderGroup.node.route_time / 60).toFixed(2) +
+                            "min"
+                          : orderGroup.node.route_time + " m"
+                        : "0 min"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    {getStatusLabel(orderGroup.status)}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="View" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -460,16 +549,15 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                           color: theme.palette.info.main,
                         }}
                         onClick={() =>
-                          router.push("/logistic/customerList/ViewCustomerList")
+                          router.push(`/logistic/order/info/${orderGroup.id}`)
                         }
                         color="inherit"
                         size="small"
                       >
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
-                      {/* </NextLink> */}
                     </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -478,7 +566,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                           color: theme.palette.primary.main,
                         }}
                         onClick={() =>
-                          router.push("/logistic/customerList/EditCustomerList")
+                          router.push(`/logistic/order/edit/${orderGroup.id}`)
                         }
                         color="inherit"
                         size="small"
@@ -486,7 +574,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
+                    <Tooltip title="Delete" arrow>
                       <IconButton
                         sx={{
                           "&:hover": { background: theme.colors.error.lighter },
@@ -494,6 +582,9 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                         }}
                         color="inherit"
                         size="small"
+                        onClick={() =>
+                          handleDeleteCustomerList(orderGroup.id)
+                        }
                       >
                         <DeleteTwoToneIcon fontSize="small" />
                       </IconButton>

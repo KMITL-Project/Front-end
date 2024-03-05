@@ -1,16 +1,13 @@
 import Head from "next/head";
-import SidebarLayout from "@/layout/SidebarLayout";
-import { ReactElement, useState, FC, useEffect } from "react";
+import { useState, FC, useEffect } from "react";
 import {
   Container,
   Grid,
   Card,
   CardHeader,
   CardContent,
-  Typography,
   Divider,
   Button,
-  Box,
   TextField,
 } from "@mui/material";
 import { useRouter } from "next/router";
@@ -23,14 +20,9 @@ interface EditUnitProps {}
 const EditUnit: FC<EditUnitProps> = () => {
   const router = useRouter();
   const { unitId } = router.query;
-  // ตรวจสอบค่า id ที่ได้
-  // console.log('router:', router);
-  // console.log('ID:', unitId);
-
   const [unitData, setUnitData] = useState<any>({
     name: "",
     detail: "",
-    // และข้อมูลอื่น ๆ ที่คุณต้องการแสดงและแก้ไข
   });
 
   useEffect(() => {
@@ -57,9 +49,7 @@ const EditUnit: FC<EditUnitProps> = () => {
                 console.error("Invalid data format from API");
               }
             } else if (response.status === 401) {
-              // Token หมดอายุหรือไม่ถูกต้อง
               console.log("Token expired or invalid");
-              // ทำการลบ token ที่หมดอายุจาก localStorage
               localStorage.removeItem("accessToken");
             } else {
               console.error("Failed to fetch unit data");
@@ -70,14 +60,14 @@ const EditUnit: FC<EditUnitProps> = () => {
         }
       };
 
-      fetchData(); // เรียก fetchData เมื่อ Component ถูก Mount
+      fetchData();
     }
   }, [unitId]);
 
   const handleUpdateUnit = async () => {
     const token = localStorage.getItem("accessToken");
     const requestData = {
-      method: "PUT", // เปลี่ยนจาก 'POST' เป็น 'PUT'
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -85,7 +75,6 @@ const EditUnit: FC<EditUnitProps> = () => {
       body: JSON.stringify({
         name: unitData.name,
         detail: unitData.detail,
-        // และข้อมูลอื่น ๆ ที่คุณต้องการแก้ไข
       }),
     };
 
@@ -98,7 +87,7 @@ const EditUnit: FC<EditUnitProps> = () => {
         console.log("ok", response);
         if (response.ok) {
           console.log("Unit updated successfully!");
-          router.push("/setup/unit/");
+          router.back();
         } else if (response.status === 401) {
           console.log("Token expired or invalid");
           localStorage.removeItem("accessToken");
@@ -114,6 +103,10 @@ const EditUnit: FC<EditUnitProps> = () => {
   if (!unitId) {
     return <div>Loading...</div>;
   }
+
+  const handleGoBack = () => {
+    router.back();
+  };
 
   return (
     <>
@@ -173,7 +166,7 @@ const EditUnit: FC<EditUnitProps> = () => {
                       variant="contained"
                       sx={{ margin: 1 }}
                       color="error"
-                      onClick={() => router.push("/setup/unit/")}
+                      onClick={handleGoBack}
                       disableRipple
                       component="a"
                     >
@@ -190,5 +183,4 @@ const EditUnit: FC<EditUnitProps> = () => {
   );
 };
 
-// EditUnit.getLayout = (page : ReactElement) => <SidebarLayout>{page}</SidebarLayout>;
 export default EditUnit;

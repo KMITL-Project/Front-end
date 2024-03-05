@@ -3,7 +3,6 @@ import SidebarLayout from "@/layout/SidebarLayout";
 import PageHeader from "@/content/setup/permission/PremissionHeader";
 import PageTitleWrapper from "@/components/PageTitleWrapper";
 import { Grid, Container } from "@mui/material";
-
 import PermissionTable from "@/content/setup/permission/PermissionTable";
 import { ReactElement } from "react";
 import Breadcrumb from "@/components/Breadcrumbs";

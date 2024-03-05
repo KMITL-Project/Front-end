@@ -16,7 +16,7 @@ function PageHeader() {
             disableRipple
             component="a"
             onClick={() => router.push('/setup/materialtype/AddMaterial/')}>
-            + Create Material Type{" "}
+            + Create Material{" "}
           </Button>
       </Grid>
     </Grid>

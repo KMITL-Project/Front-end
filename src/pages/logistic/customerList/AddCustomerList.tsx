@@ -13,7 +13,7 @@ const Forms = dynamic(() => import("@/content/logistic/customerList/AddCustomerL
 })
 
 function ApplicationsTransactions() {
-  const pageData: string = "Home/Logistic/รายการลูกค้า/Add Order"; // ระบุเส้นทางของหน้าปัจจุบัน
+  const pageData: string = "Home/Logistic/Customer List/Add Order"; // ระบุเส้นทางของหน้าปัจจุบัน
 
   return (
     <>

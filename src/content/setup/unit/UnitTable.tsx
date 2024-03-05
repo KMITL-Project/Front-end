@@ -4,8 +4,6 @@ import {
   Tooltip,
   Divider,
   Box,
-  FormControl,
-  InputLabel,
   Card,
   Checkbox,
   IconButton,
@@ -16,8 +14,6 @@ import {
   TablePagination,
   TableRow,
   TableContainer,
-  Select,
-  MenuItem,
   Typography,
   useTheme,
   CardHeader,
@@ -31,11 +27,6 @@ import { useRouter } from "next/router";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
-
-// interface RecentOrdersTableProps {
-//   className?: string;
-//   cryptoOrders: CryptoOrder[];
-// }
 
 interface Filters {
   status?: any;
@@ -79,7 +70,6 @@ const RecentOrdersTable: FC = () => {
           const response = await fetch(`${publicRuntimeConfig.BackEnd}unit`, {
             method: "GET",
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           });
@@ -173,19 +163,12 @@ const RecentOrdersTable: FC = () => {
         );
 
         if (response.ok) {
-          // ดำเนินการหลังจากการลบ Unit สำเร็จ
           console.log(`Unit with ID ${cryptoOrderId} deleted successfully!`);
-
-          // ทำการรีเฟรชหน้าหลังจากการลบข้อมูล (เพื่อดึงข้อมูลใหม่)
-          // router.replace(router.asPath);
           router.reload();
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log("Token expired or invalid");
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการลบ Unit ไม่สำเร็จ
           console.error(`Failed to delete Unit with ID ${cryptoOrderId}`);
         }
       }
@@ -201,7 +184,7 @@ const RecentOrdersTable: FC = () => {
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && <CardHeader title="Unit lists" />}
+      {!selectedBulkActions && <CardHeader title="Unit Lists" />}
       <Divider />
       <TableContainer>
         <Table>
@@ -276,7 +259,7 @@ const RecentOrdersTable: FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View Unit" arrow>
+                    <Tooltip title="View" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -293,7 +276,7 @@ const RecentOrdersTable: FC = () => {
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Order" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -310,7 +293,7 @@ const RecentOrdersTable: FC = () => {
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Order" arrow>
+                    <Tooltip title="Delete" arrow>
                       <IconButton
                         sx={{
                           "&:hover": { background: theme.colors.error.lighter },

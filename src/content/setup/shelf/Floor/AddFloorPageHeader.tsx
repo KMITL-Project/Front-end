@@ -1,9 +1,6 @@
-import { Typography, Button, Grid } from "@mui/material";
-import { useRouter } from 'next/router';
+import { Typography, Grid } from "@mui/material";
 
 function PageHeader() {
-  const router = useRouter();
-
   return (
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>

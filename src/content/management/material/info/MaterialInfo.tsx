@@ -1,14 +1,11 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, FC, useState } from "react";
-import { materialOrder } from "@/model/management/material";
 import RecentOrdersTable from "@/content/management/material/info/MaterialInfoTable";
-import { MaterialInfo } from "@/model/management/materialInfo";
 import {
   Button,
   Card,
   CardContent,
-  Typography,
   Grid,
   Container,
   CardHeader,
@@ -38,8 +35,6 @@ interface SetupMaterialInfoTableProps {
   lotData: any[];
 }
 
-
-
 const MaterialInfoPage: FC = () => {
   const router = useRouter();
   const { materialId } = router.query;
@@ -51,7 +46,7 @@ const MaterialInfoPage: FC = () => {
     total: "",
     floor_id: "",
     image_url: "",
-    created_at: "",
+    update_at: "",
   });
   const [floorOptions, setFloorOptions] = useState<Option[]>([]); // State to store floor options
   const [unitOptions, setUnitOptions] = useState<Option[]>([]);
@@ -168,6 +163,10 @@ const MaterialInfoPage: FC = () => {
     return <div>Loading...</div>;
   }
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
     <>
       <Head>
@@ -203,16 +202,14 @@ const MaterialInfoPage: FC = () => {
                       />
                     </Grid>
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
-                      label="ID"
+                      label="Id"
                       variant="outlined"
                       value={materialData.id}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Name"
@@ -221,7 +218,6 @@ const MaterialInfoPage: FC = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Detial"
@@ -230,7 +226,6 @@ const MaterialInfoPage: FC = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Unit"
@@ -243,16 +238,14 @@ const MaterialInfoPage: FC = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
-                      label="total"
+                      label="Total"
                       variant="outlined"
                       value={materialData.total}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Floor"
@@ -265,15 +258,14 @@ const MaterialInfoPage: FC = () => {
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
-                      required
                       fullWidth
                       className="mb-5"
                       label="Date"
                       variant="outlined"
                       value={
-                        materialData.created_at
+                        materialData.update_at
                           ? format(
-                              new Date(materialData.created_at),
+                              new Date(materialData.update_at),
                               "yyyy-MM-dd"
                             )
                           : ""
@@ -294,9 +286,9 @@ const MaterialInfoPage: FC = () => {
                       sx={{ margin: 1 }}
                       disableRipple
                       component="a"
-                      onClick={() => router.push("/management/material")}
+                      onClick={handleGoBack}
                     >
-                      Back
+                      Back{""}
                     </Button>
                   </Grid>
                 </Grid>

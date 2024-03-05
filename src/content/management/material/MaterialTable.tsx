@@ -246,7 +246,7 @@ const RecentOrdersTable: FC = () => {
           <BulkActions />
         </Box>
       )}
-      {!selectedBulkActions && <CardHeader title="Material lists" />}
+      {!selectedBulkActions && <CardHeader title="Material Lists" />}
       <Divider />
       <TableContainer>
         <Table>
@@ -361,7 +361,7 @@ const RecentOrdersTable: FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="View Material" arrow>
+                    <Tooltip title="View" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -380,7 +380,7 @@ const RecentOrdersTable: FC = () => {
                         <VisibilityTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Material" arrow>
+                    <Tooltip title="Edit" arrow>
                       <IconButton
                         sx={{
                           "&:hover": {
@@ -399,7 +399,7 @@ const RecentOrdersTable: FC = () => {
                         <EditTwoToneIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete Material" arrow>
+                    <Tooltip title="Delete" arrow>
                       <IconButton
                         sx={{
                           "&:hover": { background: theme.colors.error.lighter },

@@ -54,6 +54,10 @@ interface CryptoOrder {
   unit_id: string;
   floor_id: string;
   material_id: string; // Add this property to CryptoOrder
+  type: string;  // Ensure 'type' is present with a default value
+  amount: string; 
+  update_by: string; 
+  created_at: string; 
 }
 
 const applyFilters = (orders: any[], filters: Filters) => {
@@ -225,7 +229,13 @@ const RecentOrdersTable: FC = () => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
+  const ordersToExport = selectedCryptoOrders.map((orderId) =>
+    cryptoOrders.find((order) => order.id === orderId)
+  );
+  const filteredCryptoOrders = applyFilters(
+    selectedCryptoOrders.length > 0 ? ordersToExport : cryptoOrders,
+    filters
+  );
   const paginatedCryptoOrders = applyPagination(
     filteredCryptoOrders,
     page,
@@ -255,69 +265,81 @@ const RecentOrdersTable: FC = () => {
   };
 
   const handleExportConfirm = async () => {
+    // Use the original cryptoOrders array for exporting
+    const ordersToExport = selectedCryptoOrders.map((orderId) =>
+      cryptoOrders.find((order) => order.id === orderId)
+    );
+
     if (fileType === "xlsx") {
-      // สร้าง Workbook
+      // Create Workbook and add rows
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("MaterialList");
-
-      // เพิ่มหัวข้อ
       worksheet.addRow([
         "No",
         "ID",
         "Material",
         "Detail",
         "Amount",
-        "Update by",
         "Date",
       ]);
 
-      // เพิ่มข้อมูล
-      const dataForExcel: any[][] = paginatedCryptoOrders.map(
-        (cryptoOrder, index) => [
-          index + 1, // เลขลำดับอัตโนมัติ
-          cryptoOrder.id,
-          materials[cryptoOrder.material_id]?.label || "N/A",
-          cryptoOrder.type,
-          cryptoOrder.amount,
-          users.full_name,
-          cryptoOrder.created_at
-            ? format(new Date(cryptoOrder.created_at), "yyyy-MM-dd")
-            : "",
-        ]
-      );
+      const dataForExcel = ordersToExport.map((cryptoOrder, index) => {
+        if (!cryptoOrder) {
+          return []; // Skip this entry if cryptoOrder is undefined
+        }
+      
+        const {
+          id = "",
+          material_id = "",
+          type = "", // Ensure 'type' is present with a default value
+          amount = "",
+          created_at,
+        } = cryptoOrder;
+      
+        return [
+          index + 1,
+          id,
+          materials[material_id]?.label || "N/A",
+          type,
+          amount,
+          created_at ? format(new Date(created_at), "yyyy-MM-dd") : "",
+        ];
+      });
+      
 
       worksheet.addRows(dataForExcel);
 
-      // บันทึกไฟล์ Excel
+      // Write Excel file
       workbook.xlsx.writeBuffer().then((buffer) => {
         const excelBlob = new Blob([buffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
         saveAs(excelBlob, `${fileName}.xlsx`);
-        setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
+        setShowExportModal(false);
       });
-    }
-    // ถ้าเลือก Export เป็น CSV
-    else if (fileType === "csv") {
-      // สร้างข้อมูลสำหรับ CSV
+    } else if (fileType === "csv") {
+      // Create CSV content
       const csvContent = [
-        "ID,Name,Description,Unit,Total,Floor",
-        ...paginatedCryptoOrders.map(
-          (cryptoOrder) =>
-            `${cryptoOrder.id},${cryptoOrder.name},${cryptoOrder.detail},${
-              unitData[cryptoOrder.unit_id]?.name || "N/A"
-            },${cryptoOrder.total},${
-              floorData[cryptoOrder.floor_id]?.name || "N/A"
-            }`
-        ),
-      ].join("\n");
+        "ID,Material,Detail,Amount,Update by,Date",
+        ...ordersToExport.map((cryptoOrder) => [
+          cryptoOrder?.id ?? "",
+          materials[cryptoOrder?.material_id ?? ""]?.label ?? "N/A",
+          cryptoOrder?.type ?? "",
+          cryptoOrder?.amount ?? "",
+          cryptoOrder?.created_at
+            ? format(new Date(cryptoOrder.created_at), "yyyy-MM-dd")
+            : "",
+        ].join(',')),
+      ].join('\n');
+      
+      
 
-      // บันทึกไฟล์ CSV
+      // Save CSV file
       const csvBlob = new Blob([csvContent], {
         type: "text/csv;charset=utf-8",
       });
       saveAs(csvBlob, `${fileName}.csv`);
-      setShowExportModal(false); // ปิด popup หลังจากดาวน์โหลด
+      setShowExportModal(false);
     }
 
     return null;

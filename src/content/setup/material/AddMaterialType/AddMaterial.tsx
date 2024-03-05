@@ -39,7 +39,7 @@ function AddMaterial() {
 
   const [floorOptions, setFloorOptions] = useState<
     { value: string; label: string }[]
-  >([]); // State to store floor options
+  >([]);
   const [unitOptions, setUnitOptions] = useState<
     { value: string; label: string }[]
   >([]);
@@ -134,21 +134,15 @@ function AddMaterial() {
         console.log("total:", formDataToSend.get("total"));
         console.log("unit_id:", formDataToSend.get("unit_id"));
         if (response.ok) {
-          // console.log('name:', formDataToSend.get('name'));
-          // console.log('detail:', formDataToSend.get('detail'));
           const responseData = await response.json();
           const uploadedImageUrl = responseData.imageUrl;
           setImageUrl(uploadedImageUrl);
-          // ดำเนินการหลังจากการสร้าง Unit สำเร็จ
           console.log("Unit created successfully!");
-          router.push("/setup/materialtype/");
+          router.back();
         } else if (response.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง
           console.log("Token expired or invalid");
-          // ทำการลบ token ที่หมดอายุจาก localStorage
           localStorage.removeItem("accessToken");
         } else {
-          // ถ้าการสร้าง Unit ไม่สำเร็จ
           console.error("Material creation failed");
         }
       }
@@ -182,15 +176,18 @@ function AddMaterial() {
     const selectedFile = event.target.files[0];
 
     if (selectedFile) {
-      // ทำการอ่านไฟล์รูปภาพ
       const reader = new FileReader();
       reader.onloadend = () => {
         setImageUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
 
-      setFile(selectedFile); // เซ็ตค่า file ใน state
+      setFile(selectedFile);
     }
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
@@ -286,10 +283,9 @@ function AddMaterial() {
                 sx={{ margin: 1 }}
                 disableRipple
                 component="a"
-                // type="submit"
                 onClick={handleCreateUnit}
               >
-                Create
+                Create{" "}
               </Button>
               <Button
                 variant="contained"
@@ -297,9 +293,9 @@ function AddMaterial() {
                 disableRipple
                 color="error"
                 component="a"
-                onClick={() => router.push("/setup/materialtype/")}
+                onClick={handleGoBack}
               >
-                Cancel
+                Cancel{" "}
               </Button>
             </Grid>
           </form>

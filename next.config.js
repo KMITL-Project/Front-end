@@ -5,6 +5,7 @@ const nextConfig = {
   publicRuntimeConfig: {
     DebugMode: process.env.DebugMode === "true" ? true : false,
     BackEnd: process.env.BackEnd,
+    Routing: process.env.Routing,
   },
   webpack(config) {
     config.module.rules.push({

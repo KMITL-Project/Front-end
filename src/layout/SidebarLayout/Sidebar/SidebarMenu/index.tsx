@@ -299,7 +299,8 @@ const SidebarMenu = () => {
           <SubMenuWrapper>
             <List component="div">
               {(userRole.some((value: any) => value.name === "Stock") ||
-                userRole.some((value: any) => value.name === "Admin")) && (
+                userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -317,7 +318,8 @@ const SidebarMenu = () => {
                 </>
               )}
               {(userRole.some((value: any) => value.name === "Stock") ||
-                userRole.some((value: any) => value.name === "Admin")) && (
+                userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -335,7 +337,8 @@ const SidebarMenu = () => {
                 </>
               )}
               {(userRole.some((value: any) => value.name === "Stock") ||
-                userRole.some((value: any) => value.name === "Admin")) && (
+                userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -347,7 +350,7 @@ const SidebarMenu = () => {
                       href="/management/pickup"
                       startIcon={<TableChartTwoToneIcon />}
                     >
-                      เบิกวัสดุ
+                      Requisition
                     </Button>
                   </ListItem>
                 </>
@@ -398,37 +401,49 @@ const SidebarMenu = () => {
                       href="/logistic/customerList"
                       startIcon={<ListAltTwoToneIcon />}
                     >
-                      รายการลูกค้า
+                      Customer Lists
                     </Button>
                   </ListItem>
                 </>
               )}
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/logistic/order"
-                  startIcon={<DescriptionTwoToneIcon />}
-                >
-                  ใบสั่ง
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={Link}
-                  onClick={() => {
-                    dispatch(sidebarIsClose);
-                  }}
-                  href="/logistic/tracking"
-                  startIcon={<ShareLocationTwoToneIcon />}
-                >
-                  ติดตามการขนส่ง
-                </Button>
-              </ListItem>
+              {(userRole.some((value: any) => value.name === "Delivery") ||
+                userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/logistic/order"
+                      startIcon={<DescriptionTwoToneIcon />}
+                    >
+                      Order
+                    </Button>
+                  </ListItem>
+                </>
+              )}
+              {(userRole.some((value: any) => value.name === "Delivery") ||
+                userRole.some((value: any) => value.name === "Admin") ||
+                userRole.some((value: any) => value.name === "Manager")) && (
+                <>
+                  <ListItem component="div">
+                    <Button
+                      disableRipple
+                      component={Link}
+                      onClick={() => {
+                        dispatch(sidebarIsClose);
+                      }}
+                      href="/logistic/tracking"
+                      startIcon={<ShareLocationTwoToneIcon />}
+                    >
+                      Tracking
+                    </Button>
+                  </ListItem>
+                </>
+              )}
             </List>
           </SubMenuWrapper>
         </List>
@@ -443,7 +458,8 @@ const SidebarMenu = () => {
           <SubMenuWrapper>
             <List component="div">
               {(userRole.some((value: any) => value.name === "Admin") ||
-                userRole.some((value: any) => value.name === "Manager")) && (
+                userRole.some((value: any) => value.name === "Manager") ||
+                userRole.some((value: any) => value.name === "Stock")) && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -461,7 +477,8 @@ const SidebarMenu = () => {
                 </>
               )}
               {(userRole.some((value: any) => value.name === "Admin") ||
-                userRole.some((value: any) => value.name === "Manager")) && (
+                userRole.some((value: any) => value.name === "Manager") ||
+                userRole.some((value: any) => value.name === "Stock")) && (
                 <>
                   <ListItem component="div">
                     <Button
@@ -479,7 +496,8 @@ const SidebarMenu = () => {
                 </>
               )}
               {(userRole.some((value: any) => value.name === "Admin") ||
-                userRole.some((value: any) => value.name === "Manager")) && (
+                userRole.some((value: any) => value.name === "Manager") ||
+                userRole.some((value: any) => value.name === "Stock")) && (
                 <>
                   <ListItem component="div">
                     <Button

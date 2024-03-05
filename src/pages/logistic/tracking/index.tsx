@@ -7,7 +7,6 @@ import { Grid, Container } from '@mui/material';
 import RecentOrders from '@/content/logistic/tracking/status/OrderView';
 import { ReactElement } from 'react';
 import Breadcrumb from '@/components/Breadcrumbs';
-import Footer from '@/components/Footer';
 
 function ApplicationsTransactions() {
   const pageData: string = 'Home/Tracking Status'; // ระบุเส้นทางของหน้าปัจจุบัน
@@ -35,7 +34,6 @@ function ApplicationsTransactions() {
           </Grid>
         </Grid>
       </Container>
-      <Footer />
 
     </>
   );

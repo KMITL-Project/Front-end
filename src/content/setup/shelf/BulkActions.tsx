@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef } from "react";
 
 import {
   Box,
@@ -8,23 +8,10 @@ import {
   ListItemText,
   ListItem,
   List,
-  Typography
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import MoreVertTwoToneIcon from '@mui/icons-material/MoreVertTwoTone';
-
-const ButtonError = styled(Button)(
-  ({ theme }) => `
-     background: ${theme.colors.error.main};
-     color: ${theme.palette.error.contrastText};
-
-     &:hover {
-        background: ${theme.colors.error.dark};
-     }
-    `
-);
+  Typography,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import MoreVertTwoToneIcon from "@mui/icons-material/MoreVertTwoTone";
 
 function BulkActions() {
   const [onMenuOpen, menuOpen] = useState<boolean>(false);
@@ -45,13 +32,6 @@ function BulkActions() {
           <Typography variant="h5" color="text.secondary">
             Bulk actions:
           </Typography>
-          <ButtonError
-            sx={{ ml: 1 }}
-            startIcon={<DeleteTwoToneIcon />}
-            variant="contained"
-          >
-            Delete
-          </ButtonError>
         </Box>
         <IconButton
           color="primary"
@@ -69,12 +49,12 @@ function BulkActions() {
         open={onMenuOpen}
         onClose={closeMenu}
         anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'center'
+          vertical: "center",
+          horizontal: "center",
         }}
         transformOrigin={{
-          vertical: 'center',
-          horizontal: 'center'
+          vertical: "center",
+          horizontal: "center",
         }}
       >
         <List sx={{ p: 1 }} component="nav">
