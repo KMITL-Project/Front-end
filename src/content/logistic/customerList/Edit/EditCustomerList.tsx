@@ -90,6 +90,7 @@ const EditCustomerList: FC<EditCustomerListProps> = () => {
               if (responseData && responseData.data) {
                 console.log(responseData.data);
                 setCustomerData(responseData.data);
+                setCurrentPosition([responseData.data.latitude, responseData.data.longitude]);
               } else {
                 console.error("Invalid data format from API");
               }
@@ -113,7 +114,6 @@ const EditCustomerList: FC<EditCustomerListProps> = () => {
 
   useEffect(() => {
     // Fetch current location using the browser's geolocation API
-    setCurrentPosition([13.7957701, 100.7068413]);
     setMarkerPosition([13.7957701, 100.7068413]);
   }, []);
 
