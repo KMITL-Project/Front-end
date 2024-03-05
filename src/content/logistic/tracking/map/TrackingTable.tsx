@@ -297,7 +297,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {routeCoords.map((latlng, index) => {
+          {routeCoords?.map((latlng, index) => {
             return (
               <React.Fragment key={index}>
                 <Polyline

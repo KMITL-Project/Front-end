@@ -129,7 +129,7 @@ const OrderEdit: FC<EditUnitProps> = () => {
     return <div>Loading...</div>;
   }
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (): Promise<void> => {
     try {
       const token = localStorage.getItem("accessToken");
       if (token) {
@@ -146,10 +146,15 @@ const OrderEdit: FC<EditUnitProps> = () => {
         });
 
         // Create a string with comma-separated values
-        const latitudeString = latitudeArray.join(",");
-        const longitudeString = longitudeArray.join(",");
+        const newLatitude = 13.7957701;
+        const newLongitude = 100.7068413;
+        const updatedLatitudeValues = [newLatitude,...latitudeArray];
+        const updatedLongitudeValues = [newLongitude,...longitudeArray];
+        const latitudeString = updatedLatitudeValues.join(",");
+        const longitudeString = updatedLongitudeValues.join(",");
         const orderGroupIdsString = orderGroupIds.join(",");
-
+        console.log(latitudeString);
+        console.log(longitudeString);
         const formDataToSend = new FormData();
         formDataToSend.append("latitude", latitudeString);
         formDataToSend.append("longitude", longitudeString);
@@ -360,7 +365,7 @@ const OrderEdit: FC<EditUnitProps> = () => {
                     component="a"
                     onClick={handleUpdate}
                   >
-                    Create{""}
+                    Update{""}
                   </Button>
                   <Button
                     variant="contained"
