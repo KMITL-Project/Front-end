@@ -91,6 +91,8 @@ const EditCustomerList: FC<EditCustomerListProps> = () => {
                 console.log(responseData.data);
                 setCustomerData(responseData.data);
                 setCurrentPosition([responseData.data.latitude, responseData.data.longitude]);
+                setMarkerPosition([responseData.data.latitude, responseData.data.longitude])
+                setTextFieldValue({...responseData.data})
               } else {
                 console.error("Invalid data format from API");
               }
@@ -112,18 +114,8 @@ const EditCustomerList: FC<EditCustomerListProps> = () => {
     }
   }, [customerId]);
 
-  useEffect(() => {
-    // Fetch current location using the browser's geolocation API
-    setMarkerPosition([13.7957701, 100.7068413]);
-  }, []);
 
-  useEffect(() => {
-    if (currentPosition) {
-      const latitude = currentPosition[0].toFixed(6);
-      const longitude = currentPosition[1].toFixed(6);
-      setTextFieldValue({ ...textFieldValue, latitude, longitude }); // Set address as an empty string initially
-    }
-  }, [currentPosition]);
+
 
   const handleUpdateCustomerList: React.MouseEventHandler<
     HTMLAnchorElement
