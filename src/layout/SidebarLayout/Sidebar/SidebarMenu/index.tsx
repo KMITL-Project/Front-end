@@ -262,7 +262,7 @@ const SidebarMenu = () => {
   return (
     <>
       <MenuWrapper>
-        <List
+        {/* <List
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
@@ -287,7 +287,7 @@ const SidebarMenu = () => {
               </ListItem>
             </List>
           </SubMenuWrapper>
-        </List>
+        </List> */}
         <List
           component="div"
           subheader={
