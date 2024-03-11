@@ -1,29 +1,27 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Technologies Used
+
+- [Nextjs](https://nextjs.org/) - Next.js is a flexible React framework that gives you building blocks to create fast, full-stack web applications.
+- [Typescript](https://www.typescriptlang.org/) - TypeScript extends JavaScript by adding types to the language
+- [Node.js](https://nodejs.org/en/) - Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
+- [Yarn](https://yarnpkg.com/) - Yarn is a package manager that doubles down as project manager.
 
 ## Getting Started
 
 Install package:
 
 ```bash
-npm install
-#don't use yarn
+yarn install
 ```
 
 First, run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
 
 ## Build step
-
-```bash
-npm run build & nmp run start
-```
-
-## Build
 
 #### build image
 
